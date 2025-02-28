@@ -11,7 +11,7 @@ public abstract class PluginBase<T> : IPlugin where T : IPluginParamSet
 {
     protected ILogger<IPlugin> Logger;
     protected IPluginMessageBroker MessageBroker;
-    protected ICacheService Cache;
+    protected IReadOnlyCacheService Cache;
 
     protected TickerDto TickerDto;
     protected int ExecutionId;
@@ -21,7 +21,7 @@ public abstract class PluginBase<T> : IPlugin where T : IPluginParamSet
     protected string? _tradingParams;
     protected T Params;
 
-    public PluginBase(ILogger<IPlugin> logger, IPluginMessageBroker messageBroker, ICacheService cache)
+    public PluginBase(ILogger<IPlugin> logger, IPluginMessageBroker messageBroker, IReadOnlyCacheService cache)
     {
         Cache = cache;
         Logger = logger;
@@ -33,10 +33,8 @@ public abstract class PluginBase<T> : IPlugin where T : IPluginParamSet
     protected abstract T ParseParams(string? json);
 
     public abstract IPlugin.PluginInfo GetPluginInfo();
-    
-    public abstract IPluginParamSet GetDefaultParamSet();
 
-    public abstract IPlugin NewInstance();
+    public abstract IPluginParamSet GetDefaultParamSet();
 
     private void SetPluginParameters(string priceCacheKey, string tickerCacheKey, int pluginId)
     {
@@ -106,13 +104,5 @@ public abstract class PluginBase<T> : IPlugin where T : IPluginParamSet
         _tradingParams = tradingParams;
     }
 
-    public virtual IPlugin Duplicate()
-    {
-        var instance = NewInstance();
-        instance.UseLogger(Logger);
-        instance.UseMessageBroker(MessageBroker);
-        // instance.UseTicker(_tickerDto);
-        // instance.UseParamSet(ParamsJson);
-        return instance;
-    }
+    public abstract Type GetPluginType();
 }

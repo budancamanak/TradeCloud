@@ -3,4 +3,5 @@
 public interface IPluginParamSet
 {
     string GetStringRepresentation();
+    string ToJson();
 }
