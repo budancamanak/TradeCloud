@@ -1,0 +1,11 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Common.Grpc";
+
+package customTypes;
+
+// Example: 12345.6789 -> { units = 12345, nanos = 678900000 }
+message DecimalValue {
+  int64 units = 1;
+  sfixed32 nanos = 2;
+}

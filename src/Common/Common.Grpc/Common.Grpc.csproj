@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Common.Protos\Common.Protos.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Protobuf Include="../Common.Protos/Protos/market.proto" GrpcServices="Both">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Protobuf>
+        <Protobuf Include="../Common.Protos/Protos/worker.proto" GrpcServices="Both">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Protobuf>
+        <Protobuf Include="../Common.Protos/Protos/customTypes.proto" GrpcServices="Both">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Protobuf>
+<!--        <Protobuf Include="../Protos/auth.proto" GrpcServices="Both"/>-->
+<!--        <Protobuf Include="../Protos/worker.proto" GrpcServices="Both"/>-->
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Grpc.Net.Client" Version="2.55.0"/>
+        <PackageReference Include="Grpc.AspNetCore" Version="2.55.0"/>
+        <PackageReference Include="Google.Protobuf" Version="3.29.3" />
+        <PackageReference Include="Grpc.Tools" Version="2.69.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+</Project>
