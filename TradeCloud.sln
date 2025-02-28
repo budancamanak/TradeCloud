@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2AFD578A-F041-4FA4-847E-1F849657B795}"
-	ProjectSection(SolutionItems) = preProject
-		src\Readme.md = src\Readme.md
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{45E77558-7A25-47B6-B90B-1C9FA1D6C1C5}"
 EndProject
