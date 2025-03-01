@@ -25,7 +25,6 @@ public class ExchangeRepositoryTests() :
     [Order(0)]
     public async Task ListExchanges_GetById()
     {
-        this.Logger.LogWarning("ListExchanges_GetById>>>");
         // Arrange
         var exc = 1;
 

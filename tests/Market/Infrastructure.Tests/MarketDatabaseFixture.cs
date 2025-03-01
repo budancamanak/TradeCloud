@@ -24,14 +24,8 @@ public class MarketDatabaseFixture : DatabaseFixture<MarketDbContext>
     {
         if (!DbContext.Exchanges.Any())
         {
-            Console.WriteLine("Seeding database");
             DbContext.Exchanges.AddRange(MarketServiceTestData.Instance.Exchanges);
             DbContext.SaveChanges();
-            var prices = DbContext.Prices.ToList();
-            foreach (var price in prices)
-            {
-                Console.WriteLine($"price:>{price}");
-            }
         }
     }
 }
