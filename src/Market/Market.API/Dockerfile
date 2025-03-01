@@ -13,6 +13,8 @@ COPY *.sln .
 COPY ["src/Market/Market.API/Market.API.csproj", "./src/Market/Market.API/"]
 COPY ["src/Common/Common.Core/Common.Core.csproj", "./src/Common/Common.Core/"]
 COPY ["src/Common/Common.Messaging/Common.Messaging.csproj", "./src/Common/Common.Messaging/"]
+COPY ["src/Common/Common.Plugin/Common.Plugin.csproj", "./src/Common/Common.Plugin/"]
+COPY ["src/Common/Common.Protos/Common.Protos.csproj", "./src/Common/Common.Protos/"]
 COPY ["src/Common/Common.Web/Common.Web.csproj", "./src/Common/Common.Web/"]
 COPY ["src/Common/Common.Application/Common.Application.csproj", "./src/Common/Common.Application/"]
 COPY ["src/Common/Common.Grpc/Common.Grpc.csproj", "./src/Common/Common.Grpc/"]
