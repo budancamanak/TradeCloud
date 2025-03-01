@@ -12,7 +12,7 @@ namespace Worker.Plugins.MovingAverage;
 public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParamSet>
 {
     public GoldenDeathCrossPlugin(ILogger<IPlugin> logger, IPluginMessageBroker messageBroker,
-        ICacheService cache) : base(logger, messageBroker, cache)
+        IReadOnlyCacheService cache) : base(logger, messageBroker, cache)
     {
     }
 
@@ -47,19 +47,12 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParamSet>
         };
     }
 
-    public override IPlugin NewInstance()
+    public override Type GetPluginType()
     {
-        return new GoldenDeathCrossPlugin(this.Logger, this.MessageBroker, this.Cache);
+        return typeof(GoldenDeathCrossPlugin);
     }
 
-    // todo add project to git(especially github)
-    // todo make use of jenkins -> to fetch & run tests.
-    // todo write worker.tests
-    // todo write integration tests(api tests)
-    // todo make use of param set !!!!!
-    // todo get rid of newInstance & duplicate methods. use reflection. add getType method to plugin and use that type.
-    // todo dont use cache service. register & use readonlycacheservice
-    // todo IPluginParamSet should have ToJson and FromJson methods -> 
+    // todo deploy market service.
     // todo think of param set range -> purpose of this project
     // todo create plugin for each param set range? -> must have parent/child plugin architecture
     // todo execute plugin for each param set range? -> must update progress & signal workflows.
@@ -70,7 +63,9 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParamSet>
     // todo develop trading micro service for above. trading micro service can have MockBroker
     // todo MockBroker will simulate trading operations & pnl analysis. might need to fetch all prices between signals.
     // todo think & implement continuous price fetch -> for pnl analysis & continuous plugin run 
-    // todo deploy market service.
+    // todo make use of jenkins -> to fetch & run tests.
+    // todo write worker.tests
+    // todo write integration tests(api tests)
 
     protected override void Execute()
     {

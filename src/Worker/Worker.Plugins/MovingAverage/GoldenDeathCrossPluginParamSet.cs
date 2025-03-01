@@ -1,4 +1,5 @@
 ﻿using Common.Plugin.Abstraction;
+using Newtonsoft.Json;
 
 namespace Worker.Plugins.MovingAverage;
 
@@ -20,5 +21,10 @@ public class GoldenDeathCrossPluginParamSet : IPluginParamSet
     public string GetStringRepresentation()
     {
         return $"FastMovingAvg:{FastMovingAvg}, SlowMovingAvg:{SlowMovingAvg}";
+    }
+
+    public string ToJson()
+    {
+        return JsonConvert.SerializeObject(this);
     }
 }

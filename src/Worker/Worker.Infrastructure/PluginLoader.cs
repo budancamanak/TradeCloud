@@ -58,13 +58,15 @@ public class PluginLoader : IPluginLoader
         {
             if (!type.GetInterfaces().Any(inf => inf.Name.Equals(nameof(IPlugin)))) continue;
             if (type.IsAbstract) continue;
-            var result =
-                Activator.CreateInstance(type, args: [pluginLogger, _messageBroker, cache]) as IPlugin;
-            if (result == null)
-            {
-                continue;
-            }
+            // var result =
+            //     Activator.CreateInstance(type, args: [pluginLogger, _messageBroker, cache]) as IPlugin;
+            // if (result == null)
+            // {
+            //     continue;
+            // }
 
+            var result = CreatePlugin(type);
+            if (result == null) continue;
             // result.UseLogger(_logger);
             result.UseMessageBroker(_messageBroker);
             count++;
@@ -75,13 +77,32 @@ public class PluginLoader : IPluginLoader
         _logger.LogInformation("Loading {} plugins from: {}", count, pluginPath);
     }
 
+    private IPlugin? CreatePlugin(Type type)
+    {
+        using var scope = scopeFactory.CreateScope();
+        var pluginLogger = scope.ServiceProvider.GetRequiredService<ILogger<IPlugin>>();
+        var result =
+            Activator.CreateInstance(type, args: [pluginLogger, _messageBroker, cache]) as IPlugin;
+        if (result == null)
+        {
+            return null;
+        }
+
+        // result.UseLogger(_logger);
+        result.UseMessageBroker(_messageBroker);
+        return result;
+    }
+
     public IPlugin CreatePlugin(string identifier)
     {
         var pluginTemplate = _plugins.FirstOrDefault(f => f.GetPluginInfo().Identifier == identifier);
         if (pluginTemplate == null) throw new Exception($"Failed to find plugin with {identifier}");
-        var plugin = pluginTemplate.Duplicate();
-        // plugin.UseLogger(_logger);
-        plugin.UseMessageBroker(_messageBroker);
+        // var plugin = pluginTemplate.Duplicate();
+        // // plugin.UseLogger(_logger);
+        // plugin.UseMessageBroker(_messageBroker);
+        // return plugin;
+        var plugin = CreatePlugin(pluginTemplate.GetPluginType());
+        if (plugin == null) throw new Exception($"Failed to find plugin with {identifier}");
         return plugin;
     }
 }

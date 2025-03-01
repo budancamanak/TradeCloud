@@ -70,6 +70,7 @@ public static class DependencyInjection
         var multiplexer = ConnectionMultiplexer.Connect(configurationManager.GetConnectionString("Redis"));
         serviceCollection.AddSingleton<IConnectionMultiplexer>(multiplexer);
         serviceCollection.AddTransient<ICacheService, RedisCacheService>();
+        serviceCollection.AddTransient<IReadOnlyCacheService, RedisCacheService>();
         // serviceCollection.AddScoped<IPluginHost, PluginHost>();
         serviceCollection.AddSingleton<IPluginHost, PluginHost>();
         serviceCollection.AddKeyedScoped<ICacheBuilder, WorkerCacheBuilder>("worker");
