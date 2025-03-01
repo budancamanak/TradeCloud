@@ -52,7 +52,6 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParamSet>
         return typeof(GoldenDeathCrossPlugin);
     }
 
-    // todo deploy market service.
     // todo think of param set range -> purpose of this project
     // todo create plugin for each param set range? -> must have parent/child plugin architecture
     // todo execute plugin for each param set range? -> must update progress & signal workflows.
