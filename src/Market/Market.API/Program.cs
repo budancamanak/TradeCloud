@@ -4,6 +4,7 @@ using Common.Messaging.Events.PriceFetchEvents;
 using Common.RabbitMQ;
 using Hangfire;
 using Market.API;
+using Market.API.Models;
 using Market.Application;
 using Market.Infrastructure;
 using Market.Infrastructure.Data;
@@ -106,8 +107,11 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 app.UseExceptionHandler();
-
-app.MapHangfireDashboard("/fetch_ops", new DashboardOptions { DashboardTitle = "Price Fetch Jobs" });
+app.UseHangfireDashboard("/fetch_ops", new DashboardOptions
+{
+    DashboardTitle = "Price Fetch Jobs",
+    Authorization = new[] { new HangFireAuthorizationFilter() }
+});
 app.MapControllers();
 app.AddGrpcControllers();
 
