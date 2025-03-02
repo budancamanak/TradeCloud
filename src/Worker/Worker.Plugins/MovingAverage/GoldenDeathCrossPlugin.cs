@@ -1,5 +1,4 @@
 ﻿using Common.Application.Repositories;
-using Common.Core.DTOs;
 using Common.Plugin.Abstraction;
 using Common.Plugin.Signals;
 using Microsoft.Extensions.Logging;
@@ -52,6 +51,7 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParamSet>
         return typeof(GoldenDeathCrossPlugin);
     }
 
+    // todo enable elk stack.
     // todo think of param set range -> purpose of this project
     // todo create plugin for each param set range? -> must have parent/child plugin architecture
     // todo execute plugin for each param set range? -> must update progress & signal workflows.
@@ -63,6 +63,7 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParamSet>
     // todo MockBroker will simulate trading operations & pnl analysis. might need to fetch all prices between signals.
     // todo think & implement continuous price fetch -> for pnl analysis & continuous plugin run 
     // todo make use of jenkins -> to fetch & run tests.
+    // todo allow users to upload their codes. use sandboxing & compiling
     // todo write worker.tests
     // todo write integration tests(api tests)
 
