@@ -12,7 +12,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         CancellationToken cancellationToken)
     {
         var problemDetails = new ProblemDetails();
-        problemDetails.Instance = httpContext.Request.Path;
+        problemDetails.Instance = httpContext.Request.Path.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
 
         if (exception is FluentValidation.ValidationException fluentException)
         {
