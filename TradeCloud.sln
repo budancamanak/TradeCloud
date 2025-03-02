@@ -59,6 +59,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
 		Readme.md = Readme.md
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+		.github\workflows\docker-image.yml = .github\workflows\docker-image.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Worker.API", "src\Worker\Worker.API\Worker.API.csproj", "{D055B6FE-D749-47CA-AA07-7EFB26281EE7}"
