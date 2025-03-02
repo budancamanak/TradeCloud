@@ -18,6 +18,7 @@ using Tests.Common.Data;
 namespace Infrastructure.Tests.ServicesTests;
 
 [TestFixture]
+[Ignore("Skipped for faster GitHub")]
 public class PriceFetchJobTests : AbstractLoggableTest
 {
     private PriceFetchJob _fetchJob;

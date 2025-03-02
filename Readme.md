@@ -15,6 +15,8 @@ Currently, websocket signals & email notifications are considered.
 - `Trading`: So that users might bind their exchange APIs to automate position openings and closing based on generated signals.
 - `Market`: Project will fetch necessary prices before running the analysis.
 
+
+
 | Tech            | Reason                                                              |
 |:----------------|:--------------------------------------------------------------------|
 | `GRPC`          | Will be used for inter-service request-response style communication |

@@ -121,7 +121,6 @@ public class TickerRepositoryTests() :
     [Order(1)]
     public async Task AddTicker_SaveToDatabase()
     {
-        this.Logger.LogWarning("AddTicker_SaveToDatabase>>>");
         // Arrange
         var ticker = new Ticker { Symbol = "AAPL", ExchangeId = 1, Name = "Apple", DecimalPoint = 1 };
 
