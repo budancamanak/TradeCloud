@@ -39,11 +39,7 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParamSet>
 
     public override GoldenDeathCrossPluginParamSet GetDefaultParamSet()
     {
-        return new GoldenDeathCrossPluginParamSet
-        {
-            FastMovingAvg = 50,
-            SlowMovingAvg = 200
-        };
+        return new GoldenDeathCrossPluginParamSet(50, 200);
     }
 
     public override Type GetPluginType()
@@ -73,9 +69,8 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParamSet>
             Params.GetStringRepresentation());
         Thread.Sleep(5000);
         var quotes = PriceInfo.ToQuotes();
-
-        var slow = quotes.GetSma(Params.SlowMovingAvg).ToList();
-        var fast = quotes.GetSma(Params.FastMovingAvg).ToList();
+        var slow = quotes.GetSma(!Params.SlowMovingAverage).ToList();
+        var fast = quotes.GetSma(!Params.FastMovingAverage).ToList();
         var isLastLong = 0;
         for (var i = 0; i < PriceInfo.Count; i++)
         {
