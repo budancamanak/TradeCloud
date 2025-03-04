@@ -1,22 +1,19 @@
-﻿using Common.Core.Enums;
-using Common.Core.Extensions;
-using Common.Application.Services;
+﻿using Common.Application.Services;
 using Common.Core.DTOs;
+using Common.Core.Enums;
+using Common.Core.Extensions;
 using MediatR;
 
 namespace Market.Application.Features.GetPricesForPlugin.Request;
 
 public class GetPricesForPluginQuery : IRequest<IList<PriceDto>>
 {
-    private int _tickerId;
-
-    // todo change pluginId to plugin identifier?
-    // todo nope. same identifier plugin can run at the same time.
-    // todo below pluginId is id of plugin execution
-    private int _pluginId;
-    private string _timeframe;
-    private DateTime _startDate;
     private DateTime _endDate;
+
+    private int _pluginId;
+    private DateTime _startDate;
+    private int _tickerId;
+    private string _timeframe;
 
     public GetPricesForPluginQuery()
     {
