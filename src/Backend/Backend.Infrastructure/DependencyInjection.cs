@@ -13,10 +13,10 @@ using Common.Messaging.Events;
 using Common.Messaging.Events.PluginExecution;
 using Common.RabbitMQ;
 using FluentValidation;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
-using MassTransit;
 
 namespace Backend.Infrastructure;
 
@@ -58,6 +58,7 @@ public static class DependencyInjection
         );
         services.AddScoped<ITrackListRepository, TrackListRepository>();
         services.AddScoped<IPluginExecutionRepository, PluginExecutionRepository>();
+        services.AddScoped<IAnalysisExecutionRepository, AnalysisExecutionRepository>();
         services.AddScoped<IPluginOutputRepository, PluginOutputRepository>();
 
         services.AddScoped<IValidator<PluginExecution>, PluginExecutionsValidator>();

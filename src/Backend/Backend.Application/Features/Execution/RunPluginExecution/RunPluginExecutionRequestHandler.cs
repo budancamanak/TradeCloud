@@ -8,7 +8,6 @@ using Common.Core.Enums;
 using Common.Core.Models;
 using Common.Messaging.Abstraction;
 using Common.Messaging.Events.PluginExecution;
-using Common.Plugin.Abstraction;
 using Common.Plugin.Models;
 using Common.Web.Exceptions;
 using FluentValidation;
@@ -22,7 +21,7 @@ public class RunPluginExecutionRequestHandler(
     IEventBus messageBroker,
     ICacheService cache,
     IMapper mapper,
-    IPluginExecutionRepository pluginRepository)
+    IAnalysisExecutionRepository pluginRepository)
     : IRequestHandler<RunPluginExecutionRequest, MethodResponse>
 {
     public async Task<MethodResponse> Handle(RunPluginExecutionRequest request, CancellationToken cancellationToken)
@@ -45,7 +44,7 @@ public class RunPluginExecutionRequestHandler(
             TimeSpan.MaxValue);
         var @event = mapper.Map<RunPluginRequestedEvent>(plugin);
         await messageBroker.PublishAsync(@event);
-        mr = await pluginRepository.SetPluginStatus(plugin.Id, PluginStatus.RunRequested);
+        // mr = await pluginRepository.SetPluginStatus(plugin.Id, PluginStatus.RunRequested);
         return mr;
     }
 }
