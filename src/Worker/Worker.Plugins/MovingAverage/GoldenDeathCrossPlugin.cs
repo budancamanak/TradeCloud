@@ -1,5 +1,4 @@
 ﻿using Common.Application.Repositories;
-using Common.Core.DTOs;
 using Common.Plugin.Abstraction;
 using Common.Plugin.Signals;
 using Microsoft.Extensions.Logging;
@@ -40,11 +39,7 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParamSet>
 
     public override GoldenDeathCrossPluginParamSet GetDefaultParamSet()
     {
-        return new GoldenDeathCrossPluginParamSet
-        {
-            FastMovingAvg = 50,
-            SlowMovingAvg = 200
-        };
+        return new GoldenDeathCrossPluginParamSet(50, 200);
     }
 
     public override Type GetPluginType()
@@ -52,6 +47,7 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParamSet>
         return typeof(GoldenDeathCrossPlugin);
     }
 
+    // todo enable elk stack.
     // todo think of param set range -> purpose of this project
     // todo create plugin for each param set range? -> must have parent/child plugin architecture
     // todo execute plugin for each param set range? -> must update progress & signal workflows.
@@ -63,6 +59,7 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParamSet>
     // todo MockBroker will simulate trading operations & pnl analysis. might need to fetch all prices between signals.
     // todo think & implement continuous price fetch -> for pnl analysis & continuous plugin run 
     // todo make use of jenkins -> to fetch & run tests.
+    // todo allow users to upload their codes. use sandboxing & compiling
     // todo write worker.tests
     // todo write integration tests(api tests)
 
@@ -72,9 +69,8 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParamSet>
             Params.GetStringRepresentation());
         Thread.Sleep(5000);
         var quotes = PriceInfo.ToQuotes();
-
-        var slow = quotes.GetSma(Params.SlowMovingAvg).ToList();
-        var fast = quotes.GetSma(Params.FastMovingAvg).ToList();
+        var slow = quotes.GetSma(!Params.SlowMovingAverage).ToList();
+        var fast = quotes.GetSma(!Params.FastMovingAverage).ToList();
         var isLastLong = 0;
         for (var i = 0; i < PriceInfo.Count; i++)
         {
