@@ -4,7 +4,18 @@ using Common.Core.Extensions;
 
 namespace Common.Plugin.Models;
 
-public class ListParameter<T>
+public abstract class BaseParameter
+{
+    public abstract List<object> GetItems();
+    public abstract int GetDefaultIndex();
+    public abstract string GetName();
+    public abstract double GetMin();
+    public abstract double GetMax();
+    public abstract double GetValue();
+    public abstract double GetIncrement();
+}
+
+public class ListParameter<T> : BaseParameter
 {
     public ListParameter(string name, int defaultIndex, params T[] items)
     {
@@ -37,9 +48,44 @@ public class ListParameter<T>
     {
         return new ListParameter<string>(name, defaultIndex, args);
     }
+
+    public override List<object> GetItems()
+    {
+        return Items as List<object>;
+    }
+
+    public override int GetDefaultIndex()
+    {
+        return DefaultIndex;
+    }
+
+    public override string GetName()
+    {
+        return Name;
+    }
+
+    public override double GetMin()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override double GetMax()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override double GetValue()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override double GetIncrement()
+    {
+        throw new NotImplementedException();
+    }
 }
 
-public class NumericParameter<T> where T : ISignedNumber<T>, IComparisonOperators<T, T, bool>
+public class NumericParameter<T> : BaseParameter where T : ISignedNumber<T>, IComparisonOperators<T, T, bool>
 {
     public NumericParameter(string name, T value, T min, T max, T increment)
     {
@@ -96,5 +142,40 @@ public class NumericParameter<T> where T : ISignedNumber<T>, IComparisonOperator
     public override string ToString()
     {
         return $"{Name}:{Value}";
+    }
+
+    public override List<object> GetItems()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override int GetDefaultIndex()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override string GetName()
+    {
+        return Name;
+    }
+
+    public override double GetMin()
+    {
+        return (double)Min;
+    }
+
+    public override double GetMax()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override double GetValue()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override double GetIncrement()
+    {
+        throw new NotImplementedException();
     }
 }

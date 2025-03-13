@@ -1,16 +1,7 @@
-﻿using System.Numerics;
+﻿namespace Common.Plugin.Abstraction;
 
-namespace Common.Plugin.Abstraction;
-
-public interface IPluginParameter<T> where T : ISignedNumber<T>, IComparisonOperators<T, T, bool>
+public interface IPluginParameter
 {
-    T GetParameterValue();
-    string GetParameterName();
-    T GetMinValue();
-    T GetMaxValue();
-    T GetIncrement();
-
-    IEnumerator<T> GetEnumerator();
-    string ToJson();
-    void FromJson(string json);
+    bool IsListParameter();
+    Type ParameterType();
 }

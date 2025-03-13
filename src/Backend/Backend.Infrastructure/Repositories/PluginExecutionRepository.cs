@@ -93,6 +93,13 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
         return items;
     }
 
+    public async Task<List<PluginExecution>> GetPluginOfAnalysis(int analysisId)
+    {
+        Guard.Against.NegativeOrZero(analysisId);
+        var items = await dbContext.PluginExecutions.Where(f => f.AnalysisExecutionId == analysisId).ToListAsync();
+        return items;
+    }
+
     // public async Task<List<PluginExecution>> GetPluginExecutionsForTicker(int tickerId)
     // {
     //     var items = await dbContext.PluginExecutions

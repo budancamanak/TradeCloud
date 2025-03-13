@@ -32,6 +32,6 @@ public class PluginExecution
     public override string ToString()
     {
         // return $"[{Id}] TickerId:{TickerId} {Timeframe} [{Status}] [{PluginIdentifier}]";
-        return $"[{Id}] AnalysisExecutionId:{AnalysisExecutionId}, Status:{Status}";
+        return $"[{Id}] AnalysisExecutionId:{AnalysisExecutionId}, Status:{Status}, Params:{ParamSet}";
     }
 }
