@@ -8,7 +8,7 @@ namespace Backend.Application.Mappers;
 
 public class PluginExecutionMappingProfile : Profile
 {
-    public PluginExecutionMappingProfile(ITickerService tickerService, IPluginService pluginService)
+    public PluginExecutionMappingProfile( )
     {
         // todo update context.Items to use pluginService & tickerService below !! 
         // todo will be hard to supply context.Items when converting list items.
@@ -30,10 +30,10 @@ public class PluginExecutionMappingProfile : Profile
         //             tickerService.GetTickerWithSymbol(src.Symbol).GetAwaiter().GetResult().Id))
         //     .ForMember(f => f.Status, opt => opt.MapFrom((src, dst, _, _) => src.Status.ToPluginStatus()));
 
-        CreateMap<PluginExecution, PluginExecutionsDto>()
-            .ForMember(f => f.Status, opt => opt.MapFrom((src, _, _, _) => src.Status.GetStringRepresentation()));
-
-        CreateMap<PluginExecutionsDto, PluginExecution>()
-            .ForMember(f => f.Status, opt => opt.MapFrom((src, dst, _, _) => src.Status.ToPluginStatus()));
+        // CreateMap<PluginExecution, PluginExecutionsDto>()
+        //     .ForMember(f => f.Status, opt => opt.MapFrom((src, _, _, _) => src.Status.GetStringRepresentation()));
+        //
+        // CreateMap<PluginExecutionsDto, PluginExecution>()
+        //     .ForMember(f => f.Status, opt => opt.MapFrom((src, dst, _, _) => src.Status.ToPluginStatus()));
     }
 }

@@ -67,14 +67,8 @@ public static class DependencyInjection
 
         services.AddScoped<IPluginService, PluginService>();
         services.AddScoped<ITickerService, TickerService>();
+        services.AddScoped<IPluginExecutionEngine, PluginExecutionEngine>();
 
-        services.AddScoped(provider => new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile(new PluginExecutionMappingProfile(provider.GetService<ITickerService>()!,
-                provider.GetService<IPluginService>()!));
-            // cfg.AddProfile(new PluginOutputMappingProfile(provider.GetService<IPluginService>()));
-            // cfg.AddProfile(new TrackListMappingProfile(provider.GetService<ITickerService>()));
-        }).CreateMapper());
 
 
         //

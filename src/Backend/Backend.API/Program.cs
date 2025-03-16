@@ -1,9 +1,8 @@
+using System.Reflection;
 using Backend.API;
 using Backend.Application;
 using Backend.Infrastructure;
 using Backend.Infrastructure.Data;
-using Common.Grpc;
-using Common.RabbitMQ;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,8 +20,9 @@ builder.Services.AddDbContext<BackendDbContext>(options =>
 );
 
 builder.Services.AddGrpcClients(builder.Configuration);
+builder.Services.AddApplicationServices(); 
 builder.Services.AddInfrastructureServices(builder.Configuration);
-builder.Services.AddApplicationServices();
+builder.Services.AddApiServices();
 
 builder.Services.AddHttpLogging(options =>
 {

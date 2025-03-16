@@ -161,7 +161,7 @@ public class NumericParameter<T> : BaseParameter where T : ISignedNumber<T>, ICo
 
     public override double GetMin()
     {
-        return (double)Min;
+        throw new NotImplementedException();
     }
 
     public override double GetMax()

@@ -72,7 +72,6 @@ public class PluginExecutionEngine : IPluginExecutionEngine
         Console.WriteLine("hry");
         foreach (var paramset in listOfParams)
         {
-            paramset
 
             Console.WriteLine(paramset);
         }

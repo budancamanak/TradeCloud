@@ -1,4 +1,6 @@
-﻿using Backend.Application.Features.Execution.CreateAnalysisExecution;
+﻿using AutoMapper;
+using Backend.API.Models;
+using Backend.Application.Features.Execution.CreateAnalysisExecution;
 using Backend.Application.Features.Execution.CreatePluginExecution;
 using Backend.Application.Features.Execution.ListActivePlugins;
 using Backend.Application.Features.Execution.ListAvailablePlugins;
@@ -13,7 +15,7 @@ namespace Backend.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class PluginExecutionsController(ILogger<PluginExecutionsController> logger, IMediator mediator)
+public class AnalysisExecutionsController(ILogger<AnalysisExecutionsController> logger, IMediator mediator,IMapper mapper)
 {
     [HttpGet("GetAvailablePlugins")]
     public async Task<List<IPlugin.PluginInfo>> GetAvailablePlugins()
@@ -30,24 +32,17 @@ public class PluginExecutionsController(ILogger<PluginExecutionsController> logg
         var result = await mediator.Send(request);
         return result;
     }
-
+ 
     [HttpPost]
-    [Obsolete("Use CreateAnalysisExecution API")]
-    public async Task<MethodResponse> CreatePluginExecution([FromBody] CreatePluginExecutionRequest request)
+    public async Task<MethodResponse> CreateAnalysisExecution([FromBody] CreateAnalysisExecutionModel model)
     {
+        var request = mapper.Map<CreateAnalysisExecutionRequest>(model);
         var result = await mediator.Send(request);
         return result;
     }
 
-    // [HttpPost]
-    // public async Task<MethodResponse> CreateAnalysisExecution([FromBody] CreateAnalysisExecutionRequest request)
-    // {
-    //     var result = await mediator.Send(request);
-    //     return result;
-    // }
-
     [HttpPatch]
-    public async Task<MethodResponse> RunPluginExecution([FromBody] RunPluginExecutionRequest request)
+    public async Task<MethodResponse> RunAnalysisExecution([FromBody] RunPluginExecutionRequest request)
     {
         var result = await mediator.Send(request);
         return result;
