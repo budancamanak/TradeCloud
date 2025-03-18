@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using Ardalis.GuardClauses;
 using Common.Core.Extensions;
 
@@ -177,5 +178,122 @@ public class NumericParameter<T> : BaseParameter where T : ISignedNumber<T>, ICo
     public override double GetIncrement()
     {
         throw new NotImplementedException();
+    }
+}
+
+public enum ParameterType
+{
+    Int,
+    Double,
+    Str
+}
+
+public enum ParameterRange
+{
+    Single,
+    Range,
+    List
+}
+
+public class ParamValue
+{
+}
+
+public class IntParamValue
+{
+    public int Min { get; set; }
+    public int Max { get; set; }
+    public int Increment { get; set; }
+    public int Default { get; set; }
+
+    public List<int> Deflate()
+    {
+        var list = new List<int>();
+        for (int i = Min; i < Max; i += Increment)
+        {
+            list.Add(i);
+        }
+
+        return list;
+    }
+}
+
+public class IntListValue
+{
+    public int[] Items { get; set; }
+    public int DefaultIndex { get; set; }
+}
+
+public class DoubleListValue
+{
+    public double[] Items { get; set; }
+    public int DefaultIndex { get; set; }
+}
+
+public class DoubleParamValue
+{
+    public double Min { get; set; }
+    public double Max { get; set; }
+    public double Increment { get; set; }
+    public double Default { get; set; }
+}
+
+public class StringListValue
+{
+    public string[] Items { get; set; }
+    public int DefaultIndex { get; set; }
+}
+
+public class Param
+{
+    public string Name { get; set; } = "";
+    public ParameterType Type { get; set; }
+    public ParameterRange Range { get; set; }
+    public object Value { get; set; }
+
+    public static class Int
+    {
+        public static Param Single(string name, int value)
+        {
+            return new Param
+            {
+                Type = ParameterType.Int,
+                Name = name,
+                Range = ParameterRange.Single,
+                Value = value
+            };
+        }
+
+        public static Param Range(string name, int min, int max, int inc, int def)
+        {
+            return new Param
+            {
+                Type = ParameterType.Int,
+                Name = name,
+                Range = ParameterRange.Range,
+                Value = new IntParamValue
+                {
+                    Increment = inc,
+                    Default = def,
+                    Min = min,
+                    Max = max
+                }
+            };
+        }
+
+        public static Param List(string name, int defIndex, params int[] items)
+        {
+            return new Param
+            {
+                Type = ParameterType.Int,
+                Name = name,
+                Range = ParameterRange.List,
+                Value = new IntListValue
+                {
+                    DefaultIndex = defIndex,
+                    Items = items
+                }
+            };
+        }
     }
 }

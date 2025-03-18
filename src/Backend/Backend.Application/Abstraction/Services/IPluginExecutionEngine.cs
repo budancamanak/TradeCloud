@@ -1,5 +1,6 @@
 ﻿using Backend.Domain.Entities;
 using Common.Plugin.Abstraction;
+using Common.Plugin.Models;
 
 namespace Backend.Application.Abstraction.Services;
 
@@ -15,6 +16,6 @@ public interface IPluginExecutionEngine
     // /// <returns></returns>
     // Task<MethodResponse> RunPlugin(IPlugin plugin);
 
-    Task<List<PluginExecution>> GeneratePluginExecutions(AnalysisExecution execution);
-    List<IPluginParamSet> GenerateParameters(AnalysisExecution execution);
+    List<PluginExecution> GeneratePluginExecutions(AnalysisExecution execution);
+    List<Param> GenerateParameters(AnalysisExecution execution);
 }

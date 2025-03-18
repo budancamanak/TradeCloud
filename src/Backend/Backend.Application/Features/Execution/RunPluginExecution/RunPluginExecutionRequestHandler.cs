@@ -41,7 +41,7 @@ public class RunPluginExecutionRequestHandler(
         // todo generate param list here
         // todo foreach param list, save plugin execution
         // todo foreach execution, trigger runRequest
-        var executions = await pluginExecutionEngine.GeneratePluginExecutions(plugin);
+        var executions =   pluginExecutionEngine.GeneratePluginExecutions(plugin);
         foreach (var item in executions)
         {
             mr = await pluginRepository.AddAsync(item);

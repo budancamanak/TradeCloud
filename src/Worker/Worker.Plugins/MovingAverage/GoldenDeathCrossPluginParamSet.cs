@@ -16,6 +16,11 @@ namespace Worker.Plugins.MovingAverage;
 
 public class GoldenDeathCrossPluginParamSet : IPluginParamSet
 {
+    // public int FastMovingAvg { get; set; }
+    // public int SlowMovingAvg { get; set; }
+    public NumericParameter<int> FastMovingAverage { get; set; }
+    public NumericParameter<int> SlowMovingAverage { get; set; }
+
     public GoldenDeathCrossPluginParamSet()
     {
     }
@@ -25,11 +30,6 @@ public class GoldenDeathCrossPluginParamSet : IPluginParamSet
         this.FastMovingAverage = NumericParameter<int>.IntParameter("FastMovingAverage", fast);
         this.SlowMovingAverage = NumericParameter<int>.IntParameter("SlowMovingAverage", slow);
     }
-
-    // public int FastMovingAvg { get; set; }
-    // public int SlowMovingAvg { get; set; }
-    public NumericParameter<int> FastMovingAverage { get; set; }
-    public NumericParameter<int> SlowMovingAverage { get; set; }
 
     public string GetStringRepresentation()
     {

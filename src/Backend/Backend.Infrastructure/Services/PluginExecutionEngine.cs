@@ -1,5 +1,8 @@
-﻿using Backend.Application.Abstraction.Services;
+﻿using Ardalis.GuardClauses;
+using Backend.Application.Abstraction.Services;
 using Backend.Domain.Entities;
+using Common.Core.Enums;
+using Common.Core.Extensions;
 using Common.Plugin.Abstraction;
 using Common.Plugin.Models;
 using Newtonsoft.Json;
@@ -9,78 +12,156 @@ namespace Backend.Infrastructure.Services;
 
 public class PluginExecutionEngine : IPluginExecutionEngine
 {
-    public Task<List<PluginExecution>> GeneratePluginExecutions(AnalysisExecution execution)
+    public List<PluginExecution> GeneratePluginExecutions(AnalysisExecution execution)
     {
-        var listOfParams = new List<BaseParameter>();
-        IDictionary<string, JToken> jsondata = JObject.Parse(execution.ParamSet);
-        foreach (var element in jsondata)
+        var list = new List<PluginExecution>();
+        var parameters = GenerateParameters(execution);
+        foreach (var param in parameters)
         {
-            if (element.Value["Items"] != null)
+            var plugin = new PluginExecution
             {
-                if (element.Value["Items"] is not JArray arr) continue;
-                switch (arr[0].Type)
-                {
-                    case JTokenType.Float:
-                    {
-                        var listParam = JsonConvert.DeserializeObject<ListParameter<double>>(element.Value.ToString());
-                        listOfParams.Add(listParam);
-                        Console.WriteLine(listParam);
-                        break;
-                    }
-                    case JTokenType.Integer:
-                    {
-                        var listParam = JsonConvert.DeserializeObject<ListParameter<int>>(element.Value.ToString());
-                        listOfParams.Add(listParam);
-                        Console.WriteLine(listParam);
-                        break;
-                    }
-                    default:
-                    {
-                        var listParam = JsonConvert.DeserializeObject<ListParameter<string>>(element.Value.ToString());
-                        listOfParams.Add(listParam);
-                        Console.WriteLine(listParam);
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                var min = element.Value["Min"];
-                if (min != null)
-                {
-                    switch (min.Type)
-                    {
-                        case JTokenType.Integer:
-                            var numericIntParam =
-                                JsonConvert.DeserializeObject<NumericParameter<int>>(element.Value.ToString());
-                            Console.WriteLine(numericIntParam);
-                            listOfParams.Add(numericIntParam);
-                            break;
-                        case JTokenType.Float:
-                            var numericDoubleParam =
-                                JsonConvert.DeserializeObject<NumericParameter<float>>(element.Value.ToString());
-                            Console.WriteLine(numericDoubleParam);
-                            listOfParams.Add(numericDoubleParam);
-                            break;
-                        default:
-                            throw new Exception("Failed to parse json");
-                    }
-                }
-            }
+                ParamSet = JsonConvert.SerializeObject(param),
+                AnalysisExecutionId = execution.Id,
+                Status = PluginStatus.Init,
+                Error = "",
+                Progress = 0
+            };
+            list.Add(plugin);
         }
 
-        Console.WriteLine("hry");
-        foreach (var paramset in listOfParams)
-        {
-
-            Console.WriteLine(paramset);
-        }
-
-        throw new NotImplementedException();
+        return list;
     }
 
-    public List<IPluginParamSet> GenerateParameters(AnalysisExecution execution)
+    public List<Param> CartesianProductParameters(List<Param> original)
     {
-        throw new NotImplementedException();
+        var listOfParams = new List<Param>();
+        return listOfParams;
+    }
+
+    public List<Param> DeflateParameters(Param param)
+    {
+        var listOfParams = new List<Param>();
+        switch (param.Type)
+        {
+            case ParameterType.Int:
+                switch (param.Range)
+                {
+                    case ParameterRange.Single:
+                        break;
+                    case ParameterRange.Range:
+                        var v = param.Value as IntParamValue;
+                        var def = v.Deflate();
+                        foreach (var item in def)
+                        {
+                            listOfParams.Add(new Param
+                            {
+                                Type = param.Type,
+                                Range = ParameterRange.Single,
+                                Value = item,
+                                Name = param.Name
+                            });
+                        }
+
+                        break;
+                    case ParameterRange.List:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                break;
+            case ParameterType.Double:
+                ParseDoubleParamValue(param);
+                break;
+            case ParameterType.Str:
+                ParseStringParamValue(param);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        return listOfParams;
+    }
+
+    public List<Param> GenerateParameters(AnalysisExecution execution)
+    {
+        var listOfParams = new List<Param>();
+
+        var parameters = JsonConvert.DeserializeObject<Param[]>(execution.ParamSet);
+        Guard.Against.NullOrZeroLengthArray(parameters);
+        foreach (var param in parameters!)
+        {
+            switch (param.Type)
+            {
+                case ParameterType.Int:
+                    ParseIntParamValue(param);
+                    break;
+                case ParameterType.Double:
+                    ParseDoubleParamValue(param);
+                    break;
+                case ParameterType.Str:
+                    ParseStringParamValue(param);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+
+            Console.WriteLine(param);
+            listOfParams.Add(param);
+        }
+
+        return listOfParams;
+    }
+
+    private static void ParseStringParamValue(Param param)
+    {
+        switch (param.Range)
+        {
+            case ParameterRange.Single:
+                param.Value = param.Value.ToString();
+                break;
+            case ParameterRange.List:
+                param.Value = JsonConvert.DeserializeObject<StringListValue>(param.Value.ToString());
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private static void ParseDoubleParamValue(Param param)
+    {
+        switch (param.Range)
+        {
+            case ParameterRange.Single:
+                param.Value = double.Parse(param.Value.ToString());
+                break;
+            case ParameterRange.Range:
+                param.Value = JsonConvert.DeserializeObject<DoubleParamValue>(param.Value.ToString());
+                break;
+            case ParameterRange.List:
+                param.Value = JsonConvert.DeserializeObject<DoubleListValue>(param.Value.ToString());
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private static void ParseIntParamValue(Param param)
+    {
+        switch (param.Range)
+        {
+            case ParameterRange.Single:
+                param.Value = int.Parse(param.Value.ToString());
+                break;
+            case ParameterRange.Range:
+                param.Value = JsonConvert.DeserializeObject<IntParamValue>(param.Value.ToString());
+                break;
+            case ParameterRange.List:
+                param.Value = JsonConvert.DeserializeObject<IntListValue>(param.Value.ToString());
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 }
