@@ -12,15 +12,55 @@ namespace Backend.Infrastructure.Services;
 
 public class PluginExecutionEngine : IPluginExecutionEngine
 {
+    static List<List<Param>> Cartesian(List<List<Param>> sets)
+    {
+        List<List<Param>> temp = new List<List<Param>> { new List<Param>() };
+        for (int i = 0; i < sets.Count; i++)
+        {
+            List<List<Param>> newTemp = new List<List<Param>>();
+            foreach (List<Param> product in temp)
+            {
+                foreach (Param element in sets[i])
+                {
+                    List<Param> tempCopy = new List<Param>(product);
+                    tempCopy.Add(element);
+                    newTemp.Add(tempCopy);
+                }
+            }
+
+            temp = newTemp;
+        }
+
+        foreach (List<Param> product in temp)
+        {
+            Console.WriteLine(string.Join(" ", product));
+        }
+
+        return temp;
+    }
+
     public List<PluginExecution> GeneratePluginExecutions(AnalysisExecution execution)
     {
         var list = new List<PluginExecution>();
         var parameters = GenerateParameters(execution);
-        foreach (var param in parameters)
+        List<List<Param>> deflated = new List<List<Param>>();
+        foreach (var item in parameters)
         {
+            deflated.Add(item.Deflate());
+        }
+
+        var cartesian = Cartesian(deflated);
+        foreach (var param in cartesian)
+        {
+            var dict = new Dictionary<string, object>();
+            foreach (var item in param)
+            {
+                dict.Add(item.Name, item.Value);
+            }
+
             var plugin = new PluginExecution
             {
-                ParamSet = JsonConvert.SerializeObject(param),
+                ParamSet = JsonConvert.SerializeObject(dict),
                 AnalysisExecutionId = execution.Id,
                 Status = PluginStatus.Init,
                 Error = "",
@@ -30,58 +70,6 @@ public class PluginExecutionEngine : IPluginExecutionEngine
         }
 
         return list;
-    }
-
-    
-    public List<Param> CartesianProductParameters(List<Param> original)
-    {
-        var listOfParams = new List<Param>();
-        return listOfParams;
-    }
-
-    public List<Param> DeflateParameters(Param param)
-    {
-        var listOfParams = new List<Param>();
-        switch (param.Type)
-        {
-            case ParameterType.Int:
-                switch (param.Range)
-                {
-                    case ParameterRange.Single:
-                        break;
-                    case ParameterRange.Range:
-                        var v = param.Value as IntParamValue;
-                        var def = v.Deflate();
-                        foreach (var item in def)
-                        {
-                            listOfParams.Add(new Param
-                            {
-                                Type = param.Type,
-                                Range = ParameterRange.Single,
-                                Value = item,
-                                Name = param.Name
-                            });
-                        }
-
-                        break;
-                    case ParameterRange.List:
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                break;
-            case ParameterType.Double:
-                ParseDoubleParamValue(param);
-                break;
-            case ParameterType.Str:
-                ParseStringParamValue(param);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-        return listOfParams;
     }
 
     public List<Param> GenerateParameters(AnalysisExecution execution)
