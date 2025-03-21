@@ -195,7 +195,7 @@ public class Param
 
     public override string ToString()
     {
-        return $"{Name} {Type} {Range} {Value}";
+        return $"Name: {Name} Type: {Type} Range: {Range} Value: {Value}";
     }
 
     public static class Int

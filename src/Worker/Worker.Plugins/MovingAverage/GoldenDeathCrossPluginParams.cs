@@ -26,8 +26,6 @@ public class GoldenDeathCrossPluginParams : IParameters
 
     public GoldenDeathCrossPluginParams(int fast, int slow)
     {
-        // this.FastMovingAverage = Param.Int.Single("FastMovingAverage", fast);
-        // this.SlowMovingAverage = Param.Int.Single("SlowMovingAverage", slow);
         this.FastMovingAverage = fast;
         this.SlowMovingAverage = slow;
     }
@@ -41,8 +39,7 @@ public class GoldenDeathCrossPluginParams : IParameters
 
     public string GetStringRepresentation()
     {
-        // return $"{FastMovingAverage}, {SlowMovingAverage}";
-        return "";
+        return $"{FastMovingAverage}, {SlowMovingAverage}";
     }
 
     public string ToJson()
@@ -64,8 +61,7 @@ public class GoldenDeathCrossPluginParamSet : IPluginParamSet
 
     public string GetStringRepresentation()
     {
-        // return $"{FastMovingAverage}, {SlowMovingAverage}";
-        return "";
+        return $"{FastMovingAverage}, {SlowMovingAverage}";
     }
 
     public string ToJson()
