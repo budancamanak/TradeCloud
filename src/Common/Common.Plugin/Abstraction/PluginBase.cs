@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace Common.Plugin.Abstraction;
 
-public abstract class PluginBase<T> : IPlugin where T : IPluginParamSet
+public abstract class PluginBase<T> : IPlugin where T : IParameters
 {
     protected ILogger<IPlugin> Logger;
     protected IPluginMessageBroker MessageBroker;
@@ -34,7 +34,7 @@ public abstract class PluginBase<T> : IPlugin where T : IPluginParamSet
 
     public abstract IPlugin.PluginInfo GetPluginInfo();
 
-    public abstract IPluginParamSet GetDefaultParamSet();
+    public abstract IParameters GetDefaultParamSet();
 
     private void SetPluginParameters(string priceCacheKey, string tickerCacheKey, int pluginId)
     {

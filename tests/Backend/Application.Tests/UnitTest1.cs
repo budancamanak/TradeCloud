@@ -20,7 +20,8 @@ public class Tests
         // exe.ParamSet = "{\"Name\":\"FastMovAvg\",\"Type\":0,\"Range\":0,\"Value\":25}";
         // exe.ParamSet = "{\"Name\":\"FastMovRange\",\"Type\":0,\"Range\":1,\"Value\":{\"Min\":15,\"Max\":50,\"Increment\":1,\"Default\":20}}";
         // exe.ParamSet ="{\"Name\":\"fastMovList\",\"Type\":0,\"Range\":2,\"Value\":{\"Items\":[15,20,25],\"DefaultIndex\":0}}";
-        exe.ParamSet ="[\n{\"Name\":\"FastMovAvg\",\"Type\":0,\"Range\":0,\"Value\":25},\n{\"Name\":\"FastMovRange\",\"Type\":0,\"Range\":1,\"Value\":{\"Min\":15,\"Max\":50,\"Increment\":1,\"Default\":20}},\n{\"Name\":\"fastMovList\",\"Type\":0,\"Range\":2,\"Value\":{\"Items\":[15,20,25],\"DefaultIndex\":0}}\n]";
+        exe.ParamSet =
+            "[\n{\"Name\":\"FastMovAvg\",\"Type\":0,\"Range\":0,\"Value\":25},\n{\"Name\":\"FastMovRange\",\"Type\":0,\"Range\":1,\"Value\":{\"Min\":15,\"Max\":50,\"Increment\":1,\"Default\":20}},\n{\"Name\":\"fastMovList\",\"Type\":0,\"Range\":2,\"Value\":{\"Items\":[15,20,25],\"DefaultIndex\":0}}\n]";
         var fastMov = Param.Int.Single("FastMovAvg", 25);
         var fastMovRange = Param.Int.Range("FastMovRange", 15, 50, 1, 20);
         var fastMovList = Param.Int.List("fastMovList", 0, 15, 20, 25);
@@ -41,6 +42,12 @@ public class Tests
         // var mr = engine.GeneratePluginExecutions(exe).GetAwaiter().GetResult();
         var mr = engine.GenerateParameters(exe);
         var plugins = engine.GeneratePluginExecutions(exe);
+        foreach (var item in plugins)
+        {
+            var paramset = TestParamSet.ParseParams(item.ParamSet);
+            Console.WriteLine(paramset);
+        }
+
         Assert.Pass();
     }
 }
