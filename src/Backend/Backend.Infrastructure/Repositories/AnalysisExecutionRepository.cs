@@ -15,12 +15,15 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
 {
     public Task<AnalysisExecution> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        Guard.Against.NegativeOrZero(id);
+        var item = dbContext.AnalysisExecutions.FirstOrDefault(f => f.Id == id);
+        Guard.Against.Null(item, nameof(item));
+        return Task.FromResult(item);
     }
 
     public Task<List<AnalysisExecution>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return Task.FromResult(dbContext.AnalysisExecutions.ToList());
     }
 
     public async Task<MethodResponse> AddAsync(AnalysisExecution item)
@@ -33,7 +36,7 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
             f.PluginIdentifier == item.PluginIdentifier && f.Timeframe == item.Timeframe &&
             f.StartDate == item.StartDate && f.EndDate == item.EndDate &&
             f.ParamSet == item.ParamSet && f.Progress < 1.0);
-        Guard.Against.NonNull(existing, "Plugin already registered", AlreadySavedException.Creator);
+        Guard.Against.NonNull(existing, $"Plugin already registered: {existing!.Id}", AlreadySavedException.Creator);
         await dbContext.AnalysisExecutions.AddAsync(item);
         var result = await dbContext.SaveChangesAsync();
         if (result == 0) return MethodResponse.Error("Failed to save analysis execution");

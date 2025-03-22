@@ -96,7 +96,7 @@ public class PluginExecutionEngine : IPluginExecutionEngine
             }
 
 
-            Console.WriteLine(param);
+            // Console.WriteLine(param);
             listOfParams.Add(param);
         }
 

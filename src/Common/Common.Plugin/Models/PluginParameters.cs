@@ -34,7 +34,7 @@ public class IntParamValue : ParamValue<int>
     public override List<int> Deflate()
     {
         var list = new List<int>();
-        for (int i = Min; i < Max; i += Increment)
+        for (int i = Min; i <= Max; i += Increment)
         {
             list.Add(i);
         }

@@ -4,6 +4,7 @@ using Backend.Application.Features.Execution.CreateAnalysisExecution;
 using Backend.Application.Features.Execution.CreatePluginExecution;
 using Backend.Application.Features.Execution.ListActivePlugins;
 using Backend.Application.Features.Execution.ListAvailablePlugins;
+using Backend.Application.Features.Execution.RunAnalysisExecution;
 using Backend.Application.Features.Execution.RunPluginExecution;
 using Common.Core.DTOs.Backend;
 using Common.Core.Models;
@@ -42,7 +43,7 @@ public class AnalysisExecutionsController(ILogger<AnalysisExecutionsController> 
     }
 
     [HttpPatch]
-    public async Task<MethodResponse> RunAnalysisExecution([FromBody] RunPluginExecutionRequest request)
+    public async Task<MethodResponse> RunAnalysisExecution([FromBody] RunAnalysisExecutionRequest request)
     {
         var result = await mediator.Send(request);
         return result;

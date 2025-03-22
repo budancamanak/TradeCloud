@@ -13,8 +13,7 @@ namespace Backend.Application;
 public static class DependencyInjection
 {
     public static void AddApplicationServices(this IServiceCollection services)
-    {
-        Console.WriteLine("YAKUP");
+    {        
         // services.AddScoped(provider => new MapperConfiguration(cfg =>
         // {
         //     cfg.AddProfile(new AnalysisExecutionMappingProfile());

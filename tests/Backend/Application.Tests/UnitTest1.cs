@@ -40,12 +40,13 @@ public class Tests
         // exe.ParamSet =
         //     "{\"FastMovingAverage\":{\"Value\":50,\"Min\":50,\"Max\":50,\"Name\":\"FastMovingAverage\",\"Increment\":0},\"SlowMovingAverage\":{\"Value\":200,\"Min\":200,\"Max\":200,\"Name\":\"SlowMovingAverage\",\"Increment\":0}}";
         // var mr = engine.GeneratePluginExecutions(exe).GetAwaiter().GetResult();
+        Console.WriteLine(exe.ParamSet);
         var mr = engine.GenerateParameters(exe);
         var plugins = engine.GeneratePluginExecutions(exe);
         foreach (var item in plugins)
         {
             var paramset = TestParamSet.ParseParams(item.ParamSet);
-            Console.WriteLine(paramset);
+            // Console.WriteLine(paramset);
         }
 
         Assert.Pass();

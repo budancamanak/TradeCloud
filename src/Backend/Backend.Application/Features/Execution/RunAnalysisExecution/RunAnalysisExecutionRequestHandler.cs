@@ -48,11 +48,19 @@ public class RunAnalysisExecutionRequestHandler(
         // todo generate param list here
         // todo foreach param list, save plugin execution
         // todo foreach execution, trigger runRequest
-        var executions =   pluginExecutionEngine.GeneratePluginExecutions(plugin);
+        var executions = pluginExecutionEngine.GeneratePluginExecutions(plugin);
         foreach (var item in executions)
         {
-            mr = await pluginRepository.AddAsync(item);
-            if (!mr.IsSuccess) logger.LogWarning("Failed to save plugin execution!! for : {}", item);
+            try
+            {
+                mr = await pluginRepository.AddAsync(item);
+                if (!mr.IsSuccess) logger.LogWarning("Failed to save plugin execution!! for : {}", item);
+            }
+            catch (AlreadySavedException e)
+            {
+                logger.LogDebug("Plugin is already saved. Safe exception skip. {}", e);
+                // pass.
+            }
         }
 
         // todo trigger rabbitmq to inform worker to run

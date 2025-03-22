@@ -21,6 +21,7 @@ public class Tests
         returned.Should().NotBeNull();
         returned.FastMovingAverage.Should().Be(50);
         returned.SlowMovingAverage.Should().Be(200);
+        Console.WriteLine(paramSet.GetParamSet().ToJson());
         Console.WriteLine(str);
         Console.WriteLine(returned);
         Console.WriteLine(returned.FastMovingAverage.ToString());
