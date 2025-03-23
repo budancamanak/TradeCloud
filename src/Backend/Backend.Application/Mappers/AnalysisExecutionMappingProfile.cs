@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
-using Backend.Application.Abstraction.Services;
-using Backend.Application.Features.Execution.CreateAnalysisExecution;
-using Backend.Application.Features.Execution.CreatePluginExecution;
-using Backend.Application.Features.Execution.RunPluginExecution;
 using Backend.Domain.Entities;
 using Common.Core.Enums;
 using Common.Core.Extensions;
-using Common.Messaging.Events.PluginExecution;
+using Common.Messaging.Events.AnalysisExecution;
 
 namespace Backend.Application.Mappers;
 

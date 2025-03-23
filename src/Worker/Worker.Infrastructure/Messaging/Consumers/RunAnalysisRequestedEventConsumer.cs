@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
-using Common.Core.Enums;
-using Common.Grpc;
 using Common.Messaging.Abstraction;
-using Common.Messaging.Events.PluginExecution;
-using Google.Protobuf.WellKnownTypes;
+using Common.Messaging.Events.AnalysisExecution;
 using MassTransit;
 using MediatR;
-using Worker.Application.Abstraction;
 using Worker.Application.Features.RunPluginRequested;
 
 namespace Worker.Infrastructure.Messaging.Consumers;

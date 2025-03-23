@@ -58,16 +58,16 @@ public class RunPluginExecutionRequestHandler(
         // };
         // await cache.SetAsync(CacheKeyGenerator.ActiveAnalysisKey(request.ExecutionId), paramModel,
         //     TimeSpan.MaxValue);
-        var @event = mapper.Map<RunAnalysisRequestedEvent>(plugin,
-            opts =>
-            {
-                opts.Items["PluginInfos"] = executions.Select(s => new RunPluginInfo
-                {
-                    PluginParameters = s.ParamSet,
-                    PluginExecutionId = s.Id
-                }).ToList();
-            });
-        await messageBroker.PublishAsync(@event);
+        // var @event = mapper.Map<RunPluginRequestedEvent>(plugin,
+        //     opts =>
+        //     {
+        //         opts.Items["PluginInfos"] = executions.Select(s => new RunPluginInfo
+        //         {
+        //             PluginParameters = s.ParamSet,
+        //             PluginExecutionId = s.Id
+        //         }).ToList();
+        //     });
+        // await messageBroker.PublishAsync(@event);
         return mr;
     }
 }

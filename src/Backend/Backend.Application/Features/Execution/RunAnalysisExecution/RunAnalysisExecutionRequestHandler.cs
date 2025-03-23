@@ -1,13 +1,12 @@
 ﻿using Ardalis.GuardClauses;
 using AutoMapper;
 using Backend.Application.Abstraction.Repositories;
-using Backend.Application.Abstraction.Services;
-using Backend.Application.Features.Execution.RunPluginExecution;
+using Backend.Application.Abstraction.Services; 
 using Common.Application.Repositories;
 using Common.Core.Enums;
 using Common.Core.Models;
 using Common.Messaging.Abstraction;
-using Common.Messaging.Events.PluginExecution;
+using Common.Messaging.Events.AnalysisExecution;
 using Common.Web.Exceptions;
 using FluentValidation;
 using MediatR;
@@ -21,7 +20,7 @@ public class RunAnalysisExecutionRequestHandler(
     IEventBus messageBroker,
     ICacheService cache,
     IMapper mapper,
-    ILogger<RunPluginExecutionRequestHandler> logger,
+    ILogger<RunAnalysisExecutionRequestHandler> logger,
     IPluginExecutionEngine pluginExecutionEngine,
     IPluginExecutionRepository pluginRepository,
     IAnalysisExecutionRepository analysisRepository

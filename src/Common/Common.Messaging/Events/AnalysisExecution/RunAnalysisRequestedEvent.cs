@@ -1,4 +1,4 @@
-﻿namespace Common.Messaging.Events.PluginExecution;
+﻿namespace Common.Messaging.Events.AnalysisExecution;
 
 public class RunAnalysisRequestedEvent : IntegrationEvent
 {
