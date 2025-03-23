@@ -11,11 +11,10 @@ using Worker.Application.Features.RunPluginRequested;
 
 namespace Worker.Infrastructure.Messaging.Consumers;
 
-[Obsolete("Use RunAnalysisRequestedEventConsumer instead")]
-public class RunPluginRequestedEventConsumer(IMapper mapper, IMediator mediator,IPublishEndpoint publishEndpoint, IEventBus eventBus)
-    : IConsumer<RunPluginRequestedEvent>
+public class RunAnalysisRequestedEventConsumer(IMapper mapper, IMediator mediator,IPublishEndpoint publishEndpoint, IEventBus eventBus)
+    : IConsumer<RunAnalysisRequestedEvent>
 {
-    public async Task Consume(ConsumeContext<RunPluginRequestedEvent> context)
+    public async Task Consume(ConsumeContext<RunAnalysisRequestedEvent> context)
     {
         // var message = context.Message;
         var message = mapper.Map<RunPluginRequest>(context.Message);
