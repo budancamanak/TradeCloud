@@ -10,6 +10,7 @@ using Backend.Infrastructure.Services;
 using Common.Application.Repositories;
 using Common.Application.Services;
 using Common.Messaging.Events;
+using Common.Messaging.Events.AnalysisExecution;
 using Common.Messaging.Events.PluginExecution;
 using Common.RabbitMQ;
 using FluentValidation;
@@ -36,6 +37,7 @@ public static class DependencyInjection
             {
                 config.Publish<IntegrationEvent>(f => f.Exclude = true);
                 config.Message<RunPluginRequestedEvent>(f => f.SetEntityName("plugin.executions.exchange.run"));
+                config.Message<RunAnalysisRequestedEvent>(f => f.SetEntityName("analysis.executions.exchange.run"));
                 config.ReceiveEndpoint("plugin.executions.queue.status", ep =>
                 {
                     ep.ConfigureConsumeTopology = false;

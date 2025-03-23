@@ -1,6 +1,6 @@
-﻿using Common.Core.DTOs;
-using Common.Core.Models;
+﻿using Common.Core.Models;
 using Common.Plugin.Abstraction;
+using Worker.Application.Features.RunAnalysisRequested;
 using Worker.Application.Features.RunPluginRequested;
 
 namespace Worker.Application.Abstraction;
@@ -9,6 +9,7 @@ public interface IPluginHost
 {
     IList<IPlugin> Plugins();
     bool AddPluginToQueue(RunPluginRequest request);
+    bool AddAnalysisToQueue(RunAnalysisRequest requested);
     void RemovePluginFromQueue(int pluginId);
     RunPluginRequest GetRequestFor(int pluginId);
     Task<MethodResponse> RunPlugin(int pluginId);

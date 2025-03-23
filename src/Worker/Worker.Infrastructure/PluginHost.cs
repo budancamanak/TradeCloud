@@ -7,12 +7,14 @@ using Common.Application.Services;
 using Common.Core.DTOs;
 using Common.Core.Enums;
 using Common.Core.Models;
+using Common.Messaging.Events.AnalysisExecution;
 using Common.Plugin.Abstraction;
 using Common.Plugin.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Worker.Application.Abstraction;
+using Worker.Application.Features.RunAnalysisRequested;
 using Worker.Application.Features.RunPluginRequested;
 
 namespace Worker.Infrastructure;
@@ -50,6 +52,11 @@ public class PluginHost : IPluginHost
     public bool AddPluginToQueue(RunPluginRequest request)
     {
         return _waitingPluginRequests.TryAdd(request.ExecutionId, request);
+    }
+
+    public bool AddAnalysisToQueue(RunAnalysisRequest requested)
+    {
+        return true;
     }
 
     public RunPluginRequest GetRequestFor(int pluginId)
