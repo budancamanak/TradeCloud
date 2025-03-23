@@ -43,6 +43,12 @@ public static class DependencyInjection
                 config.Message<PluginStartedEvent>(f => f.SetEntityName("plugin.executions.exchange.started"));
                 config.Message<PluginFailedEvent>(f => f.SetEntityName("plugin.executions.exchange.failed"));
                 config.Message<PluginSucceededEvent>(f => f.SetEntityName("plugin.executions.exchange.succeeded"));
+                config.ReceiveEndpoint("analysis.executions.queue.run", ep =>
+                {
+                    ep.ConfigureConsumeTopology = false;
+                    ep.Bind("analysis.executions.exchange.run");
+                    ep.ConfigureConsumer<RunAnalysisRequestedEventConsumer>(context);
+                });
                 config.ReceiveEndpoint("price.fetch.queue", ep =>
                 {
                     ep.ConfigureConsumeTopology = false;

@@ -1,7 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using AutoMapper;
 using Backend.Application.Abstraction.Repositories;
-using Backend.Application.Abstraction.Services; 
+using Backend.Application.Abstraction.Services;
 using Common.Application.Repositories;
 using Common.Core.Enums;
 using Common.Core.Models;
@@ -81,6 +81,7 @@ public class RunAnalysisExecutionRequestHandler(
                     PluginExecutionId = s.Id
                 }).ToList();
             });
+        logger.LogWarning("Sending RunAnalysisRequestedEvent over message broker: {}", @event);
         await messageBroker.PublishAsync(@event);
         return mr;
     }
