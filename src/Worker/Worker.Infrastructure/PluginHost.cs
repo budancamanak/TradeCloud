@@ -28,6 +28,7 @@ public class PluginHost : IPluginHost
     private readonly int _maxActivePlugin;
     private readonly ICacheService _cache;
     private readonly ConcurrentDictionary<int, RunPluginRequest> _waitingPluginRequests;
+    private readonly ConcurrentDictionary<int, RunAnalysisRequest> _waitingAnalysisRequests;
     private readonly PluginLoader _pluginLoader;
 
     public PluginHost(IConfiguration configuration, IServiceScopeFactory scopeFactory,
@@ -35,6 +36,7 @@ public class PluginHost : IPluginHost
     {
         _cache = cache;
         _waitingPluginRequests = new ConcurrentDictionary<int, RunPluginRequest>();
+        _waitingAnalysisRequests = new ConcurrentDictionary<int, RunAnalysisRequest>();
         using var scope = scopeFactory.CreateScope();
         _messageBroker = scope.ServiceProvider.GetRequiredService<IPluginMessageBroker>();
         _logger = logger;
@@ -54,14 +56,21 @@ public class PluginHost : IPluginHost
         return _waitingPluginRequests.TryAdd(request.ExecutionId, request);
     }
 
-    public bool AddAnalysisToQueue(RunAnalysisRequest requested)
+    public bool AddAnalysisToQueue(RunAnalysisRequest request)
     {
-        return true;
+        return _waitingAnalysisRequests.TryAdd(request.ExecutionId, request);
     }
 
-    public RunPluginRequest GetRequestFor(int pluginId)
+    // public RunPluginRequest GetRequestFor(int pluginId)
+    // {
+    //     var item = _waitingPluginRequests.GetValueOrDefault(pluginId);
+    //     if (item == null) throw new NotFoundException(pluginId.ToString(), "Plugin Request Not found ");
+    //     return item;
+    // }
+
+    public RunAnalysisRequest GetRequestFor(int pluginId)
     {
-        var item = _waitingPluginRequests.GetValueOrDefault(pluginId);
+        var item = _waitingAnalysisRequests.GetValueOrDefault(pluginId);
         if (item == null) throw new NotFoundException(pluginId.ToString(), "Plugin Request Not found ");
         return item;
     }
@@ -77,29 +86,32 @@ public class PluginHost : IPluginHost
         return MethodResponse.Success("Plugin ran");
     }
 
-    public Tuple<IPlugin, string, string> GetPluginToRun(int pluginId)
+    public async Task<List<PluginRunInfo>> GetPluginToRun(int pluginId)
     {
         _logger.LogInformation("PluginHost.RunPlugin requested: {}", pluginId);
-        var request = _waitingPluginRequests.GetValueOrDefault(pluginId);
+        var items = new List<PluginRunInfo>();
+        var request = _waitingAnalysisRequests.GetValueOrDefault(pluginId);
         if (request == null) throw new NotFoundException(pluginId.ToString(), "Plugin not found in waiting list");
-        var cacheKey = CacheKeyGenerator.PluginKey(request.StartDate,
-            request.EndDate, request.Ticker, request.Timeframe.TimeFrameFromString());
-        var tickerCacheKey = CacheKeyGenerator.TickerKey(request.Ticker);
-        // var prices = await _cache.GetAsync<List<PriceDto>>(cacheKey);
-        // _logger.LogInformation("Got prices for plugin to run: {}", pluginId);
-        // var ticker = await _cache.GetAsync<TickerDto>(CacheKeyGenerator.TickerKey(request.Ticker));
-        // var paramModel =
-        //     await _cache.GetAsync<PluginParamModel>(CacheKeyGenerator.ActivePluginParamsKey(request.ExecutionId));
-        var plugin = _pluginLoader.CreatePlugin(request.Identifier);
-        // _logger.LogInformation("Setting params for plugin to run: {} - {}", pluginId, paramModel?.ParamSet);
-        // plugin.UseParamSet(paramModel?.ParamSet);
-        // // plugin.UseLogger(_logger);
-        // plugin.UseTicker(ticker!);
-        // plugin.UseTradingParams(paramModel?.TradingParams);
-        // plugin.UsePriceInfo(prices!);
-        _logger.LogInformation("Executing plugin: {}", pluginId);
-        // return new Tuple<IPlugin, TickerDto, List<PriceDto>>(plugin, ticker!, prices!);
-        return new Tuple<IPlugin, string, string>(plugin, cacheKey, tickerCacheKey);
+        foreach (var info in request.PluginInfos)
+        {
+            var priceCacheKey = CacheKeyGenerator.PluginKey(request.StartDate,
+                request.EndDate, request.Ticker, request.Timeframe.TimeFrameFromString());
+            var tickerCacheKey = CacheKeyGenerator.TickerKey(request.Ticker);
+            var plugin = _pluginLoader.CreatePlugin(request.Identifier);
+            _logger.LogInformation("Executing plugin: {}", pluginId);
+            await _cache.SetAsync(CacheKeyGenerator.ActivePluginParamsKey(info.PluginExecutionId),
+                new PluginParamModel { TradingParams = "", ParamSet = info.PluginParameters }, TimeSpan.MaxValue);
+            // return new Tuple<IPlugin, string, string>(plugin, cacheKey, tickerCacheKey);
+            items.Add(new PluginRunInfo
+            {
+                Plugin = plugin,
+                PriceCacheKey = priceCacheKey,
+                TickerCacheKey = tickerCacheKey,
+                PluginExecutionId = info.PluginExecutionId
+            });
+        }
+
+        return items;
     }
 
     public MethodResponse IsPluginInQueue(int pluginId)

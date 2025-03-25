@@ -43,7 +43,7 @@ public class RunPluginRequestedHandler(
         var plugin = pluginHost.GetPluginToRun(request.ExecutionId);
         pluginHost.RemovePluginFromQueue(request.ExecutionId);
         logger.LogDebug("Starting background job to to run plugin[{}]", request);
-        var identifier = jobClient.Enqueue(() => plugin.Item1.Run(request.ExecutionId, plugin.Item2, plugin.Item3));
+        // var identifier = jobClient.Enqueue(() => plugin.Item1.Run(request.ExecutionId, plugin.Item2, plugin.Item3));
         logger.LogDebug("Started background job to to run plugin[{}]", request);
         await eventBus.PublishAsync(new PluginStatusEvent(request.ExecutionId, PluginStatus.Queued));
         return MethodResponse.Success(request.ExecutionId, "Plugin started");

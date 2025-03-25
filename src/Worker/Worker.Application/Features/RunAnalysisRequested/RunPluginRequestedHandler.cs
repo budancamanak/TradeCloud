@@ -40,11 +40,17 @@ public class RunAnalysisRequestedHandler(
         // todo trigger hangfire !!
         // todo send pluginupdated event over rabbitmq. change plugin state to running
         pluginHost.AddAnalysisToQueue(request);
-        var plugin = pluginHost.GetPluginToRun(request.ExecutionId);
+        var info = await pluginHost.GetPluginToRun(request.ExecutionId);
         pluginHost.RemovePluginFromQueue(request.ExecutionId);
         logger.LogDebug("Starting background job to to run plugin[{}]", request);
-        var identifier = jobClient.Enqueue(() => plugin.Item1.Run(request.ExecutionId, plugin.Item2, plugin.Item3));
-        logger.LogDebug("Started background job to to run plugin[{}]", request);
+        foreach (var infoItem in info)
+        {
+            var identifier = jobClient.Enqueue(() => infoItem.Plugin.Run(infoItem.PluginExecutionId,
+                infoItem.PriceCacheKey, infoItem.TickerCacheKey));
+            // var identifier = jobClient.Enqueue(() => plugin.Item1.Run(request.ExecutionId, plugin.Item2, plugin.Item3));
+            logger.LogDebug("Started background job to to run plugin[{}] : {}", request, identifier);
+        }
+
         await eventBus.PublishAsync(new PluginStatusEvent(request.ExecutionId, PluginStatus.Queued));
         return MethodResponse.Success(request.ExecutionId, "Plugin started");
     }
