@@ -10,13 +10,14 @@ using Backend.Infrastructure.Services;
 using Common.Application.Repositories;
 using Common.Application.Services;
 using Common.Messaging.Events;
+using Common.Messaging.Events.AnalysisExecution;
 using Common.Messaging.Events.PluginExecution;
 using Common.RabbitMQ;
 using FluentValidation;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
-using MassTransit;
 
 namespace Backend.Infrastructure;
 
@@ -36,6 +37,7 @@ public static class DependencyInjection
             {
                 config.Publish<IntegrationEvent>(f => f.Exclude = true);
                 config.Message<RunPluginRequestedEvent>(f => f.SetEntityName("plugin.executions.exchange.run"));
+                config.Message<RunAnalysisRequestedEvent>(f => f.SetEntityName("analysis.executions.exchange.run"));
                 config.ReceiveEndpoint("plugin.executions.queue.status", ep =>
                 {
                     ep.ConfigureConsumeTopology = false;
@@ -58,6 +60,7 @@ public static class DependencyInjection
         );
         services.AddScoped<ITrackListRepository, TrackListRepository>();
         services.AddScoped<IPluginExecutionRepository, PluginExecutionRepository>();
+        services.AddScoped<IAnalysisExecutionRepository, AnalysisExecutionRepository>();
         services.AddScoped<IPluginOutputRepository, PluginOutputRepository>();
 
         services.AddScoped<IValidator<PluginExecution>, PluginExecutionsValidator>();
@@ -66,14 +69,8 @@ public static class DependencyInjection
 
         services.AddScoped<IPluginService, PluginService>();
         services.AddScoped<ITickerService, TickerService>();
+        services.AddScoped<IPluginExecutionEngine, PluginExecutionEngine>();
 
-        services.AddScoped(provider => new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile(new PluginExecutionMappingProfile(provider.GetService<ITickerService>()!,
-                provider.GetService<IPluginService>()!));
-            // cfg.AddProfile(new PluginOutputMappingProfile(provider.GetService<IPluginService>()));
-            // cfg.AddProfile(new TrackListMappingProfile(provider.GetService<ITickerService>()));
-        }).CreateMapper());
 
 
         //

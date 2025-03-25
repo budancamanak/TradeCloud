@@ -22,7 +22,7 @@ namespace Backend.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Backend.Domain.Entities.PluginExecution", b =>
+            modelBuilder.Entity("Backend.Domain.Entities.AnalysisExecution", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -35,9 +35,6 @@ namespace Backend.Infrastructure.Migrations
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Error")
-                        .HasColumnType("text");
 
                     b.Property<string>("ParamSet")
                         .IsRequired()
@@ -56,11 +53,6 @@ namespace Backend.Infrastructure.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
                     b.Property<int>("TickerId")
                         .HasColumnType("integer");
 
@@ -76,6 +68,41 @@ namespace Backend.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.ToTable("AnalysisExecutions", (string)null);
+                });
+
+            modelBuilder.Entity("Backend.Domain.Entities.PluginExecution", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AnalysisExecutionId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ParamSet")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<double>("Progress")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("double precision")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnalysisExecutionId");
 
                     b.ToTable("PluginExecutions", (string)null);
                 });
@@ -143,6 +170,17 @@ namespace Backend.Infrastructure.Migrations
                     b.ToTable("UserTrackLists", (string)null);
                 });
 
+            modelBuilder.Entity("Backend.Domain.Entities.PluginExecution", b =>
+                {
+                    b.HasOne("Backend.Domain.Entities.AnalysisExecution", "AnalysisExecution")
+                        .WithMany("PluginExecutions")
+                        .HasForeignKey("AnalysisExecutionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AnalysisExecution");
+                });
+
             modelBuilder.Entity("Backend.Domain.Entities.PluginOutput", b =>
                 {
                     b.HasOne("Backend.Domain.Entities.PluginExecution", "PluginExecution")
@@ -152,6 +190,11 @@ namespace Backend.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("PluginExecution");
+                });
+
+            modelBuilder.Entity("Backend.Domain.Entities.AnalysisExecution", b =>
+                {
+                    b.Navigation("PluginExecutions");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.PluginExecution", b =>

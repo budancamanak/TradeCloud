@@ -32,10 +32,8 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
         Guard.Against.Null(item);
         await validator.ValidateAndThrowAsync(item);
         var existing = dbContext.PluginExecutions.FirstOrDefault(f =>
-            f.PluginIdentifier == item.PluginIdentifier && f.UserId == item.UserId && f.Timeframe == item.Timeframe &&
-            f.StartDate == item.StartDate && f.EndDate == item.EndDate &&
+            f.AnalysisExecutionId == item.AnalysisExecutionId && f.ParamSet == item.ParamSet &&
             f.Status != PluginStatus.Failure && f.Status != PluginStatus.Success);
-        // Guard.Against.NonNull(existing, "Plugin already registered", () => new AlreadySavedException("Plugin already registered"));
         Guard.Against.NonNull(existing, "Plugin already registered", AlreadySavedException.Creator);
         await dbContext.PluginExecutions.AddAsync(item);
         var result = await dbContext.SaveChangesAsync();
@@ -51,11 +49,8 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
         Guard.Against.Null(existing);
         existing.Status = item.Status;
         existing.ParamSet = item.ParamSet;
-        existing.TradingParams = item.TradingParams;
-        existing.Timeframe = item.Timeframe;
-        existing.StartDate = item.StartDate;
-        existing.EndDate = item.EndDate;
         existing.Progress = item.Progress;
+        existing.Error = item.Error;
         var result = await dbContext.SaveChangesAsync();
         if (result > 0) return MethodResponse.Success(result, "Execution updated");
         return MethodResponse.Error("Failed to update execution");
@@ -98,19 +93,26 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
         return items;
     }
 
-    public async Task<List<PluginExecution>> GetPluginExecutionsForTicker(int tickerId)
+    public async Task<List<PluginExecution>> GetPluginOfAnalysis(int analysisId)
     {
-        var items = await dbContext.PluginExecutions
-            .Where(f => f.TickerId == tickerId).ToListAsync();
+        Guard.Against.NegativeOrZero(analysisId);
+        var items = await dbContext.PluginExecutions.Where(f => f.AnalysisExecutionId == analysisId).ToListAsync();
         return items;
     }
 
-    public async Task<List<PluginExecution>> GetPluginExecutionsWithIdentifier(string identifier)
-    {
-        var items = await dbContext.PluginExecutions
-            .Where(f => f.PluginIdentifier == identifier).ToListAsync();
-        return items;
-    }
+    // public async Task<List<PluginExecution>> GetPluginExecutionsForTicker(int tickerId)
+    // {
+    //     var items = await dbContext.PluginExecutions
+    //         .Where(f => f.TickerId == tickerId).ToListAsync();
+    //     return items;
+    // }
+    //
+    // public async Task<List<PluginExecution>> GetPluginExecutionsWithIdentifier(string identifier)
+    // {
+    //     var items = await dbContext.PluginExecutions
+    //         .Where(f => f.PluginIdentifier == identifier).ToListAsync();
+    //     return items;
+    // }
 
     public async Task<MethodResponse> SetPluginProgress(int id, double progress)
     {

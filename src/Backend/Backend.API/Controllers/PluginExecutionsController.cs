@@ -1,4 +1,5 @@
-﻿using Backend.Application.Features.Execution.CreatePluginExecution;
+﻿using Backend.Application.Features.Execution.CreateAnalysisExecution;
+using Backend.Application.Features.Execution.CreatePluginExecution;
 using Backend.Application.Features.Execution.ListActivePlugins;
 using Backend.Application.Features.Execution.ListAvailablePlugins;
 using Backend.Application.Features.Execution.RunPluginExecution;
@@ -31,11 +32,19 @@ public class PluginExecutionsController(ILogger<PluginExecutionsController> logg
     }
 
     [HttpPost]
+    [Obsolete("Use CreateAnalysisExecution API")]
     public async Task<MethodResponse> CreatePluginExecution([FromBody] CreatePluginExecutionRequest request)
     {
         var result = await mediator.Send(request);
         return result;
     }
+
+    // [HttpPost]
+    // public async Task<MethodResponse> CreateAnalysisExecution([FromBody] CreateAnalysisExecutionRequest request)
+    // {
+    //     var result = await mediator.Send(request);
+    //     return result;
+    // }
 
     [HttpPatch]
     public async Task<MethodResponse> RunPluginExecution([FromBody] RunPluginExecutionRequest request)

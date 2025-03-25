@@ -12,12 +12,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Backend.Application.Features.Execution.CreatePluginExecution;
 
+// todo rename create plugin execution to create analysis execution
+// todo seperate plugin execution and analysis execution
 public class CreatePluginExecutionRequestHandler(
     IValidator<CreatePluginExecutionRequest> validator,
     IMapper mapper,
     ITickerService tickerService,
     IPluginService pluginService,
-    IPluginExecutionRepository repository,
+    IAnalysisExecutionRepository repository,
     ILogger<CreatePluginExecutionRequestHandler> logger) : IRequestHandler<CreatePluginExecutionRequest, MethodResponse>
 {
     public async Task<MethodResponse> Handle(CreatePluginExecutionRequest request, CancellationToken cancellationToken)
@@ -27,7 +29,7 @@ public class CreatePluginExecutionRequestHandler(
         Guard.Against.Null(ticker, exceptionCreator: () => new RequestValidationException("Failed to find ticker"));
         var plugin = await pluginService.GetPluginInfo(request.PluginIdentifier);
         Guard.Against.Null(plugin, exceptionCreator: () => new RequestValidationException("Failed to find plugin"));
-        var item = mapper.Map<CreatePluginExecutionRequest, PluginExecution>(request,
+        var item = mapper.Map<CreatePluginExecutionRequest, AnalysisExecution>(request,
             opts =>
             {
                 // todo use Logged User Id

@@ -18,7 +18,7 @@ public interface IPlugin
     void UseMessageBroker(IPluginMessageBroker messageBroker);
     void UseParamSet(string? paramSet);
     void UseTradingParams(string? tradingParams);
-    IPluginParamSet GetDefaultParamSet(); 
+    IParameters GetDefaultParamSet(); 
     public Type GetPluginType();
 
     record PluginInfo(string Name, string Identifier, string Version = "1.0.0")

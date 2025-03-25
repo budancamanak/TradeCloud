@@ -8,20 +8,20 @@ using Worker.Plugins.Utils;
 
 namespace Worker.Plugins.MovingAverage;
 
-public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParamSet>
+public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
 {
     public GoldenDeathCrossPlugin(ILogger<IPlugin> logger, IPluginMessageBroker messageBroker,
         IReadOnlyCacheService cache) : base(logger, messageBroker, cache)
     {
     }
 
-    protected override GoldenDeathCrossPluginParamSet ParseParams(string? json)
+    protected override GoldenDeathCrossPluginParams ParseParams(string? json)
     {
         Logger.LogWarning("Parsing params :{}", json);
         try
         {
             return !string.IsNullOrWhiteSpace(json)
-                ? JsonConvert.DeserializeObject<GoldenDeathCrossPluginParamSet>(json)!
+                ? JsonConvert.DeserializeObject<GoldenDeathCrossPluginParams>(json)!
                 : GetDefaultParamSet();
         }
         catch (Exception e)
@@ -37,9 +37,9 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParamSet>
         return new IPlugin.PluginInfo("GoldenCrossDeathCross", "09a0a20a-666c-4b13-80f7-5dc04db19f8c", "1.0.1");
     }
 
-    public override GoldenDeathCrossPluginParamSet GetDefaultParamSet()
+    public override GoldenDeathCrossPluginParams GetDefaultParamSet()
     {
-        return new GoldenDeathCrossPluginParamSet(50, 200);
+        return new GoldenDeathCrossPluginParams(50, 200);
     }
 
     public override Type GetPluginType()
@@ -69,8 +69,8 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParamSet>
             Params.GetStringRepresentation());
         Thread.Sleep(5000);
         var quotes = PriceInfo.ToQuotes();
-        var slow = quotes.GetSma(!Params.SlowMovingAverage).ToList();
-        var fast = quotes.GetSma(!Params.FastMovingAverage).ToList();
+        var slow = quotes.GetSma(Params.SlowMovingAverage).ToList();
+        var fast = quotes.GetSma(Params.FastMovingAverage).ToList();
         var isLastLong = 0;
         for (var i = 0; i < PriceInfo.Count; i++)
         {
