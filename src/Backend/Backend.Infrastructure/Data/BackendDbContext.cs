@@ -10,6 +10,8 @@ public class BackendDbContext : DbContext
     public DbSet<TrackList> TrackLists { get; set; }
     public DbSet<PluginOutput> PluginOutputs { get; set; }
     public DbSet<PluginExecution> PluginExecutions { get; set; }
+    public DbSet<AnalysisExecution> AnalysisExecutions { get; set; }
+    
 
     public BackendDbContext(DbContextOptions<BackendDbContext> options) : base(options)
     {
@@ -18,6 +20,7 @@ public class BackendDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyAnalysisExecutionConfigurations();
         modelBuilder.ApplyPluginExecutionConfigurations();
         modelBuilder.ApplyPluginOutputConfigurations();
         modelBuilder.ApplySystemSettingConfigurations();

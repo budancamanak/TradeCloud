@@ -11,6 +11,7 @@ using Worker.Application.Features.RunPluginRequested;
 
 namespace Worker.Infrastructure.Messaging.Consumers;
 
+[Obsolete("Use RunAnalysisRequestedEventConsumer instead")]
 public class RunPluginRequestedEventConsumer(IMapper mapper, IMediator mediator,IPublishEndpoint publishEndpoint, IEventBus eventBus)
     : IConsumer<RunPluginRequestedEvent>
 {
@@ -24,6 +25,13 @@ public class RunPluginRequestedEventConsumer(IMapper mapper, IMediator mediator,
             // await eventBus.PublishAsync(new PluginStatusEvent(message.ExecutionId, PluginStatus.Queued));
             return;
         }
+        
+        /***
+         * this will be run analysis requested event consumer
+         * 
+         * .
+         * 
+         */
 
 
         throw new NotImplementedException(mr.Message);

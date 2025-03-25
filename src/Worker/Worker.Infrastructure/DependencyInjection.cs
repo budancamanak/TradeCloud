@@ -26,13 +26,13 @@ public static class DependencyInjection
         serviceCollection.AddRabbitMqEventBus(configurationManager,
             consumerConfiguration: (config) =>
             {
-                config.AddConsumer<RunPluginRequestedEventConsumer>(configX =>
-                {
-                    configX.UseMessageRetry(f => f.Immediate(5));
-                });
+                // config.AddConsumer<RunPluginRequestedEventConsumer>(configX =>
+                // {
+                //     configX.UseMessageRetry(f => f.Immediate(5));
+                // });
                 config.AddConsumer<PriceFetchedEventConsumer>();
                 config.AddConsumer<PriceFetchedFailedEventConsumer>();
-                config.AddConsumer<RunPluginRequestedEventConsumer>();
+                config.AddConsumer<RunAnalysisRequestedEventConsumer>();
             },
             configure: (context, config) =>
             {
@@ -43,6 +43,12 @@ public static class DependencyInjection
                 config.Message<PluginStartedEvent>(f => f.SetEntityName("plugin.executions.exchange.started"));
                 config.Message<PluginFailedEvent>(f => f.SetEntityName("plugin.executions.exchange.failed"));
                 config.Message<PluginSucceededEvent>(f => f.SetEntityName("plugin.executions.exchange.succeeded"));
+                config.ReceiveEndpoint("analysis.executions.queue.run", ep =>
+                {
+                    ep.ConfigureConsumeTopology = false;
+                    ep.Bind("analysis.executions.exchange.run");
+                    ep.ConfigureConsumer<RunAnalysisRequestedEventConsumer>(context);
+                });
                 config.ReceiveEndpoint("price.fetch.queue", ep =>
                 {
                     ep.ConfigureConsumeTopology = false;
@@ -54,7 +60,7 @@ public static class DependencyInjection
                 {
                     ep.ConfigureConsumeTopology = false;
                     ep.Bind("plugin.executions.exchange.run");
-                    ep.ConfigureConsumer<RunPluginRequestedEventConsumer>(context);
+                    ep.ConfigureConsumer<RunAnalysisRequestedEventConsumer>(context);
                 });
             }
         );
