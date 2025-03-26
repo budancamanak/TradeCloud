@@ -20,6 +20,8 @@ public abstract class PluginBase<T> : IPlugin where T : IParameters
     // protected string? ParamsJson;
     protected string? _tradingParams;
     protected T Params;
+    
+    protected IPluginStateManager StateManager;
 
     public PluginBase(ILogger<IPlugin> logger, IPluginMessageBroker messageBroker, IReadOnlyCacheService cache)
     {
@@ -28,13 +30,13 @@ public abstract class PluginBase<T> : IPlugin where T : IParameters
         MessageBroker = messageBroker;
     }
 
-    protected abstract void Execute();
 
     protected abstract T ParseParams(string? json);
 
     public abstract IPlugin.PluginInfo GetPluginInfo();
 
     public abstract IParameters GetDefaultParamSet();
+    protected abstract void Execute();
 
     private void SetPluginParameters(string priceCacheKey, string tickerCacheKey, int pluginId)
     {
@@ -91,6 +93,11 @@ public abstract class PluginBase<T> : IPlugin where T : IParameters
     public void UseMessageBroker(IPluginMessageBroker messageBroker)
     {
         this.MessageBroker = messageBroker;
+    }
+
+    public void UseStateManager(IPluginStateManager stateManager)
+    {
+        this.StateManager = stateManager;
     }
 
     public void UseParamSet(string? paramsJson)

@@ -29,6 +29,8 @@ public class PluginHost : IPluginHost
     private readonly ICacheService _cache;
     private readonly ConcurrentDictionary<int, RunPluginRequest> _waitingPluginRequests;
     private readonly ConcurrentDictionary<int, RunAnalysisRequest> _waitingAnalysisRequests;
+    private readonly ConcurrentDictionary<int, PluginStatus> _activePlugins;
+
     private readonly PluginLoader _pluginLoader;
 
     public PluginHost(IConfiguration configuration, IServiceScopeFactory scopeFactory,
@@ -37,6 +39,7 @@ public class PluginHost : IPluginHost
         _cache = cache;
         _waitingPluginRequests = new ConcurrentDictionary<int, RunPluginRequest>();
         _waitingAnalysisRequests = new ConcurrentDictionary<int, RunAnalysisRequest>();
+        _activePlugins = new ConcurrentDictionary<int, PluginStatus>();
         using var scope = scopeFactory.CreateScope();
         _messageBroker = scope.ServiceProvider.GetRequiredService<IPluginMessageBroker>();
         _logger = logger;
@@ -45,7 +48,7 @@ public class PluginHost : IPluginHost
         var max = configuration["Plugins:MaxConcurrentPluginRun"];
         _maxActivePlugin = string.IsNullOrWhiteSpace(max) ? 5 : int.Parse(max);
         if (_pluginsLoaded) return;
-        _pluginLoader = new PluginLoader(scopeFactory, configuration, cache, _messageBroker, logger);
+        _pluginLoader = new PluginLoader(scopeFactory, configuration, cache, _messageBroker, this, logger);
         _pluginsLoaded = true;
     }
 
@@ -128,5 +131,17 @@ public class PluginHost : IPluginHost
         return activePlugins == _maxActivePlugin
             ? MethodResponse.Error(activePlugins, "Too many active plugins exist")
             : MethodResponse.Success(0, "Plugin can run");
+    }
+
+    public void ThrowIfCancelRequested(int pluginId)
+    {
+        if (!_activePlugins.TryGetValue(pluginId, out var status))
+            throw new ArgumentException("Plugin not found in active list");
+        _logger.LogInformation("Plugin[{}]'s status is {}", pluginId, status);
+    }
+
+    public void OnPluginFinished(int pluginId)
+    {
+        _activePlugins.TryRemove(pluginId, out _);
     }
 }
