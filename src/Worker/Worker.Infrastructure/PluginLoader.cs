@@ -77,7 +77,7 @@ public class PluginLoader : IPluginLoader
         using var scope = scopeFactory.CreateScope();
         var pluginLogger = scope.ServiceProvider.GetRequiredService<ILogger<IPlugin>>();
         var result =
-            Activator.CreateInstance(type, args: [pluginLogger, _messageBroker, cache]) as IPlugin;
+            Activator.CreateInstance(type, args: [pluginLogger, _messageBroker, pluginHost, cache]) as IPlugin;
         if (result == null)
         {
             return null;
@@ -85,6 +85,7 @@ public class PluginLoader : IPluginLoader
 
         // result.UseLogger(_logger);
         result.UseMessageBroker(_messageBroker);
+        result.UseStateManager(pluginHost);
         return result;
     }
 

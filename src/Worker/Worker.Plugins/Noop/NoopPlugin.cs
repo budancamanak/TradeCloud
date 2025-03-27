@@ -7,8 +7,9 @@ namespace Worker.Plugins.Noop;
 
 public class NoopPlugin : PluginBase<NoopPluginParams>
 {
-    public NoopPlugin(ILogger<IPlugin> logger, IPluginMessageBroker messageBroker, IReadOnlyCacheService cache) : base(
-        logger, messageBroker, cache)
+    public NoopPlugin(ILogger<IPlugin> logger, IPluginMessageBroker messageBroker, IPluginStateManager stateManager,
+        IReadOnlyCacheService cache) : base(
+        logger, messageBroker, stateManager, cache)
     {
     }
 

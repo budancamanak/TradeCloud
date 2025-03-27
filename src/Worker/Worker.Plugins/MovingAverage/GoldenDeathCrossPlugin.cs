@@ -11,7 +11,8 @@ namespace Worker.Plugins.MovingAverage;
 public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
 {
     public GoldenDeathCrossPlugin(ILogger<IPlugin> logger, IPluginMessageBroker messageBroker,
-        IReadOnlyCacheService cache) : base(logger, messageBroker, cache)
+        IPluginStateManager stateManager,
+        IReadOnlyCacheService cache) : base(logger, messageBroker, stateManager, cache)
     {
     }
 

@@ -23,11 +23,12 @@ public abstract class PluginBase<T> : IPlugin where T : IParameters
     
     protected IPluginStateManager StateManager;
 
-    public PluginBase(ILogger<IPlugin> logger, IPluginMessageBroker messageBroker, IReadOnlyCacheService cache)
+    public PluginBase(ILogger<IPlugin> logger, IPluginMessageBroker messageBroker,IPluginStateManager stateManager, IReadOnlyCacheService cache)
     {
         Cache = cache;
         Logger = logger;
         MessageBroker = messageBroker;
+        StateManager = stateManager;
     }
 
 
