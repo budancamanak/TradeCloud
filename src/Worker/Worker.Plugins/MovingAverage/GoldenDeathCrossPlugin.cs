@@ -11,7 +11,8 @@ namespace Worker.Plugins.MovingAverage;
 public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
 {
     public GoldenDeathCrossPlugin(ILogger<IPlugin> logger, IPluginMessageBroker messageBroker,
-        IReadOnlyCacheService cache) : base(logger, messageBroker, cache)
+        IPluginStateManager stateManager,
+        IReadOnlyCacheService cache) : base(logger, messageBroker, stateManager, cache)
     {
     }
 
@@ -67,13 +68,13 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
     {
         Logger.LogWarning("Plugin {} is running on {} with params: {}", GetPluginInfo(), TickerDto,
             Params.GetStringRepresentation());
-        Thread.Sleep(5000);
         var quotes = PriceInfo.ToQuotes();
         var slow = quotes.GetSma(Params.SlowMovingAverage).ToList();
         var fast = quotes.GetSma(Params.FastMovingAverage).ToList();
         var isLastLong = 0;
         for (var i = 0; i < PriceInfo.Count; i++)
         {
+            StateManager.ThrowIfCancelRequested(ExecutionId);
             var slowResult = slow.Find(PriceInfo[i].Timestamp);
             var slowSma = slowResult?.Sma;
             var fastSma = fast.Find(PriceInfo[i].Timestamp)?.Sma;

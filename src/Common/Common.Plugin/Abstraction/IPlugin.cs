@@ -16,6 +16,7 @@ public interface IPlugin
     void UseTicker(TickerDto tickerDto);
     void UseLogger(ILogger<IPlugin> logger);
     void UseMessageBroker(IPluginMessageBroker messageBroker);
+    void UseStateManager(IPluginStateManager stateManager);
     void UseParamSet(string? paramSet);
     void UseTradingParams(string? tradingParams);
     IParameters GetDefaultParamSet(); 

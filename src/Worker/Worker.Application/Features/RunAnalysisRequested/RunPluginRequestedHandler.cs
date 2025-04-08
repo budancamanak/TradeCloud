@@ -3,6 +3,7 @@ using Common.Core.Models;
 using Common.Grpc;
 using Common.Messaging.Abstraction;
 using Common.Messaging.Events.PluginExecution;
+using Common.Plugin.Abstraction;
 using Google.Protobuf.WellKnownTypes;
 using Hangfire;
 using MediatR;
@@ -13,6 +14,7 @@ namespace Worker.Application.Features.RunAnalysisRequested;
 
 public class RunAnalysisRequestedHandler(
     IPluginHost pluginHost,
+    IPluginStateManager pluginStateManager,
     ILogger<RunAnalysisRequestedHandler> logger,
     IEventBus eventBus,
     IBackgroundJobClient jobClient,
@@ -20,7 +22,7 @@ public class RunAnalysisRequestedHandler(
 {
     public async Task<MethodResponse> Handle(RunAnalysisRequest request, CancellationToken cancellationToken)
     {
-        logger.LogWarning("RunPluginRequestedHandler called. Getting price info");
+        logger.LogWarning("RunAnalysisRequestedHandler called. Getting price info");
         var prices = await client.GetPricesForPluginAsync(new GrpcGetPricesRequest
         {
             Ticker = request.Ticker,
@@ -29,7 +31,7 @@ public class RunAnalysisRequestedHandler(
             PluginId = request.ExecutionId,
             StartDate = request.StartDate.ToTimestamp()
         });
-        if (prices == null || prices.Prices == null || prices.Prices.Count <= 0)
+        if (prices?.Prices is not { Count: > 0 })
         {
             // todo send pluginupdated event over rabbitmq. change plugin state to waiting data
             await eventBus.PublishAsync(new PluginStatusEvent(request.ExecutionId, PluginStatus.WaitingData));
@@ -45,9 +47,9 @@ public class RunAnalysisRequestedHandler(
         logger.LogDebug("Starting background job to to run plugin[{}]", request);
         foreach (var infoItem in info)
         {
+            pluginStateManager.OnPluginStarted(infoItem.PluginExecutionId);
             var identifier = jobClient.Enqueue(() => infoItem.Plugin.Run(infoItem.PluginExecutionId,
                 infoItem.PriceCacheKey, infoItem.TickerCacheKey));
-            // var identifier = jobClient.Enqueue(() => plugin.Item1.Run(request.ExecutionId, plugin.Item2, plugin.Item3));
             logger.LogDebug("Started background job to to run plugin[{}] : {}", request, identifier);
         }
 

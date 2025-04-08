@@ -9,9 +9,10 @@ public interface IPluginExecutionRepository : IAsyncRepository<PluginExecution>
 {
     Task<PluginExecution> GetNextWaitingPluginExecution();
     Task<List<PluginExecution>> GetWaitingPluginExecutions();
-    Task<List<PluginExecution>> GetActivePluginExecutions();
+    Task<List<PluginExecution>> GetActivePluginExecutions(int analysisId);
 
     Task<List<PluginExecution>> GetPluginExecutionsWithStatus(PluginStatus status);
+    Task<List<PluginExecution>> GetPluginExecutionsWithStatus(int analysisId, params PluginStatus[] status);
     Task<List<PluginExecution>> GetPluginOfAnalysis(int analysisId);
 
     // Task<List<PluginExecution>> GetPluginExecutionsForTicker(int tickerId);
