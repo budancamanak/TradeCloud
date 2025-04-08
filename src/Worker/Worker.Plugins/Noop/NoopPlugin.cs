@@ -38,11 +38,11 @@ public class NoopPlugin : PluginBase<NoopPluginParams>
     {
         Logger.LogWarning("Plugin {} is running on {} with params: {}", GetPluginInfo(), TickerDto,
             Params.GetStringRepresentation());
-        var timeout = TimeSpan.FromSeconds(1);
+        var timeout = TimeSpan.FromSeconds(3);
         while (true)
         {
             StateManager.ThrowIfCancelRequested(ExecutionId);
-            Logger.LogInformation("Plugin {} is running on {}", GetPluginInfo(), TickerDto);
+            Logger.LogInformation("Plugin[{}] {} is running on {}", ExecutionId, GetPluginInfo(), TickerDto);
             Thread.Sleep(timeout);
         }
     }

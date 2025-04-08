@@ -27,7 +27,6 @@
     <Folder Include="Features\Execution\ListAvailableTickers\" />
     <Folder Include="Features\Execution\PluginExecutionDetails\" />
     <Folder Include="Features\Execution\PluginExecutionHistory\" />
-    <Folder Include="Features\Execution\StopAnalysisExecution\" />
     <Folder Include="Features\Execution\TrackListOperations\" />
     <Folder Include="Features\SystemSettings\" />
     <Folder Include="Features\TrackList\ListUserTrackList\" />

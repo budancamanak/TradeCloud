@@ -27,7 +27,7 @@ public class PluginHost : IPluginHost
     private readonly IPluginMessageBroker _messageBroker;
     private readonly int _maxActivePlugin;
     private readonly ICacheService _cache;
-    private readonly ConcurrentDictionary<int, RunPluginRequest> _waitingPluginRequests;
+    // private readonly ConcurrentDictionary<int, RunPluginRequest> _waitingPluginRequests;
     private readonly ConcurrentDictionary<int, RunAnalysisRequest> _waitingAnalysisRequests;
     private readonly ConcurrentDictionary<int, PluginStatus> _activePlugins;
 
@@ -37,7 +37,7 @@ public class PluginHost : IPluginHost
         ICacheService cache, ILogger<PluginHost> logger)
     {
         _cache = cache;
-        _waitingPluginRequests = new ConcurrentDictionary<int, RunPluginRequest>();
+        // _waitingPluginRequests = new ConcurrentDictionary<int, RunPluginRequest>();
         _waitingAnalysisRequests = new ConcurrentDictionary<int, RunAnalysisRequest>();
         _activePlugins = new ConcurrentDictionary<int, PluginStatus>();
         using var scope = scopeFactory.CreateScope();
@@ -56,7 +56,8 @@ public class PluginHost : IPluginHost
 
     public bool AddPluginToQueue(RunPluginRequest request)
     {
-        return _waitingPluginRequests.TryAdd(request.ExecutionId, request);
+        // return _waitingPluginRequests.TryAdd(request.ExecutionId, request);
+        return false;
     }
 
     public bool AddAnalysisToQueue(RunAnalysisRequest request)
@@ -80,7 +81,7 @@ public class PluginHost : IPluginHost
 
     public void RemovePluginFromQueue(int pluginId)
     {
-        _waitingPluginRequests.TryRemove(pluginId, out _);
+        _waitingAnalysisRequests.TryRemove(pluginId, out _);
     }
 
     public async Task<MethodResponse> RunPlugin(int pluginId)
@@ -119,7 +120,7 @@ public class PluginHost : IPluginHost
 
     public MethodResponse IsPluginInQueue(int pluginId)
     {
-        var request = _waitingPluginRequests.GetValueOrDefault(pluginId);
+        var request = _waitingAnalysisRequests.GetValueOrDefault(pluginId);
         return request == null
             ? MethodResponse.Error(pluginId, "Plugin is not in queue")
             : MethodResponse.Success(pluginId, "Plugin is in queue already");
@@ -141,6 +142,16 @@ public class PluginHost : IPluginHost
     }
 
     public void OnPluginFinished(int pluginId)
+    {
+        _activePlugins.TryRemove(pluginId, out _);
+    }
+
+    public void OnPluginStarted(int pluginId)
+    {
+        _activePlugins.TryAdd(pluginId, PluginStatus.Running);
+    }
+
+    public void OnPluginStopped(int pluginId)
     {
         _activePlugins.TryRemove(pluginId, out _);
     }

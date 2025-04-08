@@ -6,4 +6,5 @@ namespace Backend.Application.Features.Execution.ListActivePlugins;
 
 public class ListActivePluginsRequest : IRequest<List<PluginExecutionsDto>>
 {
+    public int AnalysisExecutionId { get; set; }
 }

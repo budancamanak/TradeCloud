@@ -63,15 +63,7 @@ public class RunAnalysisExecutionRequestHandler(
         }
 
         // todo trigger rabbitmq to inform worker to run
-        executions = await pluginRepository.GetPluginOfAnalysis(plugin.Id);
-
-        // var paramModel = new PluginParamModel
-        // {
-        //     ParamSet = plugin.ParamSet,
-        //     TradingParams = plugin.TradingParams
-        // };
-        // await cache.SetAsync(CacheKeyGenerator.ActiveAnalysisKey(request.ExecutionId), paramModel,
-        //     TimeSpan.MaxValue);
+        executions = await pluginRepository.GetActivePluginExecutions(request.ExecutionId);
         var @event = mapper.Map<RunAnalysisRequestedEvent>(plugin,
             opts =>
             {

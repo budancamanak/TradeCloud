@@ -6,6 +6,7 @@ using Backend.Application.Features.Execution.ListActivePlugins;
 using Backend.Application.Features.Execution.ListAvailablePlugins;
 using Backend.Application.Features.Execution.RunAnalysisExecution;
 using Backend.Application.Features.Execution.RunPluginExecution;
+using Backend.Application.Features.Execution.StopAnalysisExecution;
 using Common.Core.DTOs.Backend;
 using Common.Core.Models;
 using Common.Plugin.Abstraction;
@@ -16,7 +17,10 @@ namespace Backend.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class AnalysisExecutionsController(ILogger<AnalysisExecutionsController> logger, IMediator mediator,IMapper mapper)
+public class AnalysisExecutionsController(
+    ILogger<AnalysisExecutionsController> logger,
+    IMediator mediator,
+    IMapper mapper)
 {
     [HttpGet("GetAvailablePlugins")]
     public async Task<List<IPlugin.PluginInfo>> GetAvailablePlugins()
@@ -27,13 +31,12 @@ public class AnalysisExecutionsController(ILogger<AnalysisExecutionsController> 
     }
 
     [HttpGet("ActivePlugins")]
-    public async Task<List<PluginExecutionsDto>> GetActivePlugins()
+    public async Task<List<PluginExecutionsDto>> GetActivePlugins([FromQuery] ListActivePluginsRequest request)
     {
-        var request = new ListActivePluginsRequest();
         var result = await mediator.Send(request);
         return result;
     }
- 
+
     [HttpPost]
     public async Task<MethodResponse> CreateAnalysisExecution([FromBody] CreateAnalysisExecutionModel model)
     {
@@ -44,6 +47,13 @@ public class AnalysisExecutionsController(ILogger<AnalysisExecutionsController> 
 
     [HttpPatch]
     public async Task<MethodResponse> RunAnalysisExecution([FromBody] RunAnalysisExecutionRequest request)
+    {
+        var result = await mediator.Send(request);
+        return result;
+    }
+
+    [HttpDelete]
+    public async Task<MethodResponse> StopAnalysisExecution([FromBody] StopAnalysisExecutionRequest request)
     {
         var result = await mediator.Send(request);
         return result;
