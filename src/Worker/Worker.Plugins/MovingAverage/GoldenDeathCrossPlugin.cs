@@ -4,7 +4,7 @@ using Common.Plugin.Signals;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Skender.Stock.Indicators;
-using Worker.Plugins.Utils;
+
 
 namespace Worker.Plugins.MovingAverage;
 
@@ -12,7 +12,7 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
 {
     public GoldenDeathCrossPlugin(ILogger<IPlugin> logger, IPluginMessageBroker messageBroker,
         IPluginStateManager stateManager,
-        IReadOnlyCacheService cache) : base(logger, messageBroker, stateManager, cache)
+        ICacheService cache) : base(logger, messageBroker, stateManager, cache)
     {
     }
 
@@ -68,9 +68,12 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
     {
         Logger.LogWarning("Plugin {} is running on {} with params: {}", GetPluginInfo(), TickerDto,
             Params.GetStringRepresentation());
-        var quotes = PriceInfo.ToQuotes();
-        var slow = quotes.GetSma(Params.SlowMovingAverage).ToList();
-        var fast = quotes.GetSma(Params.FastMovingAverage).ToList();
+        var slow = tradeMath.GetSma(Params.SlowMovingAverage).ToList();
+        var fast = tradeMath.GetSma(Params.FastMovingAverage).ToList();
+        
+        // var quotes = PriceInfo.ToQuotes();
+        // var slow = quotes.GetSma(Params.SlowMovingAverage).ToList();
+        // var fast = quotes.GetSma(Params.FastMovingAverage).ToList();
         var isLastLong = 0;
         for (var i = 0; i < PriceInfo.Count; i++)
         {

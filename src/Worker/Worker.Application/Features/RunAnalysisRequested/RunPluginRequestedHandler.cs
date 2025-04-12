@@ -1,4 +1,5 @@
-﻿using Common.Core.Enums;
+﻿using System.Linq.Expressions;
+using Common.Core.Enums;
 using Common.Core.Models;
 using Common.Grpc;
 using Common.Messaging.Abstraction;
@@ -45,12 +46,25 @@ public class RunAnalysisRequestedHandler(
         var info = await pluginHost.GetPluginToRun(request.ExecutionId);
         pluginHost.RemovePluginFromQueue(request.ExecutionId);
         logger.LogDebug("Starting background job to to run plugin[{}]", request);
+
+        string parent = "";
         foreach (var infoItem in info)
         {
+            if (string.IsNullOrWhiteSpace(parent))
+            {
+                parent = jobClient.Enqueue(() =>
+                    infoItem.Plugin.Run(request.ExecutionId, infoItem.PluginExecutionId, infoItem.PriceCacheKey,
+                        infoItem.TickerCacheKey));
+            }
+            else
+            {
+                parent = jobClient.ContinueJobWith(parent,
+                    () => infoItem.Plugin.Run(request.ExecutionId, infoItem.PluginExecutionId, infoItem.PriceCacheKey,
+                        infoItem.TickerCacheKey));
+            }
+
             pluginStateManager.OnPluginStarted(infoItem.PluginExecutionId);
-            var identifier = jobClient.Enqueue(() => infoItem.Plugin.Run(infoItem.PluginExecutionId,
-                infoItem.PriceCacheKey, infoItem.TickerCacheKey));
-            logger.LogDebug("Started background job to to run plugin[{}] : {}", request, identifier);
+            logger.LogDebug("Started background job to to run plugin[{}] : {}", request, parent);
         }
 
         await eventBus.PublishAsync(new PluginStatusEvent(request.ExecutionId, PluginStatus.Queued));
