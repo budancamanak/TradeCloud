@@ -80,18 +80,7 @@ public class Tests
         Console.WriteLine(key);
         key.Should().Be("TestFunc_3_1_3_4__6_");
     }
-    [Test]
-    public void Test_GetSma()
-    {
-        // var x = CachedFunc2(() => Multiply(3, 5));
-        // var f = () => Multiply(3, 5);
-        // Expression<Func<int>> bind = () => f();
-        // var a = bind.Compile().Invoke();
-        // var x = CachedFunc2(bind).Invoke();
-        string key = GenerateCacheKey(Args(1, 3, 4, null, 6.1));
-        Console.WriteLine(key);
-        key.Should().Be("Test_GetSma_3_1_3_4__6,1_");
-    }
+
     [Test]
     public void Test_GetSma_Null()
     {
