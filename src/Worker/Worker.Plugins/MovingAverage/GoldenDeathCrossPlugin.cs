@@ -69,9 +69,8 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
         Logger.LogWarning("Plugin {} is running on {} with params: {}", GetPluginInfo(), TickerDto,
             Params.GetStringRepresentation());
         var slow = tradeMath.GetSma(Params.SlowMovingAverage).ToList();
-        var adl = tradeMath.GetAdl(Params.SlowMovingAverage).ToList();
         var fast = tradeMath.GetSma(Params.FastMovingAverage).ToList();
-
+        
         // var quotes = PriceInfo.ToQuotes();
         // var slow = quotes.GetSma(Params.SlowMovingAverage).ToList();
         // var fast = quotes.GetSma(Params.FastMovingAverage).ToList();
