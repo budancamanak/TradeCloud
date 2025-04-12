@@ -1,8 +1,10 @@
-﻿using Common.Core.Enums;
+﻿using System.Linq.Expressions;
+using Common.Core.Enums;
 using Common.Core.Models;
 using Common.Grpc;
 using Common.Messaging.Abstraction;
 using Common.Messaging.Events.PluginExecution;
+using Common.Plugin.Abstraction;
 using Google.Protobuf.WellKnownTypes;
 using Hangfire;
 using MediatR;
@@ -13,6 +15,7 @@ namespace Worker.Application.Features.RunAnalysisRequested;
 
 public class RunAnalysisRequestedHandler(
     IPluginHost pluginHost,
+    IPluginStateManager pluginStateManager,
     ILogger<RunAnalysisRequestedHandler> logger,
     IEventBus eventBus,
     IBackgroundJobClient jobClient,
@@ -20,7 +23,7 @@ public class RunAnalysisRequestedHandler(
 {
     public async Task<MethodResponse> Handle(RunAnalysisRequest request, CancellationToken cancellationToken)
     {
-        logger.LogWarning("RunPluginRequestedHandler called. Getting price info");
+        logger.LogWarning("RunAnalysisRequestedHandler called. Getting price info");
         var prices = await client.GetPricesForPluginAsync(new GrpcGetPricesRequest
         {
             Ticker = request.Ticker,
@@ -29,7 +32,7 @@ public class RunAnalysisRequestedHandler(
             PluginId = request.ExecutionId,
             StartDate = request.StartDate.ToTimestamp()
         });
-        if (prices == null || prices.Prices == null || prices.Prices.Count <= 0)
+        if (prices?.Prices is not { Count: > 0 })
         {
             // todo send pluginupdated event over rabbitmq. change plugin state to waiting data
             await eventBus.PublishAsync(new PluginStatusEvent(request.ExecutionId, PluginStatus.WaitingData));
@@ -43,12 +46,25 @@ public class RunAnalysisRequestedHandler(
         var info = await pluginHost.GetPluginToRun(request.ExecutionId);
         pluginHost.RemovePluginFromQueue(request.ExecutionId);
         logger.LogDebug("Starting background job to to run plugin[{}]", request);
+
+        string parent = "";
         foreach (var infoItem in info)
         {
-            var identifier = jobClient.Enqueue(() => infoItem.Plugin.Run(infoItem.PluginExecutionId,
-                infoItem.PriceCacheKey, infoItem.TickerCacheKey));
-            // var identifier = jobClient.Enqueue(() => plugin.Item1.Run(request.ExecutionId, plugin.Item2, plugin.Item3));
-            logger.LogDebug("Started background job to to run plugin[{}] : {}", request, identifier);
+            if (string.IsNullOrWhiteSpace(parent))
+            {
+                parent = jobClient.Enqueue(() =>
+                    infoItem.Plugin.Run(request.ExecutionId, infoItem.PluginExecutionId, infoItem.PriceCacheKey,
+                        infoItem.TickerCacheKey));
+            }
+            else
+            {
+                parent = jobClient.ContinueJobWith(parent,
+                    () => infoItem.Plugin.Run(request.ExecutionId, infoItem.PluginExecutionId, infoItem.PriceCacheKey,
+                        infoItem.TickerCacheKey));
+            }
+
+            pluginStateManager.OnPluginStarted(infoItem.PluginExecutionId);
+            logger.LogDebug("Started background job to to run plugin[{}] : {}", request, parent);
         }
 
         await eventBus.PublishAsync(new PluginStatusEvent(request.ExecutionId, PluginStatus.Queued));

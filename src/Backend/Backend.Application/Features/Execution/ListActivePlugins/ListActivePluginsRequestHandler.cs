@@ -28,7 +28,7 @@ public class ListActivePluginsRequestHandler(ICacheService cache, IMapper mapper
          */
         // var items = await cache.GetAsync<List<PluginExecutionsDto>>(CacheKeyGenerator.ActivePluginCountKey());
         // throw new NotImplementedException();
-        var items = await repository.GetActivePluginExecutions();
+        var items = await repository.GetActivePluginExecutions(request.AnalysisExecutionId);
         var dtos = mapper.Map<List<PluginExecutionsDto>>(items);
         return dtos;
     }

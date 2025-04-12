@@ -1,6 +1,7 @@
 ﻿using Common.Application.Repositories;
 using Common.Application.Services;
 using Common.Core.DTOs;
+using Common.Plugin.Math;
 using Common.Plugin.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -11,34 +12,41 @@ public abstract class PluginBase<T> : IPlugin where T : IParameters
 {
     protected ILogger<IPlugin> Logger;
     protected IPluginMessageBroker MessageBroker;
-    protected IReadOnlyCacheService Cache;
+    protected ICacheService Cache;
 
     protected TickerDto TickerDto;
     protected int ExecutionId;
+    protected int AnalysisExecutionId;
     protected List<PriceDto> PriceInfo;
 
     // protected string? ParamsJson;
     protected string? _tradingParams;
     protected T Params;
 
-    public PluginBase(ILogger<IPlugin> logger, IPluginMessageBroker messageBroker, IReadOnlyCacheService cache)
+    protected IPluginStateManager StateManager;
+    protected TradeMath tradeMath;
+
+    public PluginBase(ILogger<IPlugin> logger, IPluginMessageBroker messageBroker, IPluginStateManager stateManager,
+        ICacheService cache)
     {
         Cache = cache;
         Logger = logger;
         MessageBroker = messageBroker;
+        StateManager = stateManager;
     }
 
-    protected abstract void Execute();
 
     protected abstract T ParseParams(string? json);
 
     public abstract IPlugin.PluginInfo GetPluginInfo();
 
     public abstract IParameters GetDefaultParamSet();
+    protected abstract void Execute();
 
-    private void SetPluginParameters(string priceCacheKey, string tickerCacheKey, int pluginId)
+    private void SetPluginParameters(string priceCacheKey, string tickerCacheKey, int analysisExecutionId, int pluginId)
     {
         ExecutionId = pluginId;
+        AnalysisExecutionId = analysisExecutionId;
         var prices = Cache.GetAsync<List<PriceDto>>(priceCacheKey).GetAwaiter().GetResult();
         Logger.LogInformation("Got prices for plugin to run: {}", pluginId);
         var ticker = Cache.GetAsync<TickerDto>(tickerCacheKey).GetAwaiter().GetResult();
@@ -54,21 +62,21 @@ public abstract class PluginBase<T> : IPlugin where T : IParameters
         UsePriceInfo(prices!);
     }
 
-    public void Run(int executionId, string priceCacheKey, string tickerCacheKey)
+    public void Run(int analysisExecutionId, int pluginExecutionId, string priceCacheKey, string tickerCacheKey)
     {
-        SetPluginParameters(priceCacheKey, tickerCacheKey, executionId);
+        SetPluginParameters(priceCacheKey, tickerCacheKey, analysisExecutionId, pluginExecutionId);
         // TickerDto ticker, List<PriceDto> priceInfo,
         Logger.LogInformation("Plugin[{}] started to run", GetPluginInfo());
-        MessageBroker.OnPluginStarted(this, executionId);
+        MessageBroker.OnPluginStarted(this, pluginExecutionId);
         try
         {
             Execute();
-            MessageBroker.OnPluginSucceeded(this, executionId);
+            MessageBroker.OnPluginSucceeded(this, pluginExecutionId);
             Logger.LogInformation("Plugin[{}] finished", GetPluginInfo());
         }
         catch (Exception ex)
         {
-            MessageBroker.OnPluginFailed(this, executionId, ex);
+            MessageBroker.OnPluginFailed(this, pluginExecutionId, ex);
             Logger.LogError("Plugin[{}] with failed: Exception:{}", GetPluginInfo(), ex);
         }
     }
@@ -76,6 +84,7 @@ public abstract class PluginBase<T> : IPlugin where T : IParameters
     public void UsePriceInfo(List<PriceDto> prices)
     {
         this.PriceInfo = prices;
+        tradeMath = new TradeMath(Cache, AnalysisExecutionId, prices);
     }
 
     public void UseTicker(TickerDto tickerDto)
@@ -93,6 +102,11 @@ public abstract class PluginBase<T> : IPlugin where T : IParameters
         this.MessageBroker = messageBroker;
     }
 
+    public void UseStateManager(IPluginStateManager stateManager)
+    {
+        this.StateManager = stateManager;
+    }
+
     public void UseParamSet(string? paramsJson)
     {
         // this.ParamsJson = paramsJson;
@@ -105,4 +119,5 @@ public abstract class PluginBase<T> : IPlugin where T : IParameters
     }
 
     public abstract Type GetPluginType();
+    
 }

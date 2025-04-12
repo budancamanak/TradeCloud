@@ -16,10 +16,12 @@ public class PluginLoader : IPluginLoader
     private readonly IPluginMessageBroker _messageBroker;
     private readonly IServiceScopeFactory scopeFactory;
     private readonly ICacheService cache;
+    private readonly IPluginHost pluginHost;
 
     public PluginLoader(IServiceScopeFactory scopeFactory, IConfiguration configuration, ICacheService cache,
-        IPluginMessageBroker messageBroker, ILogger<PluginHost> logger)
+        IPluginMessageBroker messageBroker, IPluginHost pluginHost, ILogger<PluginHost> logger)
     {
+        this.pluginHost = pluginHost;
         this.cache = cache;
         this.scopeFactory = scopeFactory;
         _logger = logger;
@@ -58,17 +60,10 @@ public class PluginLoader : IPluginLoader
         {
             if (!type.GetInterfaces().Any(inf => inf.Name.Equals(nameof(IPlugin)))) continue;
             if (type.IsAbstract) continue;
-            // var result =
-            //     Activator.CreateInstance(type, args: [pluginLogger, _messageBroker, cache]) as IPlugin;
-            // if (result == null)
-            // {
-            //     continue;
-            // }
-
             var result = CreatePlugin(type);
             if (result == null) continue;
-            // result.UseLogger(_logger);
             result.UseMessageBroker(_messageBroker);
+            result.UseStateManager(pluginHost);
             count++;
             yield return result;
         }
@@ -82,7 +77,7 @@ public class PluginLoader : IPluginLoader
         using var scope = scopeFactory.CreateScope();
         var pluginLogger = scope.ServiceProvider.GetRequiredService<ILogger<IPlugin>>();
         var result =
-            Activator.CreateInstance(type, args: [pluginLogger, _messageBroker, cache]) as IPlugin;
+            Activator.CreateInstance(type, args: [pluginLogger, _messageBroker, pluginHost, cache]) as IPlugin;
         if (result == null)
         {
             return null;
@@ -90,6 +85,7 @@ public class PluginLoader : IPluginLoader
 
         // result.UseLogger(_logger);
         result.UseMessageBroker(_messageBroker);
+        result.UseStateManager(pluginHost);
         return result;
     }
 

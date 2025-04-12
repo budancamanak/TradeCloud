@@ -80,6 +80,7 @@ public class PluginExecutionEngine : IPluginExecutionEngine
         Guard.Against.NullOrZeroLengthArray(parameters);
         foreach (var param in parameters!)
         {
+            if(string.IsNullOrWhiteSpace(param.Name)) continue;
             switch (param.Type)
             {
                 case ParameterType.Int:

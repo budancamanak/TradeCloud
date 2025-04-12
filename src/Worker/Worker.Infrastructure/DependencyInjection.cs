@@ -33,6 +33,7 @@ public static class DependencyInjection
                 config.AddConsumer<PriceFetchedEventConsumer>();
                 config.AddConsumer<PriceFetchedFailedEventConsumer>();
                 config.AddConsumer<RunAnalysisRequestedEventConsumer>();
+                config.AddConsumer<StopAnalysisExecutionConsumer>();
             },
             configure: (context, config) =>
             {
@@ -49,18 +50,18 @@ public static class DependencyInjection
                     ep.Bind("analysis.executions.exchange.run");
                     ep.ConfigureConsumer<RunAnalysisRequestedEventConsumer>(context);
                 });
+                config.ReceiveEndpoint("analysis.executions.queue.stop", ep =>
+                {
+                    ep.ConfigureConsumeTopology = false;
+                    ep.Bind("analysis.executions.exchange.stop");
+                    ep.ConfigureConsumer<StopAnalysisExecutionConsumer>(context);
+                });
                 config.ReceiveEndpoint("price.fetch.queue", ep =>
                 {
                     ep.ConfigureConsumeTopology = false;
                     ep.Bind("price.fetch.exchange");
                     ep.ConfigureConsumer<PriceFetchedEventConsumer>(context);
                     ep.ConfigureConsumer<PriceFetchedFailedEventConsumer>(context);
-                });
-                config.ReceiveEndpoint("plugin.executions.queue.run", ep =>
-                {
-                    ep.ConfigureConsumeTopology = false;
-                    ep.Bind("plugin.executions.exchange.run");
-                    ep.ConfigureConsumer<RunAnalysisRequestedEventConsumer>(context);
                 });
             }
         );
@@ -79,6 +80,7 @@ public static class DependencyInjection
         serviceCollection.AddTransient<IReadOnlyCacheService, RedisCacheService>();
         // serviceCollection.AddScoped<IPluginHost, PluginHost>();
         serviceCollection.AddSingleton<IPluginHost, PluginHost>();
+        serviceCollection.AddSingleton<IPluginStateManager, PluginHost>();
         serviceCollection.AddKeyedScoped<ICacheBuilder, WorkerCacheBuilder>("worker");
         serviceCollection.AddKeyedScoped<ICacheBuilder, AvailablePluginsCacheBuilder>("availablePlugins");
 

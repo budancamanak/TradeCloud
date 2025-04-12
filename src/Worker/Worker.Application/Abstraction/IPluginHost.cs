@@ -5,7 +5,7 @@ using Worker.Application.Features.RunPluginRequested;
 
 namespace Worker.Application.Abstraction;
 
-public interface IPluginHost
+public interface IPluginHost : IPluginStateManager
 {
     IList<IPlugin> Plugins();
     bool AddPluginToQueue(RunPluginRequest request);

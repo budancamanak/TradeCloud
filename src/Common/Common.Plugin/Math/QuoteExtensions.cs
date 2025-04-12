@@ -1,7 +1,7 @@
 ﻿using Common.Core.DTOs;
 using Skender.Stock.Indicators;
 
-namespace Worker.Plugins.Utils;
+namespace Common.Plugin.Math;
 
 public static class QuoteExtensions
 {

@@ -11,11 +11,12 @@ public interface IPlugin
     PluginInfo GetPluginInfo();
 
     // void Run(TickerDto ticker,List<PriceDto> priceInfo,int executionId);
-    void Run(int executionId, string priceCacheKey, string tickerCacheKey);
+    void Run(int analysisExecutionId,int pluginExecutionId, string priceCacheKey, string tickerCacheKey);
     void UsePriceInfo(List<PriceDto> priceInfo);
     void UseTicker(TickerDto tickerDto);
     void UseLogger(ILogger<IPlugin> logger);
     void UseMessageBroker(IPluginMessageBroker messageBroker);
+    void UseStateManager(IPluginStateManager stateManager);
     void UseParamSet(string? paramSet);
     void UseTradingParams(string? tradingParams);
     IParameters GetDefaultParamSet(); 
