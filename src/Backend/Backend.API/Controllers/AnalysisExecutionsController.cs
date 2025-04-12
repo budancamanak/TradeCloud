@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using Backend.API.Models;
 using Backend.Application.Features.Execution.CreateAnalysisExecution;
-using Backend.Application.Features.Execution.CreatePluginExecution;
 using Backend.Application.Features.Execution.ListActivePlugins;
 using Backend.Application.Features.Execution.ListAvailablePlugins;
 using Backend.Application.Features.Execution.RunAnalysisExecution;
-using Backend.Application.Features.Execution.RunPluginExecution;
 using Backend.Application.Features.Execution.StopAnalysisExecution;
 using Common.Core.DTOs.Backend;
 using Common.Core.Models;

@@ -1,10 +1,6 @@
-﻿using Backend.Application.Features.Execution.CreateAnalysisExecution;
-using Backend.Application.Features.Execution.CreatePluginExecution;
-using Backend.Application.Features.Execution.ListActivePlugins;
+﻿using Backend.Application.Features.Execution.ListActivePlugins;
 using Backend.Application.Features.Execution.ListAvailablePlugins;
-using Backend.Application.Features.Execution.RunPluginExecution;
 using Common.Core.DTOs.Backend;
-using Common.Core.Models;
 using Common.Plugin.Abstraction;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
