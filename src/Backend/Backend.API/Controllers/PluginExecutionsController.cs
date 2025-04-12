@@ -30,26 +30,4 @@ public class PluginExecutionsController(ILogger<PluginExecutionsController> logg
         var result = await mediator.Send(request);
         return result;
     }
-
-    [HttpPost]
-    [Obsolete("Use CreateAnalysisExecution API")]
-    public async Task<MethodResponse> CreatePluginExecution([FromBody] CreatePluginExecutionRequest request)
-    {
-        var result = await mediator.Send(request);
-        return result;
-    }
-
-    // [HttpPost]
-    // public async Task<MethodResponse> CreateAnalysisExecution([FromBody] CreateAnalysisExecutionRequest request)
-    // {
-    //     var result = await mediator.Send(request);
-    //     return result;
-    // }
-
-    [HttpPatch]
-    public async Task<MethodResponse> RunPluginExecution([FromBody] RunPluginExecutionRequest request)
-    {
-        var result = await mediator.Send(request);
-        return result;
-    }
 }
