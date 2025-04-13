@@ -86,6 +86,9 @@ namespace Backend.Infrastructure.Migrations
                     b.Property<string>("Error")
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("FinishStartDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("ParamSet")
                         .IsRequired()
                         .HasColumnType("text");
@@ -94,6 +97,12 @@ namespace Backend.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("double precision")
                         .HasDefaultValue(0.0);
+
+                    b.Property<DateTime>("QueuedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("RunStartDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Status")
                         .IsRequired()

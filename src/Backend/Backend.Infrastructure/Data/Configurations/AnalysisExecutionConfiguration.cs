@@ -8,44 +8,38 @@ public static class AnalysisExecutionConfiguration
 {
     public static void ApplyAnalysisExecutionConfigurations(this ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<AnalysisExecution>().ToTable("AnalysisExecutions");
-        modelBuilder.Entity<AnalysisExecution>().HasKey(f => f.Id);
-        modelBuilder.Entity<AnalysisExecution>()
-            .Property(f => f.PluginIdentifier)
+        var ent = modelBuilder.Entity<AnalysisExecution>();
+        ent.ToTable("AnalysisExecutions");
+        ent.HasKey(f => f.Id);
+        ent.Property(f => f.PluginIdentifier)
             .HasMaxLength(50)
             .IsRequired();
-        modelBuilder.Entity<AnalysisExecution>()
-            .Property(f => f.TickerId)
+        ent.Property(f => f.TickerId)
             .IsRequired();
-        modelBuilder.Entity<AnalysisExecution>()
-            .Property(p => p.Timeframe)
+        ent.Property(p => p.Timeframe)
             .HasMaxLength(3)
             .HasConversion(
                 v => v.GetStringRepresentation(),
                 v => v.TimeFrameFromString()
             )
             .IsRequired();
-        modelBuilder.Entity<AnalysisExecution>()
-            .Property(f => f.Progress)
+        ent.Property(f => f.Progress)
             .HasDefaultValue(0.0)
             .IsRequired();
-        modelBuilder.Entity<AnalysisExecution>()
-            .Property(f => f.UserId)
+        ent.Property(f => f.UserId)
             .IsRequired();
-        modelBuilder.Entity<AnalysisExecution>()
-            .Property(f => f.ParamSet)
+        ent.Property(f => f.ParamSet)
             .IsRequired();
-        modelBuilder.Entity<AnalysisExecution>()
-            .Property(f => f.TradingParams)
+        ent.Property(f => f.TradingParams)
             .IsRequired(false);
-        modelBuilder.Entity<AnalysisExecution>()
-            .Property(f => f.CreatedDate)
+        ent.Property(f => f.CreatedDate)
             .IsRequired();
-        modelBuilder.Entity<AnalysisExecution>()
-            .Property(f => f.StartDate)
+        ent.Property(f => f.StartDate)
             .IsRequired();
-        modelBuilder.Entity<AnalysisExecution>()
-            .Property(f => f.EndDate)
+        ent.Property(f => f.EndDate)
             .IsRequired();
+        ent.HasMany(f => f.PluginExecutions)
+            .WithOne(f => f.AnalysisExecution)
+            .HasForeignKey(f => f.AnalysisExecutionId);
     }
 }
