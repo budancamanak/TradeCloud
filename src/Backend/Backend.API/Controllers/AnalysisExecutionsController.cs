@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Backend.API.Models;
+using Backend.Application.Features.Execution.AnalysisExecutionDetails;
 using Backend.Application.Features.Execution.CreateAnalysisExecution;
 using Backend.Application.Features.Execution.ListActivePlugins;
 using Backend.Application.Features.Execution.ListAvailablePlugins;
@@ -21,7 +22,7 @@ public class AnalysisExecutionsController(
     IMapper mapper)
 {
     [HttpGet("GetAvailablePlugins")]
-    public async Task<List<IPlugin.PluginInfo>> GetAvailablePlugins()
+    public async Task<List<PluginInfo>> GetAvailablePlugins()
     {
         var request = new ListAvailablePluginsRequest();
         var result = await mediator.Send(request);
@@ -30,6 +31,14 @@ public class AnalysisExecutionsController(
 
     [HttpGet("ActivePlugins")]
     public async Task<List<PluginExecutionsDto>> GetActivePlugins([FromQuery] ListActivePluginsRequest request)
+    {
+        var result = await mediator.Send(request);
+        return result;
+    }
+
+    [HttpGet("AnalysisExecutionDetails")]
+    public async Task<AnalysisExecutionDto> GetAnalysisExecutionDetails(
+        [FromQuery] AnalysisExecutionDetailsRequest request)
     {
         var result = await mediator.Send(request);
         return result;

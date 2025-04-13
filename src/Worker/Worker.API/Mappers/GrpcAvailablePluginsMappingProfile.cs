@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Common.Core.Models;
 using Common.Grpc;
 using Common.Plugin.Abstraction;
 using Google.Protobuf.Collections;
@@ -9,10 +10,10 @@ public class GrpcAvailablePluginsMappingProfile : Profile
 {
     public GrpcAvailablePluginsMappingProfile()
     {
-        CreateMap<RepeatedField<GrpcAvailablePluginInfo>, List<IPlugin.PluginInfo>>()
+        CreateMap<RepeatedField<GrpcAvailablePluginInfo>, List<PluginInfo>>()
             .ConvertUsing(src =>
                 src.Select(x =>
-                    new IPlugin.PluginInfo(x.Name, x.Identifier, x.Version)
+                    new PluginInfo(x.Name, x.Identifier, x.Version)
                 ).ToList());
     }
 }

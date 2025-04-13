@@ -1,10 +1,11 @@
 ﻿using Common.Application.Repositories;
 using Common.Application.Services;
 using Common.Core.DTOs;
+using Common.Core.Models;
 using Common.Plugin.Math;
 using Common.Plugin.Models;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+
 
 namespace Common.Plugin.Abstraction;
 
@@ -38,7 +39,7 @@ public abstract class PluginBase<T> : IPlugin where T : IParameters
 
     protected abstract T ParseParams(string? json);
 
-    public abstract IPlugin.PluginInfo GetPluginInfo();
+    public abstract PluginInfo GetPluginInfo();
 
     public abstract IParameters GetDefaultParamSet();
     protected abstract void Execute();

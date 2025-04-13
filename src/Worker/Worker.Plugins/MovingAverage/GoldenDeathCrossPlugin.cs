@@ -1,4 +1,5 @@
 ﻿using Common.Application.Repositories;
+using Common.Core.Models;
 using Common.Plugin.Abstraction;
 using Common.Plugin.Signals;
 using Microsoft.Extensions.Logging;
@@ -33,9 +34,9 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
         return GetDefaultParamSet();
     }
 
-    public override IPlugin.PluginInfo GetPluginInfo()
+    public override PluginInfo GetPluginInfo()
     {
-        return new IPlugin.PluginInfo("GoldenCrossDeathCross", "09a0a20a-666c-4b13-80f7-5dc04db19f8c", "1.0.1");
+        return new PluginInfo("GoldenCrossDeathCross", "09a0a20a-666c-4b13-80f7-5dc04db19f8c", "1.0.1");
     }
 
     public override GoldenDeathCrossPluginParams GetDefaultParamSet()

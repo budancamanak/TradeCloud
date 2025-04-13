@@ -17,4 +17,5 @@ public class PluginExecutionsDto
     // public DateTime CreatedDate { get; set; }
     public string ParamSet { get; set; }
     public string Error { get; set; }
+    public PluginOutputDto[] Outputs { get; set; } = [];
 }

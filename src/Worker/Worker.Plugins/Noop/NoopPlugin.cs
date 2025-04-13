@@ -1,4 +1,5 @@
 ﻿using Common.Application.Repositories;
+using Common.Core.Models;
 using Common.Plugin.Abstraction;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -20,9 +21,9 @@ public class NoopPlugin : PluginBase<NoopPluginParams>
         return new NoopPluginParams();
     }
 
-    public override IPlugin.PluginInfo GetPluginInfo()
+    public override PluginInfo GetPluginInfo()
     {
-        return new IPlugin.PluginInfo("NoOpPlugin", "00000000-0000-0000-0000-000000000000", "1.0.0");
+        return new PluginInfo("NoOpPlugin", "00000000-0000-0000-0000-000000000000", "1.0.0");
     }
 
     public override IParameters GetDefaultParamSet()
