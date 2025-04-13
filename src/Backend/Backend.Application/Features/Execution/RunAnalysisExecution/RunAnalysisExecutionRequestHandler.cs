@@ -63,7 +63,9 @@ public class RunAnalysisExecutionRequestHandler(
         }
 
         // todo trigger rabbitmq to inform worker to run
-        executions = await pluginRepository.GetActivePluginExecutions(request.ExecutionId);
+        // todo use a method named GetPluginExecutionsToRun
+        // todo this method will fetch executions to be run. states to fetch: init
+        executions = await pluginRepository.GetPluginExecutionsWithStatus(request.ExecutionId, PluginStatus.Init);
         var @event = mapper.Map<RunAnalysisRequestedEvent>(plugin,
             opts =>
             {
@@ -75,6 +77,11 @@ public class RunAnalysisExecutionRequestHandler(
             });
         logger.LogWarning("Sending RunAnalysisRequestedEvent over message broker: {}", @event);
         await messageBroker.PublishAsync(@event);
+        foreach (var execution in executions)
+        {
+            await pluginRepository.SetPluginStatus(execution.Id, PluginStatus.RunRequested);
+        }
+
         return mr;
     }
 }

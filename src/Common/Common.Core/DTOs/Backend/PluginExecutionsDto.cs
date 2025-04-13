@@ -10,6 +10,7 @@ public class PluginExecutionsDto
     // public string Symbol { get; set; }
     // public string Timeframe { get; set; }
     public string Status { get; set; }
+    public double Progress { get; set; }
 
     // public DateTime StartDate { get; set; }
     // public DateTime EndDate { get; set; }

@@ -62,7 +62,8 @@ public class RunAnalysisRequestedHandler(
                     () => infoItem.Plugin.Run(request.ExecutionId, infoItem.PluginExecutionId, infoItem.PriceCacheKey,
                         infoItem.TickerCacheKey));
             }
-
+            
+            await eventBus.PublishAsync(new PluginStatusEvent(infoItem.PluginExecutionId, PluginStatus.Queued));
             pluginStateManager.OnPluginStarted(infoItem.PluginExecutionId);
             logger.LogDebug("Started background job to to run plugin[{}] : {}", request, parent);
         }

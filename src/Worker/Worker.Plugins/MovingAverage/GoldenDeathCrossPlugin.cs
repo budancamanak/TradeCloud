@@ -66,17 +66,19 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
 
     protected override void Execute()
     {
+        Thread.Sleep(2000);
         Logger.LogWarning("Plugin {} is running on {} with params: {}", GetPluginInfo(), TickerDto,
             Params.GetStringRepresentation());
-        var slow = tradeMath.GetSma(Params.SlowMovingAverage).ToList();
-        var fast = tradeMath.GetSma(Params.FastMovingAverage).ToList();
-        
+        var slow = tradeMath.GetSma(Params.SlowMovingAverage).Condense().ToList();
+        var fast = tradeMath.GetSma(Params.FastMovingAverage).Condense().ToList();
+
         // var quotes = PriceInfo.ToQuotes();
         // var slow = quotes.GetSma(Params.SlowMovingAverage).ToList();
         // var fast = quotes.GetSma(Params.FastMovingAverage).ToList();
         var isLastLong = 0;
         for (var i = 0; i < PriceInfo.Count; i++)
         {
+            Thread.Sleep(200);
             StateManager.ThrowIfCancelRequested(ExecutionId);
             var slowResult = slow.Find(PriceInfo[i].Timestamp);
             var slowSma = slowResult?.Sma;

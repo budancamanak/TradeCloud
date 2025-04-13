@@ -82,8 +82,10 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
     public async Task<List<PluginExecution>> GetActivePluginExecutions(int analysisId)
     {
         var items = await dbContext.PluginExecutions
-            .Where(f => f.AnalysisExecutionId == analysisId && /*f.Status > PluginStatus.Init &&*/
-                        f.Status != PluginStatus.Failure && f.Status != PluginStatus.Failure).ToListAsync();
+            .Where(f => f.AnalysisExecutionId == analysisId &&
+                        f.Status != PluginStatus.Failure &&
+                        f.Status != PluginStatus.Success &&
+                        f.Status != PluginStatus.Init).ToListAsync();
         return items;
     }
 
