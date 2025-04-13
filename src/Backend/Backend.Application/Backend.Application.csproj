@@ -23,11 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Execution\CreatePluginOutput\" />
-    <Folder Include="Features\Execution\ListAvailableTickers\" />
-    <Folder Include="Features\Execution\PluginExecutionDetails\" />
-    <Folder Include="Features\Execution\PluginExecutionHistory\" />
-    <Folder Include="Features\Execution\TrackListOperations\" />
     <Folder Include="Features\SystemSettings\" />
     <Folder Include="Features\TrackList\ListUserTrackList\" />
     <Folder Include="Features\TrackList\RemoveTickerFromUserTrackList\" />
