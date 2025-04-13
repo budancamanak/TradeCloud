@@ -68,7 +68,7 @@ public class RunAnalysisRequestedHandler(
             logger.LogDebug("Started background job to to run plugin[{}] : {}", request, parent);
         }
 
-        await eventBus.PublishAsync(new PluginStatusEvent(request.ExecutionId, PluginStatus.Queued));
+        // await eventBus.PublishAsync(new PluginStatusEvent(request.ExecutionId, PluginStatus.Queued));
         return MethodResponse.Success(request.ExecutionId, "Plugin started");
     }
 }

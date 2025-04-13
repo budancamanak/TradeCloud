@@ -146,6 +146,20 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
         Guard.Against.Null(existing);
         if (status > existing.Status)
             existing.Status = status;
+        switch (status)
+        {
+            case PluginStatus.Queued:
+                existing.QueuedDate = DateTime.UtcNow;
+                break;
+            case PluginStatus.Failure:
+            case PluginStatus.Success:
+                existing.FinishDate = DateTime.UtcNow;
+                break;
+            case PluginStatus.Running:
+                existing.RunStartDate = DateTime.UtcNow;
+                break;
+        }
+
         var result = await dbContext.SaveChangesAsync();
         if (result > 0) return MethodResponse.Success(result, "Execution updated status");
         return MethodResponse.Error("Failed to update execution status");

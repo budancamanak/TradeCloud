@@ -11,7 +11,7 @@ public class PluginExecution
     public string Error { get; set; } //todo make use of error field
     public DateTime? QueuedDate { get; set; }
     public DateTime? RunStartDate { get; set; }
-    public DateTime? FinishStartDate { get; set; }
+    public DateTime? FinishDate { get; set; }
     public int AnalysisExecutionId { get; set; }
     public virtual ICollection<PluginOutput> PluginOutputs { get; set; }
     public virtual AnalysisExecution AnalysisExecution { get; set; }

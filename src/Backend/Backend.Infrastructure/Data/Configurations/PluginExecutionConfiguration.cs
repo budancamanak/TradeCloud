@@ -34,5 +34,11 @@ public static class PluginExecutionConfiguration
         ent.HasMany(f => f.PluginOutputs)
             .WithOne(f => f.PluginExecution)
             .HasForeignKey(f => f.PluginId);
+        ent.Property(f => f.QueuedDate)
+            .IsRequired(false);
+        ent.Property(f => f.FinishDate)
+            .IsRequired(false);
+        ent.Property(f => f.RunStartDate)
+            .IsRequired(false);
     }
 }
