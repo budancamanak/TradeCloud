@@ -18,6 +18,9 @@ namespace Backend.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.1")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -86,6 +89,9 @@ namespace Backend.Infrastructure.Migrations
                     b.Property<string>("Error")
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("FinishDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("ParamSet")
                         .IsRequired()
                         .HasColumnType("text");
@@ -94,6 +100,12 @@ namespace Backend.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("double precision")
                         .HasDefaultValue(0.0);
+
+                    b.Property<DateTime?>("QueuedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("RunStartDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Status")
                         .IsRequired()

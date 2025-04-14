@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using Backend.Application.Abstraction.Services;
-using Backend.Application.Features.Execution.CreatePluginExecution;
 using Backend.Domain.Entities;
-using Common.Core.Enums;
+
 
 namespace Backend.Application.Features.Execution.CreateAnalysisExecution;
 

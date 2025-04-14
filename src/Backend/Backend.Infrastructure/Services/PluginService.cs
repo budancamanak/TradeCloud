@@ -3,7 +3,6 @@ using Common.Application.Repositories;
 using Common.Application.Services;
 using Common.Core.Models;
 using Common.Grpc;
-using Common.Plugin.Abstraction;
 
 namespace Backend.Infrastructure.Services;
 
@@ -11,33 +10,33 @@ public class PluginService(
     ICacheService cache,
     GrpcAvailablePluginsController.GrpcAvailablePluginsControllerClient grpcClient) : IPluginService
 {
-    public async Task<List<IPlugin.PluginInfo>> GetAvailablePlugins()
+    public async Task<List<PluginInfo>> GetAvailablePlugins()
     {
-        var itemsOnCache = await cache.GetAsync<List<IPlugin.PluginInfo>>(CacheKeyGenerator.AvailablePlugins());
+        var itemsOnCache = await cache.GetAsync<List<PluginInfo>>(CacheKeyGenerator.AvailablePlugins());
         if (itemsOnCache is { Count: > 0 })
             return itemsOnCache;
         var response = await grpcClient.GetAvailablePluginsAsync(new GrpcGetAvailablePluginsRequest());
         if (response == null) return itemsOnCache;
-        itemsOnCache = new List<IPlugin.PluginInfo>();
+        itemsOnCache = new List<PluginInfo>();
         foreach (var info in response.Plugins)
         {
-            itemsOnCache.Add(new IPlugin.PluginInfo(info.Name, info.Identifier, info.Version));
+            itemsOnCache.Add(new PluginInfo(info.Name, info.Identifier, info.Version));
         }
 
         return itemsOnCache;
     }
 
-    public async Task<IPlugin.PluginInfo> GetPluginInfo(string identifier)
+    public async Task<PluginInfo> GetPluginInfo(string identifier)
     {
-        var cached = await cache.GetAsync<IPlugin.PluginInfo>(CacheKeyGenerator.AvailablePluginKey(identifier));
-        if (cached != null) return cached;
+        var cached = await cache.GetAsync<PluginInfo>(CacheKeyGenerator.AvailablePluginKey(identifier));
+        if (cached != null && !string.IsNullOrWhiteSpace(cached.Name)) return cached;
         var response = await grpcClient.GetAvailablePluginWithIdentifierAsync(new GrpcGetAvailablePluginWithIdentifier
         {
             Identifier = identifier
         });
         if (response != null)
         {
-            cached = new IPlugin.PluginInfo(response.Name, response.Identifier, response.Version);
+            cached = new PluginInfo(response.Name, response.Identifier, response.Version);
             await cache.SetAsync(CacheKeyGenerator.AvailablePluginKey(identifier), cached, TimeSpan.MaxValue);
         }
 

@@ -88,7 +88,7 @@ public class AnalysisExecution
         }
     }
 
-    public List<PluginExecution> PluginExecutions { get; set; } = [];
+    public virtual ICollection<PluginExecution> PluginExecutions { get; set; } = [];
 
     public override string ToString()
     {

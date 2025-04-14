@@ -1,4 +1,5 @@
 ﻿using Common.Core.DTOs;
+using Common.Core.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Common.Plugin.Abstraction;
@@ -22,7 +23,5 @@ public interface IPlugin
     IParameters GetDefaultParamSet(); 
     public Type GetPluginType();
 
-    record PluginInfo(string Name, string Identifier, string Version = "1.0.0")
-    {
-    }
+
 }

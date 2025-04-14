@@ -7,6 +7,7 @@ using Common.Core.Extensions;
 using Common.Core.Models;
 using Common.Web.Exceptions;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Infrastructure.Repositories;
 
@@ -21,9 +22,9 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
         return Task.FromResult(item);
     }
 
-    public Task<List<AnalysisExecution>> GetAllAsync()
+    public async Task<List<AnalysisExecution>> GetAllAsync()
     {
-        return Task.FromResult(dbContext.AnalysisExecutions.ToList());
+        return await dbContext.AnalysisExecutions.ToListAsync();
     }
 
     public async Task<MethodResponse> AddAsync(AnalysisExecution item)

@@ -8,26 +8,15 @@ public static class PluginOutputConfigurations
 {
     public static void ApplyPluginOutputConfigurations(this ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<PluginOutput>()
-            .ToTable("PluginOutputs");
-        modelBuilder.Entity<PluginOutput>()
-            .HasKey(f => f.Id);
-        modelBuilder.Entity<PluginOutput>()
-            .Property(f => f.PluginId)
-            .IsRequired();
-        modelBuilder.Entity<PluginOutput>()
-            .Property(f => f.PluginSignal)
-            .HasMaxLength(20)
-            .HasConversion(
-                v => v.GetStringRepresentation(),
-                v => v.ToSignalType()
-            )
-            .IsRequired();
-        modelBuilder.Entity<PluginOutput>()
-            .Property(f => f.SignalDate)
-            .IsRequired();
-        modelBuilder.Entity<PluginOutput>()
-            .Property(f => f.CreatedDate)
-            .IsRequired();
+        var ent = modelBuilder.Entity<PluginOutput>();
+        ent.ToTable("PluginOutputs");
+        ent.HasKey(f => f.Id);
+        ent.Property(f => f.PluginId).IsRequired();
+        ent.Property(f => f.PluginSignal).HasMaxLength(20).HasConversion(
+            v => v.GetStringRepresentation(),
+            v => v.ToSignalType()
+        ).IsRequired();
+        ent.Property(f => f.SignalDate).IsRequired();
+        ent.Property(f => f.CreatedDate).IsRequired();
     }
 }

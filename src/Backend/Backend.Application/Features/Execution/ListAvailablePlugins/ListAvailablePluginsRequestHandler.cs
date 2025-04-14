@@ -1,4 +1,5 @@
 ﻿using Backend.Application.Abstraction.Services;
+using Common.Core.Models;
 using Common.Plugin.Abstraction;
 using FluentValidation;
 using MediatR;
@@ -8,9 +9,9 @@ namespace Backend.Application.Features.Execution.ListAvailablePlugins;
 public class ListAvailablePluginsRequestHandler(
     IValidator<ListAvailablePluginsRequest> validator,
     IPluginService pluginService)
-    : IRequestHandler<ListAvailablePluginsRequest, List<IPlugin.PluginInfo>>
+    : IRequestHandler<ListAvailablePluginsRequest, List<PluginInfo>>
 {
-    public async Task<List<IPlugin.PluginInfo>> Handle(ListAvailablePluginsRequest request,
+    public async Task<List<PluginInfo>> Handle(ListAvailablePluginsRequest request,
         CancellationToken cancellationToken)
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);

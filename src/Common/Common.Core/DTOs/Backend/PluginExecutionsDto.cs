@@ -10,10 +10,11 @@ public class PluginExecutionsDto
     // public string Symbol { get; set; }
     // public string Timeframe { get; set; }
     public string Status { get; set; }
-
-    // public DateTime StartDate { get; set; }
-    // public DateTime EndDate { get; set; }
-    // public DateTime CreatedDate { get; set; }
+    public double Progress { get; set; }
+    public DateTime? QueuedDate { get; set; }
+    public DateTime? RunStartDate { get; set; }
+    public DateTime? FinishDate { get; set; }
     public string ParamSet { get; set; }
     public string Error { get; set; }
+    public PluginOutputDto[] Outputs { get; set; } = [];
 }

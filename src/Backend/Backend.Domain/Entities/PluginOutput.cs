@@ -10,7 +10,7 @@ public class PluginOutput
     public DateTime SignalDate { get; set; }
     public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-    public PluginExecution PluginExecution { get; set; }
+    public virtual PluginExecution PluginExecution { get; set; }
 
     public override string ToString()
     {

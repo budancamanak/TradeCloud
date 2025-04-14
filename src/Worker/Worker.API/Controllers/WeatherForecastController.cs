@@ -1,6 +1,5 @@
 using Common.Application.Repositories;
 using Common.Core.Models;
-using Common.Plugin.Abstraction;
 using Microsoft.AspNetCore.Mvc;
 using Worker.Application.Abstraction;
 
@@ -13,9 +12,9 @@ public class WeatherForecastController(ILogger<WeatherForecastController> logger
     : ControllerBase
 {
     [HttpGet("/PluginList")]
-    public async Task<IEnumerable<IPlugin.PluginInfo>> GetPlugins()
+    public async Task<IEnumerable<PluginInfo>> GetPlugins()
     {
-        var plugins = await cache.GetAsync<List<IPlugin.PluginInfo>>("AvailablePlugins");
+        var plugins = await cache.GetAsync<List<PluginInfo>>("AvailablePlugins");
         // var plugins = host.Plugins();
         logger.LogWarning(plugins[0].Identifier);
         logger.LogWarning(plugins[0].Name);

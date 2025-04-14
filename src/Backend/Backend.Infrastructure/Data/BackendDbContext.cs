@@ -11,10 +11,18 @@ public class BackendDbContext : DbContext
     public DbSet<PluginOutput> PluginOutputs { get; set; }
     public DbSet<PluginExecution> PluginExecutions { get; set; }
     public DbSet<AnalysisExecution> AnalysisExecutions { get; set; }
-    
+
 
     public BackendDbContext(DbContextOptions<BackendDbContext> options) : base(options)
     {
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        optionsBuilder.UseLazyLoadingProxies();
+        // todo enable seeding below
+        // .UseSeeding()
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

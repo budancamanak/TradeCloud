@@ -2,7 +2,6 @@
 using AutoMapper;
 using Backend.Application.Abstraction.Repositories;
 using Backend.Application.Abstraction.Services;
-using Backend.Application.Features.Execution.CreatePluginExecution;
 using Backend.Domain.Entities;
 using Common.Core.Enums;
 using Common.Core.Models;
@@ -19,7 +18,7 @@ public class CreateAnalysisExecutionRequestHandler(
     ITickerService tickerService,
     IPluginService pluginService,
     IAnalysisExecutionRepository repository,
-    ILogger<CreatePluginExecutionRequestHandler> logger)
+    ILogger<CreateAnalysisExecutionRequestHandler> logger)
     : IRequestHandler<CreateAnalysisExecutionRequest, MethodResponse>
 {
     public async Task<MethodResponse> Handle(CreateAnalysisExecutionRequest request,

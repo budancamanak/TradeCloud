@@ -1,4 +1,5 @@
 ﻿using Common.Application.Repositories;
+using Common.Core.Models;
 using Common.Plugin.Abstraction;
 using Common.Plugin.Signals;
 using Microsoft.Extensions.Logging;
@@ -33,9 +34,9 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
         return GetDefaultParamSet();
     }
 
-    public override IPlugin.PluginInfo GetPluginInfo()
+    public override PluginInfo GetPluginInfo()
     {
-        return new IPlugin.PluginInfo("GoldenCrossDeathCross", "09a0a20a-666c-4b13-80f7-5dc04db19f8c", "1.0.1");
+        return new PluginInfo("GoldenCrossDeathCross", "09a0a20a-666c-4b13-80f7-5dc04db19f8c", "1.0.1");
     }
 
     public override GoldenDeathCrossPluginParams GetDefaultParamSet()
@@ -66,17 +67,19 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
 
     protected override void Execute()
     {
+        Thread.Sleep(2000);
         Logger.LogWarning("Plugin {} is running on {} with params: {}", GetPluginInfo(), TickerDto,
             Params.GetStringRepresentation());
-        var slow = tradeMath.GetSma(Params.SlowMovingAverage).ToList();
-        var fast = tradeMath.GetSma(Params.FastMovingAverage).ToList();
-        
+        var slow = tradeMath.GetSma(Params.SlowMovingAverage).Condense().ToList();
+        var fast = tradeMath.GetSma(Params.FastMovingAverage).Condense().ToList();
+
         // var quotes = PriceInfo.ToQuotes();
         // var slow = quotes.GetSma(Params.SlowMovingAverage).ToList();
         // var fast = quotes.GetSma(Params.FastMovingAverage).ToList();
         var isLastLong = 0;
         for (var i = 0; i < PriceInfo.Count; i++)
         {
+            Thread.Sleep(200);
             StateManager.ThrowIfCancelRequested(ExecutionId);
             var slowResult = slow.Find(PriceInfo[i].Timestamp);
             var slowSma = slowResult?.Sma;

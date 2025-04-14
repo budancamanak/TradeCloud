@@ -82,8 +82,10 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
     public async Task<List<PluginExecution>> GetActivePluginExecutions(int analysisId)
     {
         var items = await dbContext.PluginExecutions
-            .Where(f => f.AnalysisExecutionId == analysisId && /*f.Status > PluginStatus.Init &&*/
-                        f.Status != PluginStatus.Failure && f.Status != PluginStatus.Failure).ToListAsync();
+            .Where(f => f.AnalysisExecutionId == analysisId &&
+                        f.Status != PluginStatus.Failure &&
+                        f.Status != PluginStatus.Success &&
+                        f.Status != PluginStatus.Init).ToListAsync();
         return items;
     }
 
@@ -144,6 +146,20 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
         Guard.Against.Null(existing);
         if (status > existing.Status)
             existing.Status = status;
+        switch (status)
+        {
+            case PluginStatus.Queued:
+                existing.QueuedDate = DateTime.UtcNow;
+                break;
+            case PluginStatus.Failure:
+            case PluginStatus.Success:
+                existing.FinishDate = DateTime.UtcNow;
+                break;
+            case PluginStatus.Running:
+                existing.RunStartDate = DateTime.UtcNow;
+                break;
+        }
+
         var result = await dbContext.SaveChangesAsync();
         if (result > 0) return MethodResponse.Success(result, "Execution updated status");
         return MethodResponse.Error("Failed to update execution status");

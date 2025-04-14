@@ -6,4 +6,5 @@ namespace Backend.Application.Abstraction.Repositories;
 public interface ITrackListRepository : IAsyncRepository<TrackList>
 {
     Task<List<TrackList>> GetUserTrackListAsync(int userId);
+    Task<TrackList?> GetUserTrackListAsync(int userId,int tickerId);
 }
