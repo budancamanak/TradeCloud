@@ -31,9 +31,12 @@ Currently, websocket signals & email notifications are considered.
 
 ### Development Roadmap
 - [ ] Backend
+  - [x] v1: ***Handle usertracklist, analysis & plugin execution/cancellation***
 - [ ] Worker
+  - [x] v1: ***Handle analysis & plugin execution/cancellation***
 - [ ] Security
 - [ ] Market
+  - [x] v1: ***Handle ticker ops, fetch price info.***
 - [ ] Notifications
 - [ ] Web UI
 
