@@ -1,6 +1,10 @@
-﻿namespace Backend.Application.Features.TrackList.RemoveUserTrackList;
+﻿using Common.Core.Models;
+using MediatR;
 
-public class RemoveUserTrackListRequest
+namespace Backend.Application.Features.TrackList.RemoveUserTrackList;
+
+public class RemoveUserTrackListRequest : IRequest<MethodResponse>
 {
-    
+    public int UserId { get; set; }
+    public int TickerId { get; set; }
 }

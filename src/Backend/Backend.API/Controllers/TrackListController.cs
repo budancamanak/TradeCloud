@@ -1,6 +1,7 @@
 ﻿using Backend.Application.Features.TrackList.AddTickerToTrackList;
 using Backend.Application.Features.TrackList.ListAvailableTickers;
 using Backend.Application.Features.TrackList.ListUserTrackList;
+using Backend.Application.Features.TrackList.RemoveUserTrackList;
 using Common.Core.DTOs;
 using Common.Core.DTOs.Backend;
 using Common.Core.Models;
@@ -35,5 +36,12 @@ public class TrackListController(
     {
         var result = await mediator.Send(request);
         return result;
+    }
+
+    [HttpDelete("RemoveTickerFromUserTrackList")]
+    public async Task<MethodResponse> RemoveTickerFromUserTrackList([FromBody] RemoveUserTrackListRequest request)
+    {
+        var mr = await mediator.Send(request);
+        return mr;
     }
 }
