@@ -6,6 +6,9 @@ using Skender.Stock.Indicators;
 
 namespace Common.Plugin.Math;
 
+/**
+ * todo clear cache after analysis finishes !!!
+ */
 public class TradeMath
 {
     private readonly ICacheService cache;

@@ -24,8 +24,6 @@
 
   <ItemGroup>
     <Folder Include="Features\SystemSettings\" />
-    <Folder Include="Features\TrackList\ListUserTrackList\" />
-    <Folder Include="Features\TrackList\RemoveTickerFromUserTrackList\" />
   </ItemGroup>
 
 </Project>
