@@ -21,7 +21,7 @@ public class AnalysisExecutionsController(
     IMediator mediator,
     IMapper mapper)
 {
-    [HttpGet("GetAvailablePlugins")]
+    [HttpGet("/AvailablePlugins")]
     public async Task<List<PluginInfo>> GetAvailablePlugins()
     {
         var request = new ListAvailablePluginsRequest();
@@ -29,17 +29,17 @@ public class AnalysisExecutionsController(
         return result;
     }
 
-    [HttpGet("ActivePlugins")]
+    [HttpGet("/ActivePlugins")]
     public async Task<List<PluginExecutionsDto>> GetActivePlugins([FromQuery] ListActivePluginsRequest request)
     {
         var result = await mediator.Send(request);
         return result;
     }
 
-    [HttpGet("AnalysisExecutionDetails")]
-    public async Task<AnalysisExecutionDto> GetAnalysisExecutionDetails(
-        [FromQuery] AnalysisExecutionDetailsRequest request)
+    [HttpGet("{executionId:int}/Details")]
+    public async Task<AnalysisExecutionDto> GetAnalysisExecutionDetails(int executionId)
     {
+        var request = new AnalysisExecutionDetailsRequest { AnalysisExecutionId = executionId };
         var result = await mediator.Send(request);
         return result;
     }
@@ -59,9 +59,10 @@ public class AnalysisExecutionsController(
         return result;
     }
 
-    [HttpDelete]
-    public async Task<MethodResponse> StopAnalysisExecution([FromBody] StopAnalysisExecutionRequest request)
+    [HttpDelete("{executionId:int}")]
+    public async Task<MethodResponse> StopAnalysisExecution(int executionId)
     {
+        var request = new StopAnalysisExecutionRequest { AnalysisExecutionId = executionId };
         var result = await mediator.Send(request);
         return result;
     }
