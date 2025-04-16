@@ -26,8 +26,9 @@ public class PluginLoader : IPluginLoader
         this.scopeFactory = scopeFactory;
         _logger = logger;
         _messageBroker = messageBroker;
-        _pluginFolder = configuration["Plugins:Folder"] ??
-                        $"{Path.GetDirectoryName(typeof(PluginLoader).Assembly.Location)}";
+        _pluginFolder = configuration["Plugins:Folder"];
+        if (string.IsNullOrWhiteSpace(_pluginFolder))
+            _pluginFolder = $"{Path.GetDirectoryName(typeof(PluginLoader).Assembly.Location)}";
         _plugins = LoadPlugins();
     }
 

@@ -55,11 +55,11 @@ builder.Services.AddGrpc(options =>
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenLocalhost(5163,
+    options.ListenAnyIP(5163,
         listenOptions => { listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2; });
 
     // HTTP/1.1 for other endpoints (e.g., MVC or REST)
-    options.ListenLocalhost(5162, listenOptions =>
+    options.ListenAnyIP(5162, listenOptions =>
     {
         listenOptions.Protocols =
             Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols
