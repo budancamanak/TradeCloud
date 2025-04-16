@@ -1,6 +1,7 @@
 using Common.Application.Services;
 using Hangfire;
 using Worker.API;
+using Worker.API.Models;
 using Worker.Application;
 using Worker.Infrastructure;
 
@@ -97,7 +98,11 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.MapHangfireDashboard("/plugins", new DashboardOptions { DashboardTitle = "Plugin Execution Jobs" });
+app.MapHangfireDashboard("/plugins", new DashboardOptions
+{
+    DashboardTitle = "Plugin Execution Jobs",
+    Authorization = new[] { new HangFireAuthorizationFilter() }
+});
 app.MapControllers();
 app.AddGrpcControllers();
 
