@@ -6,7 +6,9 @@ using Backend.Application.Features.Execution.ListActivePlugins;
 using Backend.Application.Features.Execution.ListAvailablePlugins;
 using Backend.Application.Features.Execution.RunAnalysisExecution;
 using Backend.Application.Features.Execution.StopAnalysisExecution;
+using Backend.Application.Features.Execution.UserAnalysisExecutionList;
 using Common.Core.DTOs.Backend;
+using Common.Core.Enums;
 using Common.Core.Models;
 using Common.Plugin.Abstraction;
 using MediatR;
@@ -32,6 +34,15 @@ public class AnalysisExecutionsController(
     [HttpGet("/ActivePlugins")]
     public async Task<List<PluginExecutionsDto>> GetActivePlugins([FromQuery] ListActivePluginsRequest request)
     {
+        var result = await mediator.Send(request);
+        return result;
+    }
+
+    [HttpGet("User/{userId:int}/Info")]
+    public async Task<List<UserAnalysisExecutionDto>> GetUserAnalysisExecutionInfos(int userId,
+        [FromQuery] PluginStatus? status = null)
+    {
+        var request = new UserAnalysisExecutionListRequest(userId, status);
         var result = await mediator.Send(request);
         return result;
     }

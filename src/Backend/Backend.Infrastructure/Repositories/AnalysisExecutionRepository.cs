@@ -72,4 +72,20 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
     {
         throw new NotImplementedException();
     }
+
+    public async Task<List<AnalysisExecution>> GetUserAnalysisExecutions(int userId)
+    {
+        Guard.Against.NegativeOrZero(userId);
+        var items = await dbContext.AnalysisExecutions.Where(f => f.UserId == userId).ToListAsync();
+        return items;
+    }
+
+    public async Task<List<AnalysisExecution>> GetUserAnalysisExecutions(int userId, PluginStatus status)
+    {
+        Guard.Against.NegativeOrZero(userId);
+        Guard.Against.EnumOutOfRange(status);
+        var items = await dbContext.AnalysisExecutions.Where(f => f.UserId == userId && f.Status == status)
+            .ToListAsync();
+        return items;
+    }
 }
