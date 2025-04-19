@@ -16,6 +16,7 @@ COPY ["src/Common/Common.Messaging/Common.Messaging.csproj", "./src/Common/Commo
 COPY ["src/Common/Common.Plugin/Common.Plugin.csproj", "./src/Common/Common.Plugin/"]
 COPY ["src/Common/Common.Protos/Common.Protos.csproj", "./src/Common/Common.Protos/"]
 COPY ["src/Common/Common.Web/Common.Web.csproj", "./src/Common/Common.Web/"]
+COPY ["src/Common/Common.Logging/Common.Logging.csproj", "./src/Common/Common.Logging/"]
 COPY ["src/Common/Common.Application/Common.Application.csproj", "./src/Common/Common.Application/"]
 COPY ["src/Common/Common.Grpc/Common.Grpc.csproj", "./src/Common/Common.Grpc/"]
 COPY ["src/Common/Common.RabbitMQ/Common.RabbitMQ.csproj", "./src/Common/Common.RabbitMQ/"]

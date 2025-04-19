@@ -18,6 +18,7 @@ COPY ["src/Common/Common.Protos/Common.Protos.csproj", "./src/Common/Common.Prot
 COPY ["src/Common/Common.Web/Common.Web.csproj", "./src/Common/Common.Web/"]
 COPY ["src/Common/Common.Application/Common.Application.csproj", "./src/Common/Common.Application/"]
 COPY ["src/Common/Common.Grpc/Common.Grpc.csproj", "./src/Common/Common.Grpc/"]
+COPY ["src/Common/Common.Logging/Common.Logging.csproj", "./src/Common/Common.Logging/"]
 COPY ["src/Common/Common.RabbitMQ/Common.RabbitMQ.csproj", "./src/Common/Common.RabbitMQ/"]
 COPY ["src/Backend/Backend.Domain/Backend.Domain.csproj", "./src/Backend/Backend.Domain/"]
 COPY ["src/Backend/Backend.Application/Backend.Application.csproj", "./src/Backend/Backend.Application/"]
