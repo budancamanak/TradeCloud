@@ -50,13 +50,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogHelper.EnrichFromRequest);
 
-// app.UseHttpLogging();
+app.UseHttpLogging();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 app.UseExceptionHandler();
 
 app.MapControllers();
-app.MapHealthChecks("/healthz");
+app.MapHealthChecks("/health");
 
 app.Run();

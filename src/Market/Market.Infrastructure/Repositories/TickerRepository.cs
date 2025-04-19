@@ -8,10 +8,12 @@ using Market.Application.Exceptions;
 using Market.Domain.Entities;
 using Market.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Market.Infrastructure.Repositories;
 
-public class TickerRepository(MarketDbContext dbContext, IValidator<Ticker> validator) : ITickerRepository
+public class TickerRepository(MarketDbContext dbContext, IValidator<Ticker> validator, ILogger<TickerRepository> logger)
+    : ITickerRepository
 {
     public async Task<Ticker> GetByIdAsync(int id)
     {
@@ -36,6 +38,7 @@ public class TickerRepository(MarketDbContext dbContext, IValidator<Ticker> vali
         var ticker = await dbContext.Tickers.Include(f => f.Exchange).FirstOrDefaultAsync(f => f.Symbol == symbol);
         Guard.Against.Null(ticker, message: "Couldn't find ticker",
             exceptionCreator: () => new RequestValidationException("Couldn't find ticker"));
+        logger.LogInformation("Found ticker info with symbol: {symbol}", symbol);
         return ticker;
     }
 

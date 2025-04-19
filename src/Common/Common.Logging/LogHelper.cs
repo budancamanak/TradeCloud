@@ -44,6 +44,7 @@ public static class LogHelper
         if (context.HostingEnvironment.IsDevelopment())
         {
             loggerConfiguration.MinimumLevel.Override("Backend.API", LogEventLevel.Debug);
+            loggerConfiguration.MinimumLevel.Override("Market.API", LogEventLevel.Debug);
         }
         
         var elasticUrl = context.Configuration.GetValue<string>("Elastic:Host");

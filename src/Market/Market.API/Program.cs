@@ -1,4 +1,5 @@
 using Common.Application.Services;
+using Common.Logging;
 using Common.Messaging.Events;
 using Common.Messaging.Events.PriceFetchEvents;
 using Common.RabbitMQ;
@@ -10,6 +11,7 @@ using Market.Infrastructure;
 using Market.Infrastructure.Data;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,6 +82,10 @@ builder.WebHost.ConfigureKestrel(options =>
     //     listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
     // });
 });
+builder.Logging.ClearProviders();
+builder.Host.UseSerilog((context, configuration) =>
+    LogHelper.ConfigureLogger("market-api", builder.Configuration, context, configuration), true);
+
 var app = builder.Build();
 app.Lifetime.ApplicationStarted.Register(() =>
 {
@@ -95,6 +101,7 @@ app.Lifetime.ApplicationStopping.Register(() =>
     var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
     logger.CreateLogger("ApplicationLifeCycle").LogWarning("MarketApi Stopping..");
 });
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -102,6 +109,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogHelper.EnrichFromRequest);
 app.UseHttpLogging();
 app.UseHttpsRedirection();
 
@@ -114,5 +122,5 @@ app.UseHangfireDashboard("/fetch_ops", new DashboardOptions
 });
 app.MapControllers();
 app.AddGrpcControllers();
-
+app.MapHealthChecks("/health");
 app.Run();
