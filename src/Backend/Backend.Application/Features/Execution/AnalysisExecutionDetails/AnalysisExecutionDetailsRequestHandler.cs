@@ -6,6 +6,7 @@ using Common.Core.DTOs.Backend;
 using Common.Core.Enums;
 using FluentValidation;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Backend.Application.Features.Execution.AnalysisExecutionDetails;
 
@@ -15,6 +16,7 @@ public class AnalysisExecutionDetailsRequestHandler(
     IPluginExecutionRepository pluginExecutionRepository,
     IPluginOutputRepository pluginOutputRepository,
     IMapper mapper,
+    ILogger<AnalysisExecutionDetailsRequestHandler> logger,
     IPluginService pluginService)
     : IRequestHandler<AnalysisExecutionDetailsRequest, AnalysisExecutionDto>
 {
@@ -22,6 +24,7 @@ public class AnalysisExecutionDetailsRequestHandler(
         CancellationToken cancellationToken)
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
+        logger.LogWarning($"Getting execution details : {request.AnalysisExecutionId}" );
         var analysis = await analysisExecutionRepository.GetByIdAsync(request.AnalysisExecutionId);
         Guard.Against.Null(analysis);
         var pluginInfo = await pluginService.GetPluginInfo(analysis.PluginIdentifier);

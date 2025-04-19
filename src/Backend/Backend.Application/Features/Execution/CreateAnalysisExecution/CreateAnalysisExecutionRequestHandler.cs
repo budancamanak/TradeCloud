@@ -39,7 +39,7 @@ public class CreateAnalysisExecutionRequestHandler(
             }
         );
         Guard.Against.Null(item, message: "Request mapping failed");
-        logger.LogInformation("Creating analysis execution for [{}] in request handler. For {} @ {}",
+        logger.LogWarning("Creating analysis execution for [{}] in request handler. For {} @ {}",
             item.PluginIdentifier, request.Symbol, request.Timeframe.GetStringRepresentation());
         var mr = await repository.AddAsync(item);
         return mr;
