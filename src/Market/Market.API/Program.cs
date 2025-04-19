@@ -69,18 +69,12 @@ builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5238,
         listenOptions => { listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2; });
-
-    // HTTP/1.1 for other endpoints (e.g., MVC or REST)
     options.ListenAnyIP(5237, listenOptions =>
     {
         listenOptions.Protocols =
             Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols
-                .Http1AndHttp2; // Allow both HTTP/1.1 and HTTP/2, but prefer HTTP/1.1.
+                .Http1AndHttp2;
     });
-    // options.ConfigureEndpointDefaults(listenOptions =>
-    // {
-    //     listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
-    // });
 });
 builder.Logging.ClearProviders();
 builder.Host.UseSerilog((context, configuration) =>

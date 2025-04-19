@@ -1,9 +1,12 @@
 using Common.Application.Services;
+using Common.Logging;
 using Hangfire;
 using Worker.API;
 using Worker.API.Models;
 using Worker.Application;
 using Worker.Infrastructure;
+using Microsoft.AspNetCore.HttpLogging;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,18 +62,24 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ListenAnyIP(5163,
         listenOptions => { listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2; });
 
-    // HTTP/1.1 for other endpoints (e.g., MVC or REST)
     options.ListenAnyIP(5162, listenOptions =>
     {
         listenOptions.Protocols =
             Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols
-                .Http1AndHttp2; // Allow both HTTP/1.1 and HTTP/2, but prefer HTTP/1.1.
+                .Http1AndHttp2;
     });
-    // options.ConfigureEndpointDefaults(listenOptions =>
-    // {
-    //     listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
-    // });
 });
+builder.Services.AddHttpLogging(options =>
+{
+    options.LoggingFields = HttpLoggingFields.Duration | HttpLoggingFields.RequestMethod |
+                            HttpLoggingFields.RequestPath |
+                            HttpLoggingFields.ResponseStatusCode | HttpLoggingFields.RequestBody |
+                            HttpLoggingFields.RequestQuery;
+    options.CombineLogs = true;
+});
+builder.Logging.ClearProviders();
+builder.Host.UseSerilog((context, configuration) =>
+    LogHelper.ConfigureLogger("worker-api", builder.Configuration, context, configuration), true);
 
 var app = builder.Build();
 app.Lifetime.ApplicationStarted.Register(() =>
@@ -94,6 +103,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogHelper.EnrichFromRequest);
+app.UseHttpLogging();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

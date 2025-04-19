@@ -26,7 +26,9 @@ public class PluginHost : IPluginHost
     private readonly ILogger<PluginHost> _logger;
     private readonly IPluginMessageBroker _messageBroker;
     private readonly int _maxActivePlugin;
+
     private readonly ICacheService _cache;
+
     // private readonly ConcurrentDictionary<int, RunPluginRequest> _waitingPluginRequests;
     private readonly ConcurrentDictionary<int, RunAnalysisRequest> _waitingAnalysisRequests;
     private readonly ConcurrentDictionary<int, PluginStatus> _activePlugins;
@@ -48,6 +50,7 @@ public class PluginHost : IPluginHost
         var max = configuration["Plugins:MaxConcurrentPluginRun"];
         _maxActivePlugin = string.IsNullOrWhiteSpace(max) ? 5 : int.Parse(max);
         if (_pluginsLoaded) return;
+        logger.LogInformation("Loading plugins");
         _pluginLoader = new PluginLoader(scopeFactory, configuration, cache, _messageBroker, this, logger);
         _pluginsLoaded = true;
     }
