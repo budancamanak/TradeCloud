@@ -1,0 +1,1 @@
+docker build -f src\Worker\Worker.API\Dockerfile -t worker-api .

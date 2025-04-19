@@ -1,0 +1,1 @@
+docker build -f src\Backend\Backend.API\Dockerfile -t backend-api .
