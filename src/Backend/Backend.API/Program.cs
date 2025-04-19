@@ -25,18 +25,20 @@ builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApiServices();
 
-// builder.Services.AddHttpLogging(options =>
-// {
-//     options.LoggingFields = HttpLoggingFields.Duration | HttpLoggingFields.RequestMethod |
-//                             HttpLoggingFields.RequestPath |
-//                             HttpLoggingFields.ResponseStatusCode | HttpLoggingFields.RequestBody |
-//                             HttpLoggingFields.RequestQuery;
-//     options.CombineLogs = true;
-// });
+builder.Services.AddHttpLogging(options =>
+{
+    options.LoggingFields = HttpLoggingFields.Duration | HttpLoggingFields.RequestMethod |
+                            HttpLoggingFields.RequestPath |
+                            HttpLoggingFields.ResponseStatusCode | HttpLoggingFields.RequestBody |
+                            HttpLoggingFields.RequestQuery;
+    options.CombineLogs = true;
+});
 // builder.Services.AddSerilog((provider, configuration) =>
 //     LogHelper.ConfigureLogger("backend-api", builder.Configuration, provider, configuration));
+
+builder.Logging.ClearProviders();
 builder.Host.UseSerilog((context, configuration) =>
-    LogHelper.ConfigureLogger("backend-api", builder.Configuration, context, configuration));
+    LogHelper.ConfigureLogger("backend-api", builder.Configuration, context, configuration), true);
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
@@ -46,7 +48,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// app.UseSerilogRequestLogging(opts    => opts.EnrichDiagnosticContext = LogHelper.EnrichFromRequest);
+app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogHelper.EnrichFromRequest);
 
 // app.UseHttpLogging();
 app.UseHttpsRedirection();
@@ -55,6 +57,6 @@ app.UseAuthorization();
 app.UseExceptionHandler();
 
 app.MapControllers();
-// app.MapHealthChecks("/healthz");
+app.MapHealthChecks("/healthz");
 
 app.Run();

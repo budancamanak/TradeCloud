@@ -24,7 +24,7 @@ public class AnalysisExecutionDetailsRequestHandler(
         CancellationToken cancellationToken)
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
-        logger.LogWarning($"Getting execution details : {request.AnalysisExecutionId}" );
+        logger.LogWarning("Getting execution details : {AnalysisExecutionId}", request.AnalysisExecutionId);
         var analysis = await analysisExecutionRepository.GetByIdAsync(request.AnalysisExecutionId);
         Guard.Against.Null(analysis);
         var pluginInfo = await pluginService.GetPluginInfo(analysis.PluginIdentifier);
