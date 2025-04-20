@@ -11,16 +11,19 @@ using Common.Core.DTOs.Backend;
 using Common.Core.Enums;
 using Common.Core.Models;
 using Common.Plugin.Abstraction;
+using Common.Web.Attributes.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.API.Controllers;
 
+[HasPermission(Permission.RunAnalysis | Permission.ExecuteAll)]
 [ApiController]
 [Route("[controller]")]
 public class AnalysisExecutionsController(
     ILogger<AnalysisExecutionsController> logger,
     IMediator mediator,
+    HttpContext context,
     IMapper mapper)
 {
     [HttpGet("/AvailablePlugins")]
