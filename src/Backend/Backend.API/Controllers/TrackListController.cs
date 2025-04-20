@@ -5,11 +5,14 @@ using Backend.Application.Features.TrackList.RemoveUserTrackList;
 using Common.Core.DTOs;
 using Common.Core.DTOs.Backend;
 using Common.Core.Models;
+using Common.Security.Attributes;
+using Common.Web.Attributes.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.API.Controllers;
 
+[HasScope("Level1")]
 [ApiController]
 [Route("[controller]")]
 public class TrackListController(
@@ -17,6 +20,7 @@ public class TrackListController(
     IMediator mediator)
 {
     [HttpGet("/AvailableTickers")]
+    [HasPolicy(Policies.TrackList.Read)]
     public async Task<List<TickerDto>> GetAvailableTickers()
     {
         var request = new ListAvailableTickersRequest();
@@ -25,6 +29,7 @@ public class TrackListController(
     }
 
     [HttpGet]
+    [HasPolicy(Policies.TrackList.Read)]
     public async Task<List<TrackListDto>> GetUserTrackList([FromQuery] ListUserTrackListRequest request)
     {
         var result = await mediator.Send(request);
@@ -32,6 +37,7 @@ public class TrackListController(
     }
 
     [HttpPost]
+    [HasPolicy(Policies.TrackList.Write)]
     public async Task<MethodResponse> AddTickerToUserTrackList([FromBody] AddTickerToTrackListRequest request)
     {
         var result = await mediator.Send(request);
@@ -39,6 +45,7 @@ public class TrackListController(
     }
 
     [HttpDelete("User/{userId:int}/Ticker/{tickerId:int}")]
+    [HasPolicy(Policies.TrackList.Write)]
     public async Task<MethodResponse> RemoveTickerFromUserTrackList(int userId, int tickerId)
     {
         var request = new RemoveUserTrackListRequest { UserId = userId, TickerId = tickerId };

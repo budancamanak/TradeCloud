@@ -11,13 +11,18 @@ using Common.Core.DTOs.Backend;
 using Common.Core.Enums;
 using Common.Core.Models;
 using Common.Plugin.Abstraction;
+using Common.Security.Attributes;
 using Common.Web.Attributes.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.API.Controllers;
 
-[HasPermission(Permission.RunAnalysis | Permission.ExecuteAll)]
+// Level1: ViewerUser
+// Level2: Level1+AnalyserUser
+// Level3: Level2+SuperUser
+// Level4: Admin
+[HasScope("Level2")]
 [ApiController]
 [Route("[controller]")]
 public class AnalysisExecutionsController(
@@ -59,6 +64,7 @@ public class AnalysisExecutionsController(
     }
 
     [HttpPost]
+    [HasPermission("RunAnalysis")]
     public async Task<MethodResponse> CreateAnalysisExecution([FromBody] CreateAnalysisExecutionModel model)
     {
         var request = mapper.Map<CreateAnalysisExecutionRequest>(model);
@@ -67,6 +73,7 @@ public class AnalysisExecutionsController(
     }
 
     [HttpPatch]
+    [HasPermission("RunAnalysis")]
     public async Task<MethodResponse> RunAnalysisExecution([FromBody] RunAnalysisExecutionRequest request)
     {
         var result = await mediator.Send(request);
@@ -74,6 +81,7 @@ public class AnalysisExecutionsController(
     }
 
     [HttpDelete("{executionId:int}")]
+    [HasPermission("RunAnalysis")]
     public async Task<MethodResponse> StopAnalysisExecution(int executionId)
     {
         var request = new StopAnalysisExecutionRequest { AnalysisExecutionId = executionId };

@@ -1,4 +1,4 @@
-namespace Common.Security.Interfaces;
+namespace Common.Security.Abstraction;
 
 public interface ISecurityGrpcClient
 {

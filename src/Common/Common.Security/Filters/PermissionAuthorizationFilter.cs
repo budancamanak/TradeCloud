@@ -1,5 +1,5 @@
+using Common.Security.Abstraction;
 using Common.Security.Attributes;
-using Common.Security.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Http;
