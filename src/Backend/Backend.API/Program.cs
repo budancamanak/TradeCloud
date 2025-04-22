@@ -3,6 +3,9 @@ using Backend.Application;
 using Backend.Infrastructure;
 using Backend.Infrastructure.Data;
 using Common.Logging;
+using Common.Security.Abstraction;
+using Common.Security.Filters;
+using Common.Security.Services;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -24,6 +27,11 @@ builder.Services.AddGrpcClients(builder.Configuration);
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApiServices();
+builder.Services.AddScoped<PermissionAuthorizationFilter>();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddScoped<ISecurityGrpcClient, SecurityGrpcClient>(); // your implementation
+
+builder.Services.AddControllers(options => { options.Filters.Add<PermissionAuthorizationFilter>(); });
 
 builder.Services.AddHttpLogging(options =>
 {

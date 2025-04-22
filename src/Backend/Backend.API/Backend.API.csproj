@@ -27,6 +27,7 @@
     <ProjectReference Include="..\..\Common\Common.Logging\Common.Logging.csproj" />
     <ProjectReference Include="..\..\Common\Common.Plugin\Common.Plugin.csproj" />    
     <ProjectReference Include="..\..\Common\Common.RabbitMQ\Common.RabbitMQ.csproj" />    
+    <ProjectReference Include="..\..\Common\Common.Security\Common.Security.csproj" />    
     <ProjectReference Include="..\Backend.Application\Backend.Application.csproj" />
     <ProjectReference Include="..\Backend.Infrastructure\Backend.Infrastructure.csproj" />
   </ItemGroup>
