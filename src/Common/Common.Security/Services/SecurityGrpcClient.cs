@@ -3,7 +3,7 @@ using Common.Security.Abstraction;
 
 namespace Common.Security.Services;
 
-public class SecurityGrpcClient(AuthService.AuthServiceClient grpcClient) : ISecurityGrpcClient
+public class SecurityGrpcClient(GrpcAuthController.GrpcAuthControllerClient grpcClient) : ISecurityGrpcClient
 {
     public async Task<bool> HasPermissionAsync(string token, string permission)
     {
