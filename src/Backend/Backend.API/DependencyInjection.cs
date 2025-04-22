@@ -30,5 +30,9 @@ public static class DependencyInjection
         {
             cfg.Address = new Uri(configuration["Worker:GrpcHost"]);
         });
+        services.AddGrpcClient<GrpcAuthController.GrpcAuthControllerClient>(cfg =>
+        {
+            cfg.Address = new Uri(configuration["Security:GrpcHost"]);
+        });
     }
 }

@@ -27,11 +27,11 @@ builder.Services.AddGrpcClients(builder.Configuration);
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApiServices();
-builder.Services.AddScoped<PermissionAuthorizationFilter>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<ISecurityGrpcClient, SecurityGrpcClient>(); // your implementation
+builder.Services.AddScoped<PermissionAuthorizationFilter>();
 
-builder.Services.AddControllers(options => { options.Filters.Add<PermissionAuthorizationFilter>(); });
+builder.Services.AddControllers(options => { /*options.Filters.Add<PermissionAuthorizationFilter>();*/ });
 
 builder.Services.AddHttpLogging(options =>
 {

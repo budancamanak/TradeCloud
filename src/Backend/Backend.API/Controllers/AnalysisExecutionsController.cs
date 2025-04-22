@@ -28,7 +28,6 @@ namespace Backend.API.Controllers;
 public class AnalysisExecutionsController(
     ILogger<AnalysisExecutionsController> logger,
     IMediator mediator,
-    HttpContext context,
     IMapper mapper)
 {
     [HttpGet("/AvailablePlugins")]
