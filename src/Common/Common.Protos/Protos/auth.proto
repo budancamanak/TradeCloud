@@ -3,7 +3,7 @@
 option csharp_namespace = "Common.Grpc";
 import "google/protobuf/timestamp.proto";
 
-service AuthService {
+service GrpcAuthController {
   rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
   rpc LoginUser(UserLoginRequest) returns (UserLoginResponse);
   rpc RegisterUser(UserRegisterRequest) returns (UserRegisterResponse);

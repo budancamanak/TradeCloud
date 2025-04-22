@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="GrpcControllers\" />
+    <ProjectReference Include="..\..\Common\Common.Grpc\Common.Grpc.csproj" />
   </ItemGroup>
 
 </Project>
