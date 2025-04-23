@@ -10,9 +10,7 @@ using Backend.Application.Features.Execution.UserAnalysisExecutionList;
 using Common.Core.DTOs.Backend;
 using Common.Core.Enums;
 using Common.Core.Models;
-using Common.Plugin.Abstraction;
 using Common.Security.Attributes;
-using Common.Web.Attributes.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
