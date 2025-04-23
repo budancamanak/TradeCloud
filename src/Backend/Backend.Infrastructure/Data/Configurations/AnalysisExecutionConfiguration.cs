@@ -23,7 +23,10 @@ public static class AnalysisExecutionConfiguration
                 v => v.TimeFrameFromString()
             )
             .IsRequired();
-        ent.Property(f => f.Progress)
+        ent.Property(f => f.ProgressCurrent)
+            .HasDefaultValue(0.0)
+            .IsRequired();
+        ent.Property(f => f.ProgressTotal)
             .HasDefaultValue(0.0)
             .IsRequired();
         ent.Property(f => f.UserId)

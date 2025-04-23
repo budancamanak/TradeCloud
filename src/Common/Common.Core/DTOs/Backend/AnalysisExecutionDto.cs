@@ -7,6 +7,7 @@ public class AnalysisExecutionDto
 {
     public int Id { get; set; }
     public string Status { get; set; }
+    public double Progress { get; set; }
     public PluginInfo PluginInfo { get; set; }
     public PluginExecutionsDto[] PluginExecutions { get; set; }
     public DateTime StartDate { get; set; }

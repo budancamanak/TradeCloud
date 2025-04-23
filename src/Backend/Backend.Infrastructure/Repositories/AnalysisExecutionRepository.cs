@@ -88,4 +88,31 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
             .ToListAsync();
         return items;
     }
+
+    public async Task<MethodResponse> SetAnalysisExecutionProgress(int id, int increment, int total)
+    {
+        Guard.Against.NegativeOrZero(id);
+        var existing = dbContext.AnalysisExecutions.FirstOrDefault(f => f.Id == id);
+        Guard.Against.Null(existing);
+        if (existing.ProgressTotal == 0)
+        {
+            existing.ProgressTotal = total * dbContext.PluginExecutions.Count(f => f.AnalysisExecutionId == id);
+        }
+
+        if (increment == total)
+        {
+            existing.ProgressCurrent = existing.ProgressTotal;
+        }
+        else
+        {
+            existing.ProgressCurrent += increment;
+            if (existing.ProgressCurrent >= existing.ProgressTotal)
+                existing.ProgressCurrent = existing.ProgressTotal;
+        }
+
+        var result = await dbContext.SaveChangesAsync();
+        if (result > 0) return MethodResponse.Success(result, "AnalysisExecutions updated progress");
+
+        return MethodResponse.Error("Failed to update AnalysisExecutions progress");
+    }
 }

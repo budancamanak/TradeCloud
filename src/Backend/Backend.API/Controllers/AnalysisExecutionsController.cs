@@ -55,9 +55,10 @@ public class AnalysisExecutionsController(
     }
 
     [HttpGet("{executionId:int}/Details")]
-    public async Task<AnalysisExecutionDto> GetAnalysisExecutionDetails(int executionId)
+    public async Task<AnalysisExecutionDto> GetAnalysisExecutionDetails(int executionId, [FromQuery] int minimal = 0)
     {
-        var request = new AnalysisExecutionDetailsRequest { AnalysisExecutionId = executionId };
+        var request = new AnalysisExecutionDetailsRequest
+            { AnalysisExecutionId = executionId, RequestMinimalInfo = minimal == 1 };
         var result = await mediator.Send(request);
         return result;
     }

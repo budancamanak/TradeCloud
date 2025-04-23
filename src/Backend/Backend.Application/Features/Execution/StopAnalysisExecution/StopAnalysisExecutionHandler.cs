@@ -13,6 +13,7 @@ public class StopAnalysisExecutionHandler(
     IValidator<StopAnalysisExecutionRequest> validator,
     IEventBus messageBroker,
     IPluginExecutionRepository pluginRepository,
+    IAnalysisExecutionRepository analysisExecutionRepository,
     ILogger<StopAnalysisExecutionHandler> logger,
     IMapper mapper
 ) : IRequestHandler<StopAnalysisExecutionRequest, MethodResponse>
@@ -22,6 +23,7 @@ public class StopAnalysisExecutionHandler(
         logger.LogDebug("Validating  stop analysis request");
         await validator.ValidateAndThrowAsync(request, cancellationToken);
         logger.LogInformation("StopAnalysisExecutionHandler> Fetching plugins of {}", request.AnalysisExecutionId);
+        await analysisExecutionRepository.SetAnalysisExecutionProgress(request.AnalysisExecutionId, 100, 100);
         var executions = await pluginRepository.GetPluginOfAnalysis(request.AnalysisExecutionId);
         var @event = new StopAnalysisEvent
         {

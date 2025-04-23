@@ -39,6 +39,8 @@ public static class DependencyInjection
             {
                 config.Publish<IntegrationEvent>(f => f.Exclude = true);
                 config.Message<PluginProgressEvent>(f => f.SetEntityName("plugin.executions.exchange.progress"));
+                config.Message<AnalysisExecutionProgressEvent>(f =>
+                    f.SetEntityName("analysis.executions.exchange.progress"));
                 config.Message<PluginSignalEvent>(f => f.SetEntityName("plugin.executions.exchange.signal"));
                 config.Message<PluginStatusEvent>(f => f.SetEntityName("plugin.executions.exchange.status"));
                 config.Message<PluginStartedEvent>(f => f.SetEntityName("plugin.executions.exchange.started"));

@@ -37,15 +37,18 @@ public class AnalysisExecutionDetailsRequestHandler(
             Status = analysis.Status.GetStringRepresentation(),
             EndDate = analysis.EndDate,
             StartDate = analysis.StartDate,
-            PluginExecutions = mapper.Map<List<PluginExecutionsDto>>(analysis.PluginExecutions).ToArray()
+            Progress = analysis.Progress
         };
-
-        foreach (var item in result.PluginExecutions)
+        if (!request.RequestMinimalInfo)
         {
-            var outputs = await pluginOutputRepository.GetPluginOutputs(item.Id);
-            var outputDtos =
-                mapper.Map<List<PluginOutputDto>>(outputs, opts => { opts.Items["PluginName"] = pluginInfo.Name; });
-            item.Outputs = outputDtos.ToArray();
+            result.PluginExecutions = mapper.Map<List<PluginExecutionsDto>>(analysis.PluginExecutions).ToArray();
+            foreach (var item in result.PluginExecutions)
+            {
+                var outputs = await pluginOutputRepository.GetPluginOutputs(item.Id);
+                var outputDtos =
+                    mapper.Map<List<PluginOutputDto>>(outputs, opts => { opts.Items["PluginName"] = pluginInfo.Name; });
+                item.Outputs = outputDtos.ToArray();
+            }
         }
 
         return result;
