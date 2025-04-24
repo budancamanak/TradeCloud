@@ -109,7 +109,6 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
         return MethodResponse.Success(id, "Password updated");
     }
 
-
     public async Task<MethodResponse> UpdateUserStatus(int id, Status status)
     {
         Guard.Against.NegativeOrZero(id);
@@ -120,5 +119,31 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
         var result = await dbContext.SaveChangesAsync();
         if (result == 0) return MethodResponse.Error("Failed to update user status");
         return MethodResponse.Success(existing.Id, "User status updated");
+    }
+
+    public Task<List<UserRole>> GetUserRoles(string token)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<List<UserRole>> GetUserRoles(int userId)
+    {
+        Guard.Against.NegativeOrZero(userId);
+        var item = await dbContext.Users.Include(user => user.UserRoles).FirstOrDefaultAsync(f => f.Id == userId);
+        Guard.Against.Null(item);
+        return item.UserRoles.ToList();
+    }
+
+    public async Task<MethodResponse> RemoveRoleFromUser(int userId, int roleId)
+    {
+        Guard.Against.NegativeOrZero(userId);
+        var user = await dbContext.Users.Include(user => user.UserRoles).FirstOrDefaultAsync(f => f.Id == userId);
+        Guard.Against.Null(user);
+        var item = user.UserRoles.FirstOrDefault(f => f.RoleId == roleId);
+        Guard.Against.Null(item);
+        user.UserRoles.Remove(item);
+        var result = await dbContext.SaveChangesAsync();
+        if (result == 0) return MethodResponse.Error("Failed to remove role from user");
+        return MethodResponse.Success(user.Id, "Role removed from user");
     }
 }

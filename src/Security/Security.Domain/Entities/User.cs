@@ -13,4 +13,5 @@ public class User
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
     public virtual ICollection<UserLogin> UserLogins { get; set; }
+    public virtual ICollection<UserRole> UserRoles { get; set; }
 }

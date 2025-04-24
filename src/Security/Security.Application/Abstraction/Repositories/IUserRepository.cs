@@ -9,6 +9,9 @@ public interface IUserRepository : IAsyncRepository<User>
 {
     Task<List<User>> GetUsersWithStatus(Status status);
     Task<MethodResponse> CheckUsernameAvailability(string username);
-    Task<MethodResponse> UpdateUserPassword(int id,string password);
+    Task<MethodResponse> UpdateUserPassword(int id, string password);
     Task<MethodResponse> UpdateUserStatus(int id, Status status);
+    Task<List<UserRole>> GetUserRoles(string token);
+    Task<List<UserRole>> GetUserRoles(int userId);
+    Task<MethodResponse> RemoveRoleFromUser(int userId, int roleId);
 }
