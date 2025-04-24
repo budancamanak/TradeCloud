@@ -4,7 +4,7 @@ using Security.Domain.Entities;
 
 namespace Security.Infrastructure.Data.Configurations;
 
-public static class UserConfiguration
+public static class UserConfigurations
 {
     public static void ApplyUserConfigurations(this ModelBuilder modelBuilder)
     {
@@ -23,6 +23,6 @@ public static class UserConfiguration
                 v => Status.FromName(v)!
             )
             .IsRequired();
+        ent.HasMany(f => f.UserLogins).WithOne();
     }
-    
 }

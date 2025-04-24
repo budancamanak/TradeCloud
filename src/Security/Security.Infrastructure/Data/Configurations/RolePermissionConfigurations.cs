@@ -4,12 +4,12 @@ using Security.Domain.Entities;
 
 namespace Security.Infrastructure.Data.Configurations;
 
-public static class RolePermissionConfiguration
+public static class RolePermissionConfigurations
 {
     public static void ApplyRolePermissionConfigurations(this ModelBuilder modelBuilder)
     {
         var ent = modelBuilder.Entity<RolePermission>();
-        ent.ToTable("RolePermission");
+        ent.ToTable("RolePermissions");
         ent.HasKey(f => new { f.RoleId, f.PermissionId });
         ent.HasData(
             Create(Roles.Admin, Permissions.AssignRoles),

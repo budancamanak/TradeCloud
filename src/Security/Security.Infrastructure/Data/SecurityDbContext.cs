@@ -26,6 +26,7 @@ public class SecurityDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyUserConfigurations();
+        modelBuilder.ApplyUserLoginConfigurations();
         modelBuilder.ApplyPermissionConfigurations();
         modelBuilder.ApplyRoleConfigurations();
         modelBuilder.ApplyRolePermissionConfigurations();

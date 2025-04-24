@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Infrastructure.Data.Configurations;
 
-public static class AnalysisExecutionConfiguration
+public static class AnalysisExecutionConfigurations
 {
     public static void ApplyAnalysisExecutionConfigurations(this ModelBuilder modelBuilder)
     {

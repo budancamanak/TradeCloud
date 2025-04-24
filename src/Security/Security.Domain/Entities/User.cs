@@ -12,4 +12,6 @@ public class User
     public string Password { get; set; }
     public Status Status { get; set; } = Status.Active;
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+
+    public virtual ICollection<UserLogin> UserLogins { get; set; }
 }

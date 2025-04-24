@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Security.Infrastructure.Data;
@@ -11,9 +12,11 @@ using Security.Infrastructure.Data;
 namespace Security.Infrastructure.Migrations
 {
     [DbContext(typeof(SecurityDbContext))]
-    partial class SecurityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250424195144_PluralizedTableNames")]
+    partial class PluralizedTableNames
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -311,37 +314,6 @@ namespace Security.Infrastructure.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("Security.Domain.Entities.UserLogin", b =>
-                {
-                    b.Property<string>("Token")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ClientIP")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<DateTime>("ExpirationDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("LoginDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UserAgent")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Token");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserLogins", (string)null);
-                });
-
             modelBuilder.Entity("RoleUser", b =>
                 {
                     b.HasOne("Security.Domain.Entities.Role", null)
@@ -370,20 +342,6 @@ namespace Security.Infrastructure.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Security.Domain.Entities.UserLogin", b =>
-                {
-                    b.HasOne("Security.Domain.Entities.User", null)
-                        .WithMany("UserLogins")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Security.Domain.Entities.User", b =>
-                {
-                    b.Navigation("UserLogins");
                 });
 #pragma warning restore 612, 618
         }

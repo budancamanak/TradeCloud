@@ -11,6 +11,5 @@ public interface IUserRepository : IAsyncRepository<User>
     Task<MethodResponse> LogoutUser(string token);
     Task<MethodResponse> CheckUsernameAvailability(string username);
     Task<MethodResponse> UpdateUserStatus(string username);
-    Task<List<UserRole>> GetUserRoles(string token);
     Task<List<Permission>> GetUserPermissions(string token);
 }

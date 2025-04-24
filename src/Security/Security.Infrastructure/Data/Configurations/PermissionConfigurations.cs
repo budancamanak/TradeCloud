@@ -4,12 +4,12 @@ using Security.Domain.Entities;
 
 namespace Security.Infrastructure.Data.Configurations;
 
-public static class PermissionConfiguration
+public static class PermissionConfigurations
 {
     public static void ApplyPermissionConfigurations(this ModelBuilder modelBuilder)
     {
         var ent = modelBuilder.Entity<Permission>();
-        ent.ToTable("Permission");
+        ent.ToTable("Permissions");
         ent.HasKey(f => f.Id);
         ent.Property(f => f.Name).IsRequired();
         ent.HasData(Permissions.GetValues()
