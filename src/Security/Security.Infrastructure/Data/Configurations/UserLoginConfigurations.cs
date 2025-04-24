@@ -16,5 +16,7 @@ public static class UserLoginConfigurations
         ent.Property(f => f.ExpirationDate).IsRequired();
         ent.Property(f => f.UserAgent).HasMaxLength(255);
         ent.Property(f => f.ClientIP).HasMaxLength(50);
+
+        ent.HasOne(f => f.User).WithMany(f => f.UserLogins);
     }
 }

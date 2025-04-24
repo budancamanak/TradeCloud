@@ -8,4 +8,6 @@ public class UserLogin
     public DateTime ExpirationDate { get; set; }
     public string ClientIP { get; set; }
     public string UserAgent { get; set; }
+
+    public virtual User User { get; set; }
 }

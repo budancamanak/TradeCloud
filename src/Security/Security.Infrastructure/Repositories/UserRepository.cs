@@ -27,6 +27,24 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
         return await dbContext.Users.Where(f => f.Status == status).ToListAsync();
     }
 
+    public async Task<User> FindUserByUsername(string username)
+    {
+        Guard.Against.NullOrWhiteSpace(username);
+        var item = await dbContext.Users.FirstOrDefaultAsync(f => f.Username == username);
+        Guard.Against.Null(item);
+        return item;
+    }
+
+    public async Task<MethodResponse> AddUserLogin(User user, UserLogin login)
+    {
+        Guard.Against.Null(user);
+        Guard.Against.Null(login);
+        user.UserLogins.Add(login);
+        var result = await dbContext.SaveChangesAsync();
+        if (result == 0) return MethodResponse.Error("Failed to save user login");
+        return MethodResponse.Success(user.Id, "User login saved");
+    }
+
     public async Task<List<User>> GetAllAsync()
     {
         return await dbContext.Users.ToListAsync();
