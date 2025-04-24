@@ -1,4 +1,5 @@
-﻿using Common.Security.Enums;
+﻿using Common.Core.Enums;
+using Common.Security.Enums;
 
 namespace Security.Domain.Entities;
 
@@ -9,6 +10,6 @@ public class User
     public string Username { get; set; }
     public string Email { get; set; }
     public string Password { get; set; }
-    // public UserTypes UserType { get; set; }
+    public Status Status { get; set; } = Status.Active;
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 }

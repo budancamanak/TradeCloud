@@ -25,6 +25,7 @@ public class SecurityDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyUserConfigurations();
         modelBuilder.ApplyPermissionConfigurations();
         modelBuilder.ApplyRoleConfigurations();
         modelBuilder.ApplyRolePermissionConfigurations();

@@ -5,10 +5,17 @@ public class MethodResponse
     public bool IsSuccess { get; set; }
     public int Id { get; set; }
     public string Message { get; set; } = "";
+    public object Data { get; set; }
 
 
     private MethodResponse()
     {
+    }
+
+    public MethodResponse WithData(object data)
+    {
+        this.Data = data;
+        return this;
     }
 
     public static MethodResponse Success(string message)
