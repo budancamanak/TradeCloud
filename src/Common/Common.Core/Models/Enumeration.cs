@@ -41,6 +41,11 @@ public abstract class Enumeration<T> : IEquatable<Enumeration<T>>
         return Value.GetHashCode();
     }
 
+    public static List<T> GetValues()
+    {
+        return _enumerations.Values.Select(s => s).ToList();
+    }
+
     private static Dictionary<int, T> CreateEnumerations()
     {
         var _type = typeof(T);
