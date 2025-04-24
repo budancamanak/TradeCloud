@@ -68,6 +68,8 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
     {
         Guard.Against.Null(item);
         Guard.Against.NegativeOrZero(item.Id);
+        // todo implement User validators
+        await validator.ValidateAndThrowAsync(item);
         var existing = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == item.Id);
         Guard.Against.NotFound(item.Id, existing);
 

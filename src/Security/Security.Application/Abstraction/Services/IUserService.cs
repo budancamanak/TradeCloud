@@ -9,4 +9,5 @@ public interface IUserService
     Task<MethodResponse> LoginUser(string username, string password);
     Task<MethodResponse> LogoutUser(string token);
     Task<List<Permission>> GetUserPermissions(string token);
+    Task<List<Role>> GetUserRoles(string token);
 }

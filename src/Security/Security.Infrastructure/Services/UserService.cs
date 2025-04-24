@@ -48,4 +48,9 @@ public class UserService(IUserRepository repository, ITokenService tokenService)
     {
         throw new NotImplementedException();
     }
+
+    public Task<List<Role>> GetUserRoles(string token)
+    {
+        throw new NotImplementedException();
+    }
 }
