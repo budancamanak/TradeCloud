@@ -2,13 +2,10 @@
 using Common.Application.Services;
 using Common.Web;
 using FluentValidation;
-using Market.Application.Behaviours;
-using Market.Application.Exceptions;
-using Market.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Security.Application.Behaviours;
 
-
-namespace Market.Application;
+namespace Security.Application;
 
 public static class DependencyInjection
 {
@@ -24,9 +21,9 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
-        services.AddKeyedScoped<ICacheBuilder, MarketCacheBuilder>("market");
-        services.AddKeyedScoped<ICacheBuilder, TickerCacheBuilder>("ticker");
-        services.AddKeyedScoped<ICacheBuilder, ExchangeCacheBuilder>("exchange");
+        // services.AddKeyedScoped<ICacheBuilder, MarketCacheBuilder>("market");
+        // services.AddKeyedScoped<ICacheBuilder, TickerCacheBuilder>("ticker");
+        // services.AddKeyedScoped<ICacheBuilder, ExchangeCacheBuilder>("exchange");
 
         //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
         //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>)); 

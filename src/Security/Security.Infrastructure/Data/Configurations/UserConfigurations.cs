@@ -13,7 +13,6 @@ public static class UserConfigurations
         ent.HasKey(f => f.Id);
         ent.Property(f => f.Username).HasMaxLength(50).IsRequired();
         ent.Property(f => f.Email).HasMaxLength(255).IsRequired();
-        ent.Property(f => f.Identity).IsRequired();
         ent.Property(f => f.Password).IsRequired();
         ent.Property(f => f.CreatedDate).IsRequired();
         ent.Property(f => f.Status)
