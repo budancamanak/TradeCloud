@@ -27,7 +27,7 @@ public class UserService(IUserRepository repository, ITokenService tokenService)
         var passMatch = BCrypt.Net.BCrypt.Verify(password, user.Password);
         if (!passMatch) return MethodResponse.Error("Password mismatch");
         // todo generate jwt token
-        var token = tokenService.GenerateToken();
+        var token = tokenService.GenerateToken(user);
         var mr = await repository.AddUserLogin(user, new UserLogin
         {
             Token = token,

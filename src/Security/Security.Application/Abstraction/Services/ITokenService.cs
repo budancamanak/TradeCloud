@@ -1,6 +1,8 @@
-﻿namespace Security.Application.Abstraction.Services;
+﻿using Security.Domain.Entities;
+
+namespace Security.Application.Abstraction.Services;
 
 public interface ITokenService
 {
-    string GenerateToken();
+    string GenerateToken(User user);
 }
