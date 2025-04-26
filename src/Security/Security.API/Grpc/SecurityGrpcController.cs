@@ -1,14 +1,16 @@
 ﻿using Common.Grpc;
 using Common.Security.Enums;
 using Grpc.Core;
+using MediatR;
 using Security.Application.Abstraction.Repositories;
 using Security.Application.Abstraction.Services;
+using Security.Application.Features.User.RegisterUser;
 using Security.Domain.Entities;
 using Status = Common.Core.Enums.Status;
 
 namespace Security.API.Grpc;
 
-public class SecurityGrpcController(IUserService userService, IUserRepository repository)
+public class SecurityGrpcController(IUserService userService, IUserRepository repository, IMediator mediator)
     : GrpcAuthController.GrpcAuthControllerBase
 {
     public override async Task<CheckResponse> CheckPermission(CheckRequest request, ServerCallContext context)
@@ -74,24 +76,24 @@ public class SecurityGrpcController(IUserService userService, IUserRepository re
         };
     }
 
-    public override async Task<UserRegisterResponse> RegisterUser(UserRegisterRequest request,
+    public override async Task<UserRegisterResponse> RegisterUser(UserRegisterRequest grpcRequest,
         ServerCallContext context)
     {
-        var mr = await userService.RegisterUser(new User
+        // todo use automapper here
+        var request = new RegisterUserRequest
         {
-            Email = request.Email,
-            Password = request.Password,
-            Username = request.Nickname,
-            Status = Status.Active,
-            CreatedDate = DateTime.UtcNow
-        });
+            Email = grpcRequest.Email,
+            Password = grpcRequest.Password,
+            Username = grpcRequest.Nickname,
+            PasswordConfirm = grpcRequest.PasswordConfirm
+        };
+        var mr = await mediator.Send(request, context.CancellationToken);
         if (!mr.IsSuccess)
             return new UserRegisterResponse
             {
                 Message = mr.Message,
                 Success = mr.IsSuccess
             };
-        await repository.AddRoleToUser(mr.Id, Roles.Admin);
         return new UserRegisterResponse
         {
             Message = mr.Message,

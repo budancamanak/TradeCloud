@@ -29,6 +29,7 @@ message UserRegisterRequest{
   string email = 1;
   string nickname = 2;
   string password = 3;
+  string passwordConfirm = 4;
 }
 
 message UserRegisterResponse{

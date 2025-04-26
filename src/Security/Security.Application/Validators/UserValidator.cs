@@ -14,5 +14,6 @@ public class UserValidator : AbstractValidator<User>
             .MinimumLength(5).WithMessage("User.Username's length can't be less than 5");
         RuleFor(f => f.Password).NotEmpty().WithMessage("User.Email can't be null")
             .MinimumLength(8).WithMessage("User.Password's length can't be less than 8");
+        RuleFor(f => f.Status).NotNull().WithMessage("User.Status can't be null");
     }
 }
