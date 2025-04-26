@@ -1,4 +1,5 @@
-﻿using Common.Grpc;
+﻿using AutoMapper;
+using Common.Grpc;
 using Common.Security.Enums;
 using Grpc.Core;
 using MediatR;
@@ -10,7 +11,7 @@ using Status = Common.Core.Enums.Status;
 
 namespace Security.API.Grpc;
 
-public class SecurityGrpcController(IUserService userService, IUserRepository repository, IMediator mediator)
+public class SecurityGrpcController(IUserService userService, IUserRepository repository,IMapper mapper, IMediator mediator)
     : GrpcAuthController.GrpcAuthControllerBase
 {
     public override async Task<CheckResponse> CheckPermission(CheckRequest request, ServerCallContext context)
@@ -79,14 +80,7 @@ public class SecurityGrpcController(IUserService userService, IUserRepository re
     public override async Task<UserRegisterResponse> RegisterUser(UserRegisterRequest grpcRequest,
         ServerCallContext context)
     {
-        // todo use automapper here
-        var request = new RegisterUserRequest
-        {
-            Email = grpcRequest.Email,
-            Password = grpcRequest.Password,
-            Username = grpcRequest.Nickname,
-            PasswordConfirm = grpcRequest.PasswordConfirm
-        };
+        var request = mapper.Map<RegisterUserRequest>(grpcRequest);
         var mr = await mediator.Send(request, context.CancellationToken);
         if (!mr.IsSuccess)
             return new UserRegisterResponse
