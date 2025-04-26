@@ -13,7 +13,7 @@ public static class RoleConfigurations
         ent.HasKey(f => f.Id);
         ent.Property(f => f.Name).IsRequired();
         ent.HasMany(f => f.Permissions).WithMany().UsingEntity<RolePermission>();
-        ent.HasMany(f => f.Users).WithMany();
+        ent.HasMany(f => f.Users).WithMany().UsingEntity<UserRole>();;
         ent.HasData(Roles.GetValues()
             .Select(s => new Role
             {
