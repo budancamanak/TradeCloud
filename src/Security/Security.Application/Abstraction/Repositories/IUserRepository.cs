@@ -11,9 +11,10 @@ public interface IUserRepository : IAsyncRepository<User>
     Task<User> FindUserByUsername(string username);
     Task<MethodResponse> AddUserLogin(User user, UserLogin login);
     Task<MethodResponse> CheckUsernameAvailability(string username);
+    Task<MethodResponse> CheckEmailAvailability(string email);
     Task<MethodResponse> UpdateUserPassword(int id, string password);
     Task<MethodResponse> UpdateUserStatus(int id, Status status);
-    Task<List<UserRole>> GetUserRoles(string token);
-    Task<List<UserRole>> GetUserRoles(int userId);
+    Task<List<Role>> GetUserRoles(string token);
+    Task<List<Role>> GetUserRoles(int userId);
     Task<MethodResponse> RemoveRoleFromUser(int userId, int roleId);
 }

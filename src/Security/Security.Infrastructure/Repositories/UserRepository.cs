@@ -116,6 +116,15 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
             : MethodResponse.Success("Username is already taken");
     }
 
+    public async Task<MethodResponse> CheckEmailAvailability(string email)
+    {
+        Guard.Against.NullOrWhiteSpace(email);
+        var count = await dbContext.Users.CountAsync(f => f.Email == email);
+        return count == 0
+            ? MethodResponse.Error("Email is not being used")
+            : MethodResponse.Success("Email is already taken");
+    }
+
     public async Task<MethodResponse> UpdateUserPassword(int id, string password)
     {
         Guard.Against.NegativeOrZero(id);
@@ -141,12 +150,12 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
         return MethodResponse.Success(existing.Id, "User status updated");
     }
 
-    public Task<List<UserRole>> GetUserRoles(string token)
+    public Task<List<Role>> GetUserRoles(string token)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<List<UserRole>> GetUserRoles(int userId)
+    public async Task<List<Role>> GetUserRoles(int userId)
     {
         Guard.Against.NegativeOrZero(userId);
         var item = await dbContext.Users.Include(user => user.UserRoles).FirstOrDefaultAsync(f => f.Id == userId);
@@ -159,7 +168,7 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
         Guard.Against.NegativeOrZero(userId);
         var user = await dbContext.Users.Include(user => user.UserRoles).FirstOrDefaultAsync(f => f.Id == userId);
         Guard.Against.Null(user);
-        var item = user.UserRoles.FirstOrDefault(f => f.RoleId == roleId);
+        var item = user.UserRoles.FirstOrDefault(f => f.Id == roleId);
         Guard.Against.Null(item);
         user.UserRoles.Remove(item);
         var result = await dbContext.SaveChangesAsync();

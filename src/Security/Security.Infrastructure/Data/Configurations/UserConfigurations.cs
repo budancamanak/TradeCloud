@@ -23,5 +23,6 @@ public static class UserConfigurations
             )
             .IsRequired();
         ent.HasMany(f => f.UserLogins).WithOne();
+        ent.HasMany(f => f.UserRoles).WithMany().UsingEntity<UserRole>();
     }
 }
