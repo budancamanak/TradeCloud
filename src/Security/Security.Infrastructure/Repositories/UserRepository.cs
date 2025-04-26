@@ -2,6 +2,7 @@
 using Common.Core.Enums;
 using Common.Core.Extensions;
 using Common.Core.Models;
+using Common.Security.Enums;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Security.Application.Abstraction.Repositories;
@@ -153,6 +154,19 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
     public Task<List<Role>> GetUserRoles(string token)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<MethodResponse> AddRoleToUser(int userId, Roles eRole)
+    {
+        Guard.Against.NegativeOrZero(userId);
+        var item = await dbContext.Users.Include(user => user.UserRoles).FirstOrDefaultAsync(f => f.Id == userId);
+        Guard.Against.Null(item);
+        var role = await dbContext.Roles.FirstOrDefaultAsync(f => f.Id == eRole.Value);
+        Guard.Against.Null(role);
+        item.UserRoles.Add(role);
+        var result = await dbContext.SaveChangesAsync();
+        if (result == 0) return MethodResponse.Error("Failed to assign role to user");
+        return MethodResponse.Success(userId, "Role assigned to user");
     }
 
     public async Task<List<Role>> GetUserRoles(int userId)

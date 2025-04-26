@@ -22,7 +22,8 @@ public static class UserConfigurations
                 v => Status.FromName(v)!
             )
             .IsRequired();
-        ent.HasMany(f => f.UserLogins).WithOne();
+        ent.HasMany(f => f.UserLogins).WithOne(f=>f.User);
+        // ent.HasMany(f => f.UserRoles).WithMany(f=>f.Users).UsingEntity(f=>f.ToTable("RoleUser"));//.UsingEntity<Role>();
         ent.HasMany(f => f.UserRoles).WithMany().UsingEntity<UserRole>();
     }
 }

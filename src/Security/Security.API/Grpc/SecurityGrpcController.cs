@@ -1,12 +1,15 @@
 ﻿using Common.Grpc;
+using Common.Security.Enums;
 using Grpc.Core;
+using Security.Application.Abstraction.Repositories;
 using Security.Application.Abstraction.Services;
 using Security.Domain.Entities;
 using Status = Common.Core.Enums.Status;
 
 namespace Security.API.Grpc;
 
-public class SecurityGrpcController(IUserService userService) : GrpcAuthController.GrpcAuthControllerBase
+public class SecurityGrpcController(IUserService userService, IUserRepository repository)
+    : GrpcAuthController.GrpcAuthControllerBase
 {
     public override async Task<CheckResponse> CheckPermission(CheckRequest request, ServerCallContext context)
     {
@@ -82,6 +85,13 @@ public class SecurityGrpcController(IUserService userService) : GrpcAuthControll
             Status = Status.Active,
             CreatedDate = DateTime.UtcNow
         });
+        if (!mr.IsSuccess)
+            return new UserRegisterResponse
+            {
+                Message = mr.Message,
+                Success = mr.IsSuccess
+            };
+        await repository.AddRoleToUser(mr.Id, Roles.Admin);
         return new UserRegisterResponse
         {
             Message = mr.Message,

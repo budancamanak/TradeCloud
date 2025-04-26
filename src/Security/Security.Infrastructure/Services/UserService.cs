@@ -11,9 +11,9 @@ public class UserService(IUserRepository repository, ITokenService tokenService)
     public async Task<MethodResponse> RegisterUser(User user)
     {
         var mr = await repository.CheckUsernameAvailability(user.Username);
-        if (mr.IsSuccess) return mr;
+        if (mr.IsSuccess) return MethodResponse.Error(mr.Message);
         mr = await repository.CheckEmailAvailability(user.Email);
-        if (mr.IsSuccess) return mr;
+        if (mr.IsSuccess) return MethodResponse.Error(mr.Message);
         // todo check password if its strong
         // todo send registration email.
         mr = await repository.AddAsync(user);

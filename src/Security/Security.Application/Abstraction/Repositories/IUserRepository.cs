@@ -1,6 +1,7 @@
 ﻿using Common.Application.Repositories;
 using Common.Core.Enums;
 using Common.Core.Models;
+using Common.Security.Enums;
 using Security.Domain.Entities;
 
 namespace Security.Application.Abstraction.Repositories;
@@ -16,5 +17,6 @@ public interface IUserRepository : IAsyncRepository<User>
     Task<MethodResponse> UpdateUserStatus(int id, Status status);
     Task<List<Role>> GetUserRoles(string token);
     Task<List<Role>> GetUserRoles(int userId);
+    Task<MethodResponse> AddRoleToUser(int userId, Roles eRole);
     Task<MethodResponse> RemoveRoleFromUser(int userId, int roleId);
 }
