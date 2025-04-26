@@ -20,11 +20,12 @@ public class RegisterUserRequestHandler(
 {
     public async Task<MethodResponse> Handle(RegisterUserRequest request, CancellationToken cancellationToken)
     {
-        var validated = validator.Validate(request);
+        var validated = await validator.ValidateAsync(request, cancellationToken);
         if (validated is { IsValid: false })
         {
-            return MethodResponse.Error(string.Join("|", validated.Errors));
+            return MethodResponse.Error(string.Join(" && ", validated.Errors));
         }
+        // await validator.ValidateAndThrowAsync(request, cancellationToken);
 
         logger.LogWarning("Registering user with email: {Email} and username: {Username}", request.Email,
             request.Username);
