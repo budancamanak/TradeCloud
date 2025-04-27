@@ -2,6 +2,7 @@
 using Common.Application.Repositories;
 using Common.Application.Services;
 using Common.Core.Models;
+using Common.Core.Serialization;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Security.Application.Abstraction.Repositories;
@@ -59,21 +60,21 @@ public class UserService(
 
     public async Task<List<Permission>> GetUserPermissions(string userId)
     {
-        var cached = await cache.GetAsync<List<Permission>>(CacheKeyGenerator.UserRoleInfoKey(userId));
+        var cached = await cache.GetAsync<List<Permission>>(CacheKeyGenerator.UserPermissionsKey(userId));
         if (cached is { Count: > 0 }) return cached;
         cached = await repository.GetUserPermissions(int.Parse(userId));
-        await cache.SetAsync(CacheKeyGenerator.UserRoleInfoKey(userId), JsonConvert.SerializeObject(cached),
+        await cache.SetAsync(CacheKeyGenerator.UserPermissionsKey(userId), JsonSerialization.ToJson(cached),
             TimeSpan.FromMinutes(15));
         return cached;
     }
 
     public async Task<List<Role>> GetUserRoles(string userId)
     {
-        // var cached = await cache.GetAsync<List<Role>>(CacheKeyGenerator.UserRoleInfoKey(userId));
-        // if (cached is { Count: > 0 }) return cached;
-        var cached = await repository.GetUserRoles(int.Parse(userId));
-        // await cache.SetAsync(CacheKeyGenerator.UserRoleInfoKey(userId), JsonConvert.SerializeObject(cached),
-        //     TimeSpan.FromMinutes(15));
+        var cached = await cache.GetAsync<List<Role>>(CacheKeyGenerator.UserRoleInfoKey(userId));
+        if (cached is { Count: > 0 }) return cached;
+        cached = await repository.GetUserRoles(int.Parse(userId));
+        await cache.SetAsync(CacheKeyGenerator.UserRoleInfoKey(userId), JsonSerialization.ToJson(cached),
+            TimeSpan.FromMinutes(15));
         return cached;
     }
 }

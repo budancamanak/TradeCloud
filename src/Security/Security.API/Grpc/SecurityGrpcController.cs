@@ -28,7 +28,6 @@ public class SecurityGrpcController(
         if (!valid.IsValid) return new CheckResponse { Granted = false };
         var userPermissions = await userService.GetUserPermissions(valid.UserId);
         var hasPermission = userPermissions.FirstOrDefault(f => f.Name == request.Value) != null;
-        // var hasPermission = userPermissions.Any(f => f.FirstOrDefault(fx => fx.Name == request.Value) != null);
         if (hasPermission)
             return new CheckResponse
             {
