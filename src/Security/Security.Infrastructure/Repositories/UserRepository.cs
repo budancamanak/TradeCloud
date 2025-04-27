@@ -151,11 +151,6 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
         return MethodResponse.Success(existing.Id, "User status updated");
     }
 
-    public Task<List<Role>> GetUserRoles(string token)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<MethodResponse> AddRoleToUser(int userId, Roles eRole)
     {
         Guard.Against.NegativeOrZero(userId);
@@ -175,6 +170,20 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
         var item = await dbContext.Users.Include(user => user.UserRoles).FirstOrDefaultAsync(f => f.Id == userId);
         Guard.Against.Null(item);
         return item.UserRoles.ToList();
+    }
+
+    public async Task<List<Permission>> GetUserPermissions(int userId)
+    {
+        Guard.Against.NegativeOrZero(userId);
+        var user = await dbContext.Users.Include(user => user.UserRoles).ThenInclude(f => f.Permissions)
+            .FirstOrDefaultAsync(f => f.Id == userId);
+        Guard.Against.Null(user);
+        var permissions = new List<Permission>();
+        foreach (var userRole in user.UserRoles)
+        {
+            permissions.AddRange(userRole.Permissions);
+        }
+        return permissions.Distinct().ToList();
     }
 
     public async Task<MethodResponse> RemoveRoleFromUser(int userId, int roleId)

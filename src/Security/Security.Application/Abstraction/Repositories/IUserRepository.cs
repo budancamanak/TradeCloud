@@ -14,9 +14,9 @@ public interface IUserRepository : IAsyncRepository<User>
     Task<MethodResponse> CheckUsernameAvailability(string username);
     Task<MethodResponse> CheckEmailAvailability(string email);
     Task<MethodResponse> UpdateUserPassword(int id, string password);
-    Task<MethodResponse> UpdateUserStatus(int id, Status status);
-    Task<List<Role>> GetUserRoles(string token);
+    Task<MethodResponse> UpdateUserStatus(int id, Status status); 
     Task<List<Role>> GetUserRoles(int userId);
+    Task<List<Permission>> GetUserPermissions(int userId);
     Task<MethodResponse> AddRoleToUser(int userId, Roles eRole);
     Task<MethodResponse> RemoveRoleFromUser(int userId, int roleId);
 }

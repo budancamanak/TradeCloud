@@ -26,20 +26,14 @@ public class SecurityGrpcController(
         var clientIp = context.RequestHeaders.GetValue("ClientIP") ?? "";
         var valid = await tokenService.ValidateToken(request.Token, clientIp);
         if (!valid.IsValid) return new CheckResponse { Granted = false };
-        var userRoles = await userService.GetUserRoles(request.Token);
-        var hasPermission = userRoles.Any(f => f.Permissions.FirstOrDefault(fx => fx.Name == request.Value) != null);
+        var userPermissions = await userService.GetUserPermissions(valid.UserId);
+        var hasPermission = userPermissions.FirstOrDefault(f => f.Name == request.Value) != null;
+        // var hasPermission = userPermissions.Any(f => f.FirstOrDefault(fx => fx.Name == request.Value) != null);
         if (hasPermission)
             return new CheckResponse
             {
                 Granted = true
             };
-        // var permissions = await userService.GetUserPermissions(request.Token);
-        // hasPermission = permissions.Any(f => f.Name == request.Value);
-        // if (hasPermission)
-        //     return new CheckResponse
-        //     {
-        //         Granted = true
-        //     };
         return new CheckResponse
         {
             Granted = false
@@ -53,7 +47,10 @@ public class SecurityGrpcController(
 
     public override async Task<CheckResponse> CheckRole(CheckRequest request, ServerCallContext context)
     {
-        var userRoles = await userService.GetUserRoles(request.Token);
+        var clientIp = context.RequestHeaders.GetValue("ClientIP") ?? "";
+        var valid = await tokenService.ValidateToken(request.Token, clientIp);
+        if (!valid.IsValid) return new CheckResponse { Granted = false };
+        var userRoles = await userService.GetUserRoles(valid.UserId);
         var hasPermission = userRoles.Any(f => f.Name == request.Value);
         if (hasPermission)
             return new CheckResponse

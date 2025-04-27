@@ -3,6 +3,7 @@ using Common.Application.Repositories;
 using Common.Application.Services;
 using Common.Core.Models;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Security.Application.Abstraction.Repositories;
 using Security.Application.Abstraction.Services;
 using Security.Domain.Entities;
@@ -45,7 +46,9 @@ public class UserService(
             UserId = user.Id,
             ClientIP = clientIp
         });
-        // cache.SetAsync(CacheKeyGenerator.AuthTokenKey(user.Id),)
+        await cache.SetAsync(CacheKeyGenerator.UserRoleInfoKey(user.Id.ToString()),
+            JsonConvert.SerializeObject(user.UserRoles),
+            TimeSpan.FromMinutes(15));
         return mr.WithData(token);
     }
 
@@ -54,13 +57,23 @@ public class UserService(
         throw new NotImplementedException();
     }
 
-    public Task<List<Permission>> GetUserPermissions(string token)
+    public async Task<List<Permission>> GetUserPermissions(string userId)
     {
-        throw new NotImplementedException();
+        var cached = await cache.GetAsync<List<Permission>>(CacheKeyGenerator.UserRoleInfoKey(userId));
+        if (cached is { Count: > 0 }) return cached;
+        cached = await repository.GetUserPermissions(int.Parse(userId));
+        await cache.SetAsync(CacheKeyGenerator.UserRoleInfoKey(userId), JsonConvert.SerializeObject(cached),
+            TimeSpan.FromMinutes(15));
+        return cached;
     }
 
-    public Task<List<Role>> GetUserRoles(string token)
+    public async Task<List<Role>> GetUserRoles(string userId)
     {
-        throw new NotImplementedException();
+        // var cached = await cache.GetAsync<List<Role>>(CacheKeyGenerator.UserRoleInfoKey(userId));
+        // if (cached is { Count: > 0 }) return cached;
+        var cached = await repository.GetUserRoles(int.Parse(userId));
+        // await cache.SetAsync(CacheKeyGenerator.UserRoleInfoKey(userId), JsonConvert.SerializeObject(cached),
+        //     TimeSpan.FromMinutes(15));
+        return cached;
     }
 }

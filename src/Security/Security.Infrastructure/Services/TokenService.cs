@@ -92,18 +92,10 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
             };
         }
 
-        // var claimsPrincipal = handler.ValidateToken(token, pars, out SecurityToken securityToken);
-        // return claimsPrincipal;
-        // var result = await tokenValidator.ValidateTokenAsync(token, pars);
         return new ValidateTokenResponse
         {
             IsValid = true,
             UserId = user
         };
-        // return new ValidateTokenResponse
-        // {
-        //     IsValid = result.IsValid,
-        //     UserId = result.Claims.FirstOrDefault(f => f.Key == "sub").Value.ToString()
-        // };
     }
 }
