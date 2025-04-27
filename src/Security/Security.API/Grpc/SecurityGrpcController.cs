@@ -70,7 +70,7 @@ public class SecurityGrpcController(
     public override async Task<ValidateTokenResponse> ValidateToken(ValidateTokenRequest request,
         ServerCallContext context)
     {
-        var ip = new ClientIP(contextAccessor).GetClientIPv2();
+        var ip = contextAccessor.GetClientIPv2();
         Console.WriteLine(context.Host);
         var clientIp = context.RequestHeaders.GetValue("ClientIP") ?? "";
         return await tokenService.ValidateToken(request.Token, clientIp);

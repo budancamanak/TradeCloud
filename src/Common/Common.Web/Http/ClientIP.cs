@@ -4,54 +4,15 @@ using Microsoft.Extensions.Primitives;
 
 namespace Common.Web.Http;
 
-public class ClientIP(IHttpContextAccessor contextAccessor)
+public static class HttpContextExtensions
 {
-    public string GetClientIPv1(bool tryUseXForwardHeader = true)
+    public static string? CurrentUser(this IHttpContextAccessor contextAccessor)
     {
-        string ip = null;
-
-        // todo support new "Forwarded" header (2014) https://en.wikipedia.org/wiki/X-Forwarded-For
-
-        // X-Forwarded-For (csv list):  Using the First entry in the list seems to work
-        // for 99% of cases however it has been suggested that a better (although tedious)
-        // approach might be to read each IP from right to left and use the first public IP.
-        // http://stackoverflow.com/a/43554000/538763
-        //
-        if (tryUseXForwardHeader)
-            ip = GetHeaderValueAs<string>("X-Forwarded-For").SplitCsv().FirstOrDefault();
-
-        // RemoteIpAddress is always null in DNX RC1 Update1 (bug).
-        if (ip.IsNullOrWhitespace() && contextAccessor.HttpContext?.Connection?.RemoteIpAddress != null)
-            ip = contextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
-
-        if (ip.IsNullOrWhitespace())
-            ip = GetHeaderValueAs<string>("REMOTE_ADDR");
-
-        // _httpContextAccessor.HttpContext?.Request?.Host this is the local host.
-
-        if (ip.IsNullOrWhitespace())
-            throw new Exception("Unable to determine caller's IP.");
-
-        return ip;
+        return contextAccessor.HttpContext?.Items.FirstOrDefault(f => f.Key.ToString() == "CurrentUser")
+            .Value?.ToString();
     }
 
-    public T GetHeaderValueAs<T>(string headerName)
-    {
-        StringValues values;
-
-        if (contextAccessor.HttpContext?.Request?.Headers?.TryGetValue(headerName, out values) ?? false)
-        {
-            string rawValues = values.ToString(); // writes out as Csv when there are multiple.
-
-            if (!rawValues.IsNullOrWhitespace())
-                return (T)Convert.ChangeType(values.ToString(), typeof(T));
-        }
-
-        return default(T);
-    }
-
-
-    public string GetClientIPv2()
+    public static string GetClientIPv2(this IHttpContextAccessor contextAccessor)
     {
         IPAddress remoteIpAddress = contextAccessor.HttpContext.Connection.RemoteIpAddress;
         string result = "";
@@ -70,14 +31,50 @@ public class ClientIP(IHttpContextAccessor contextAccessor)
 
         return result;
     }
-}
 
-public static class HttpContextExtensions
-{
-    public static string? CurrentUser(this IHttpContextAccessor contextAccessor)
+
+    public static string GetClientIPv1(this IHttpContextAccessor contextAccessor, bool tryUseXForwardHeader = true)
     {
-        return contextAccessor.HttpContext?.Items.FirstOrDefault(f => f.Key.ToString() == "CurrentUser")
-            .Value?.ToString();
+        string ip = null;
+
+        // todo support new "Forwarded" header (2014) https://en.wikipedia.org/wiki/X-Forwarded-For
+
+        // X-Forwarded-For (csv list):  Using the First entry in the list seems to work
+        // for 99% of cases however it has been suggested that a better (although tedious)
+        // approach might be to read each IP from right to left and use the first public IP.
+        // http://stackoverflow.com/a/43554000/538763
+        //
+        if (tryUseXForwardHeader)
+            ip = GetHeaderValueAs<string>(contextAccessor, "X-Forwarded-For").SplitCsv().FirstOrDefault();
+
+        // RemoteIpAddress is always null in DNX RC1 Update1 (bug).
+        if (ip.IsNullOrWhitespace() && contextAccessor.HttpContext?.Connection?.RemoteIpAddress != null)
+            ip = contextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
+
+        if (ip.IsNullOrWhitespace())
+            ip = GetHeaderValueAs<string>(contextAccessor, "REMOTE_ADDR");
+
+        // _httpContextAccessor.HttpContext?.Request?.Host this is the local host.
+
+        if (ip.IsNullOrWhitespace())
+            throw new Exception("Unable to determine caller's IP.");
+
+        return ip;
+    }
+
+    private static T GetHeaderValueAs<T>(IHttpContextAccessor contextAccessor, string headerName)
+    {
+        StringValues values;
+
+        if (contextAccessor.HttpContext?.Request?.Headers?.TryGetValue(headerName, out values) ?? false)
+        {
+            string rawValues = values.ToString(); // writes out as Csv when there are multiple.
+
+            if (!rawValues.IsNullOrWhitespace())
+                return (T)Convert.ChangeType(values.ToString(), typeof(T));
+        }
+
+        return default(T);
     }
 }
 
