@@ -72,6 +72,15 @@ public class ClientIP(IHttpContextAccessor contextAccessor)
     }
 }
 
+public static class HttpContextExtensions
+{
+    public static string? CurrentUser(this IHttpContextAccessor contextAccessor)
+    {
+        return contextAccessor.HttpContext?.Items.FirstOrDefault(f => f.Key.ToString() == "CurrentUser")
+            .Value?.ToString();
+    }
+}
+
 internal static class StringExtensions
 {
     public static List<string> SplitCsv(this string csvList, bool nullOrWhitespaceInputReturnsNull = false)

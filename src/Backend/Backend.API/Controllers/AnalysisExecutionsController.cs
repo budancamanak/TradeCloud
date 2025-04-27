@@ -35,6 +35,7 @@ public class AnalysisExecutionsController(
     [HasPermission(Permissions.Enum.RunAnalysis)]
     public async Task<List<PluginInfo>> GetAvailablePlugins()
     {
+        var currentUser = contextAccessor.CurrentUser();
         var request = new ListAvailablePluginsRequest();
         var result = await mediator.Send(request);
         return result;

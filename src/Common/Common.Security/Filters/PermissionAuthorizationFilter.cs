@@ -26,7 +26,7 @@ public class PermissionAuthorizationFilter(
             context.Result = new ForbidResult();
             return;
         }
-        
+
         foreach (var attr in metadata.GetOrderedMetadata<HasPermissionAttribute>())
         {
             if (await securityClient.HasPermissionAsync(token, attr.Permission.ToString())) continue;
@@ -55,7 +55,6 @@ public class PermissionAuthorizationFilter(
             return;
         }
 
-        context.HttpContext.Session.SetString("UserId", tokenValidation.UserId);
-        // context.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]{new Claim()}))
+        context.HttpContext.Items.Add("CurrentUser", tokenValidation.UserId);
     }
 }
