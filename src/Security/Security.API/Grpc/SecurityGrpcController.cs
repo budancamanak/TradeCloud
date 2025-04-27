@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Common.Grpc;
 using Common.Security.Enums;
+using Common.Web.Http;
 using Grpc.Core;
 using MediatR;
 using Security.Application.Abstraction.Repositories;
@@ -11,11 +12,20 @@ using Status = Common.Core.Enums.Status;
 
 namespace Security.API.Grpc;
 
-public class SecurityGrpcController(IUserService userService, IUserRepository repository,IMapper mapper, IMediator mediator)
+public class SecurityGrpcController(
+    IUserService userService,
+    ITokenService tokenService,
+    IHttpContextAccessor contextAccessor,
+    IUserRepository repository,
+    IMapper mapper,
+    IMediator mediator)
     : GrpcAuthController.GrpcAuthControllerBase
 {
     public override async Task<CheckResponse> CheckPermission(CheckRequest request, ServerCallContext context)
     {
+        var clientIp = context.RequestHeaders.GetValue("ClientIP") ?? "";
+        var valid = await tokenService.ValidateToken(request.Token, clientIp);
+        if (!valid.IsValid) return new CheckResponse { Granted = false };
         var userRoles = await userService.GetUserRoles(request.Token);
         var hasPermission = userRoles.Any(f => f.Permissions.FirstOrDefault(fx => fx.Name == request.Value) != null);
         if (hasPermission)
@@ -61,14 +71,19 @@ public class SecurityGrpcController(IUserService userService, IUserRepository re
         return base.CheckScope(request, context);
     }
 
-    public override Task<ValidateTokenResponse> ValidateToken(ValidateTokenRequest request, ServerCallContext context)
+    public override async Task<ValidateTokenResponse> ValidateToken(ValidateTokenRequest request,
+        ServerCallContext context)
     {
-        return base.ValidateToken(request, context);
+        var ip = new ClientIP(contextAccessor).GetClientIPv2();
+        Console.WriteLine(context.Host);
+        var clientIp = context.RequestHeaders.GetValue("ClientIP") ?? "";
+        return await tokenService.ValidateToken(request.Token, clientIp);
     }
 
     public override async Task<UserLoginResponse> LoginUser(UserLoginRequest request, ServerCallContext context)
     {
-        var mr = await userService.LoginUser(request.Email, request.Password);
+        var clientIp = context.RequestHeaders.GetValue("ClientIP") ?? "";
+        var mr = await userService.LoginUser(request.Email, request.Password, clientIp);
         return new UserLoginResponse
         {
             Message = mr.Message,

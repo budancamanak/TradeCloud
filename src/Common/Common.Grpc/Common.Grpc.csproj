@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Common.Protos\Common.Protos.csproj"/>
+        <ProjectReference Include="..\Common.Web\Common.Web.csproj" />
     </ItemGroup>
     <ItemGroup>
         <Protobuf Include="../Common.Protos/Protos/market.proto" GrpcServices="Both">

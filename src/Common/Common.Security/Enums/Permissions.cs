@@ -1,8 +1,22 @@
 ﻿using Common.Core.Models;
 
 namespace Common.Security.Enums;
+
 public sealed class Permissions : Enumeration<Permissions>
 {
+    public enum Enum
+    {
+        ViewMarketData,
+        RunAnalysis,
+        ScheduleTask,
+        ManageScripts,
+        ExecuteTrades,
+        ViewResults,
+        ManageUsers,
+        AssignRoles,
+        ManageTrackList
+    }
+
     public static readonly Permissions ViewMarketData = new Permissions(1, nameof(ViewMarketData));
     public static readonly Permissions RunAnalysis = new Permissions(2, nameof(RunAnalysis));
     public static readonly Permissions ScheduleTask = new Permissions(3, nameof(ScheduleTask));

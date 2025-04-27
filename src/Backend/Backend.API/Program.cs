@@ -7,6 +7,7 @@ using Common.Security.Abstraction;
 using Common.Security.Filters;
 using Common.Security.Services;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -31,7 +32,7 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<ISecurityGrpcClient, SecurityGrpcClient>(); // your implementation
 builder.Services.AddScoped<PermissionAuthorizationFilter>();
 
-builder.Services.AddControllers(options => { /*options.Filters.Add<PermissionAuthorizationFilter>();*/ });
+builder.Services.AddControllers(options => { options.Filters.Add<PermissionAuthorizationFilter>(); });
 
 builder.Services.AddHttpLogging(options =>
 {
@@ -61,10 +62,15 @@ app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogHelper.En
 app.UseHttpLogging();
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseExceptionHandler();
 
 app.MapControllers();
 app.MapHealthChecks("/health");
-
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                       ForwardedHeaders.XForwardedProto
+});
 app.Run();

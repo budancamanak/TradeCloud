@@ -11,8 +11,11 @@ using Common.Core.DTOs.Backend;
 using Common.Core.Enums;
 using Common.Core.Models;
 using Common.Security.Attributes;
+using Common.Security.Enums;
+using Common.Web.Http;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 
 namespace Backend.API.Controllers;
 
@@ -20,21 +23,23 @@ namespace Backend.API.Controllers;
 // Level2: Level1+AnalyserUser
 // Level3: Level2+SuperUser
 // Level4: Admin
-[HasScope("Level2")]
 [ApiController]
 [Route("[controller]")]
 public class AnalysisExecutionsController(
     ILogger<AnalysisExecutionsController> logger,
+    IHttpContextAccessor contextAccessor,
     IMediator mediator,
     IMapper mapper)
 {
     [HttpGet("/AvailablePlugins")]
+    [HasPermission(Permissions.Enum.RunAnalysis)]
     public async Task<List<PluginInfo>> GetAvailablePlugins()
     {
         var request = new ListAvailablePluginsRequest();
         var result = await mediator.Send(request);
         return result;
     }
+
 
     [HttpGet("/ActivePlugins")]
     public async Task<List<PluginExecutionsDto>> GetActivePlugins([FromQuery] ListActivePluginsRequest request)
@@ -61,8 +66,9 @@ public class AnalysisExecutionsController(
         return result;
     }
 
+
     [HttpPost]
-    [HasPermission("RunAnalysis")]
+    // [HasPermission("RunAnalysis")]
     public async Task<MethodResponse> CreateAnalysisExecution([FromBody] CreateAnalysisExecutionModel model)
     {
         var request = mapper.Map<CreateAnalysisExecutionRequest>(model);
@@ -71,7 +77,7 @@ public class AnalysisExecutionsController(
     }
 
     [HttpPatch]
-    [HasPermission("RunAnalysis")]
+    // [HasPermission("RunAnalysis")]
     public async Task<MethodResponse> RunAnalysisExecution([FromBody] RunAnalysisExecutionRequest request)
     {
         var result = await mediator.Send(request);
@@ -79,7 +85,7 @@ public class AnalysisExecutionsController(
     }
 
     [HttpDelete("{executionId:int}")]
-    [HasPermission("RunAnalysis")]
+    // [HasPermission("RunAnalysis")]
     public async Task<MethodResponse> StopAnalysisExecution(int executionId)
     {
         var request = new StopAnalysisExecutionRequest { AnalysisExecutionId = executionId };

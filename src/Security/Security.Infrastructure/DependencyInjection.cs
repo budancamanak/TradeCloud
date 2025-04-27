@@ -2,8 +2,10 @@
 using Common.Application.Repositories;
 using Common.Application.Services;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Security.Application.Abstraction.Repositories;
 using Security.Application.Abstraction.Services;
 using Security.Infrastructure.Repositories;
@@ -38,5 +40,22 @@ public static class DependencyInjection
         // services.AddScoped<IValidator<PluginExecution>, PluginExecutionsValidator>();
         // services.AddScoped<IValidator<TrackList>, TrackListValidator>();
         // services.AddScoped<IValidator<PluginOutput>, PluginOutputValidator>();
+    }
+
+    public static void AddSecurityAuthentication(this IServiceCollection services, IConfigurationManager configuration)
+    {
+        services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(o =>
+            {
+                // var validator = new JwtTokenValidator(configuration);
+                // o.UseSecurityTokenValidators = true;
+                // o.SecurityTokenValidators.Add(validator);
+                o.MapInboundClaims = false;
+            });
+        services.AddAuthorization();
     }
 }

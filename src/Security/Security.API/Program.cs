@@ -1,4 +1,5 @@
 using Common.Logging;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Security.API;
 using Security.Application;
@@ -15,16 +16,16 @@ builder.Services.AddDbContext<SecurityDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("SecurityDbConnection"))
 );
 
-builder.Services.AddSecurityServices(builder.Configuration);
 builder.Services.AddApplicationServices();
 builder.Services.AddApiServices(builder.Configuration);
+builder.Services.AddSecurityServices(builder.Configuration);
 builder.Services.AddGrpc(options =>
 {
     options.EnableDetailedErrors = true;
     // options.Interceptors.Add(new InterceptorRegistration());
 });
-
-
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddSecurityAuthentication(builder.Configuration);
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5501,
@@ -39,7 +40,7 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 builder.Host.UseSerilog((context, configuration) =>
     LogHelper.ConfigureLogger("security-api", builder.Configuration, context, configuration), true);
-
+System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 var app = builder.Build();
 
 app.Lifetime.ApplicationStarted.Register(() =>
@@ -64,6 +65,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// app.UseAuthentication();
+// app.UseAuthorization();
 app.UseHttpsRedirection();
 app.AddGrpcControllers();
 

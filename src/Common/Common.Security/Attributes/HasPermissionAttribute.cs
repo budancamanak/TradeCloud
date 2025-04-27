@@ -1,7 +1,9 @@
+using Common.Security.Enums;
+
 namespace Common.Security.Attributes;
 
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
-public class HasPermissionAttribute(string permission) : Attribute
+public class HasPermissionAttribute(Permissions.Enum permission) : Attribute
 {
-    public string Permission { get; } = permission;
+    public Permissions.Enum Permission { get; } = permission;
 }
