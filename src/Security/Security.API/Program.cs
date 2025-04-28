@@ -21,7 +21,7 @@ builder.Services.AddDbContext<SecurityDbContext>(options =>
             foptions.EnableRetryOnFailure(maxRetryCount: 4, maxRetryDelay: TimeSpan.FromSeconds(1),
                 errorCodesToAdd: []);
         });
-    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+    // options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
     if (builder.Environment.IsDevelopment())
     {
         options.EnableDetailedErrors();
