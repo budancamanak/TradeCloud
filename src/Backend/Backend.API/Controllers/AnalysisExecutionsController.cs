@@ -43,6 +43,7 @@ public class AnalysisExecutionsController(
 
 
     [HttpGet("/ActivePlugins")]
+    [HasRole(Roles.Enum.Analyst)]
     public async Task<List<PluginExecutionsDto>> GetActivePlugins([FromQuery] ListActivePluginsRequest request)
     {
         var result = await mediator.Send(request);

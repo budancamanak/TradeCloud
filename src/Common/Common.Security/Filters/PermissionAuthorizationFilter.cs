@@ -45,7 +45,7 @@ public class PermissionAuthorizationFilter(
 
         foreach (var attr in metadata.GetOrderedMetadata<HasRoleAttribute>())
         {
-            if (await securityClient.HasRoleAsync(token, attr.Role)) continue;
+            if (await securityClient.HasRoleAsync(token, attr.Role.ToString())) continue;
             context.Result = new ForbidResult();
             return;
         }

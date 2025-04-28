@@ -1,7 +1,9 @@
+using Common.Security.Enums;
+
 namespace Common.Security.Attributes;
 
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
-public class HasRoleAttribute(string role) : Attribute
+public class HasRoleAttribute(Roles.Enum role) : Attribute
 {
-    public string Role { get; } = role;
+    public Roles.Enum Role { get; } = role;
 }

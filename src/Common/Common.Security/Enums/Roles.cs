@@ -4,6 +4,16 @@ namespace Common.Security.Enums;
 
 public sealed class Roles : Enumeration<Roles>
 {
+    public enum Enum
+    {
+        Admin,
+        Trader,
+        Analyst,
+        ScriptDeveloper,
+        Viewer,
+        QA
+    }
+
     public static readonly Roles Admin = new Roles(1, nameof(Admin));
     public static readonly Roles Trader = new Roles(2, nameof(Trader));
     public static readonly Roles Analyst = new Roles(3, nameof(Analyst));
