@@ -27,7 +27,7 @@ public abstract class BaseRepositoryTest<T, TFixture, TRepo, TValidator>(string 
         Fixture = Activator.CreateInstance(typeof(TFixture), dbName) as TFixture;
         Fixture.SeedData();
         DbContext = Fixture.DbContext;
-        Repository = (TRepo)Activator.CreateInstance(typeof(TRepo), DbContext, validator);
+        Repository = (TRepo)Activator.CreateInstance(typeof(TRepo), DbContext, validator,Logger);
     }
 
     [TearDown]

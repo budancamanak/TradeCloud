@@ -83,6 +83,8 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
         }
 
         var issuedIp = tokenValidationResult.ClaimsIdentity.FindFirst(JwtRegisteredClaimNames.Address)?.Value;
+        // todo enabled below. and check ip from jwt with the one we saved to UserLogins
+        // todo might also use redis instead of going to db directly
         if (string.IsNullOrWhiteSpace(issuedIp) && false)
         {
             return new ValidateTokenResponse
