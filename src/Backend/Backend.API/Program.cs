@@ -6,6 +6,7 @@ using Common.Logging;
 using Common.Security.Abstraction;
 using Common.Security.Filters;
 using Common.Security.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,19 @@ builder.Services.AddScoped<ISecurityGrpcClient, SecurityGrpcClient>(); // your i
 builder.Services.AddScoped<PermissionAuthorizationFilter>();
 
 builder.Services.AddControllers(options => { options.Filters.Add<PermissionAuthorizationFilter>(); });
-
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(o =>
+    {
+        // var validator = new JwtTokenValidator(configuration);
+        // o.UseSecurityTokenValidators = true;
+        // o.SecurityTokenValidators.Add(validator);
+        o.MapInboundClaims = false;
+    });
+builder.Services.AddAuthorization();
 builder.Services.AddHttpLogging(options =>
 {
     options.LoggingFields = HttpLoggingFields.Duration | HttpLoggingFields.RequestMethod |
