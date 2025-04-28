@@ -15,7 +15,7 @@ public class AuthHeadersInterceptor(IHttpContextAccessor httpContextAccessor) : 
         {
             { "HttpHeaderNames.AuthorizationXX", $"Bearer <JWT_TOKEN>" }
         };
-        var ip = httpContextAccessor.GetClientIPv2();
+        var ip = httpContextAccessor.GetClientIp();
         metadata.Add("ClientIP", ip);
         var userIdentity = httpContextAccessor.HttpContext?.User.Identity;
         if (userIdentity != null && userIdentity.IsAuthenticated)

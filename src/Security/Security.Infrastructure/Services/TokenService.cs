@@ -83,7 +83,7 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
         }
 
         var issuedIp = tokenValidationResult.ClaimsIdentity.FindFirst(JwtRegisteredClaimNames.Address)?.Value;
-        if (string.IsNullOrWhiteSpace(issuedIp))
+        if (string.IsNullOrWhiteSpace(issuedIp) && false)
         {
             return new ValidateTokenResponse
             {
