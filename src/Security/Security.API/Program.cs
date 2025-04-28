@@ -1,6 +1,7 @@
 using Common.Logging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Security.API;
 using Security.Application;
 using Security.Infrastructure;
@@ -13,8 +14,29 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<SecurityDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("SecurityDbConnection"))
-);
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("SecurityDbConnection"),
+        foptions =>
+        {
+            foptions.EnableRetryOnFailure(maxRetryCount: 4, maxRetryDelay: TimeSpan.FromSeconds(1),
+                errorCodesToAdd: []);
+        });
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+    if (builder.Environment.IsDevelopment())
+    {
+        options.EnableDetailedErrors();
+        options.EnableSensitiveDataLogging();
+        options.ConfigureWarnings(waction =>
+        {
+            waction.Log(new EventId[]
+            {
+                CoreEventId.FirstWithoutOrderByAndFilterWarning,
+                CoreEventId.RowLimitingOperationWithoutOrderByWarning,
+                RelationalEventId.MultipleCollectionIncludeWarning
+            });
+        });
+    }
+});
 
 builder.Services.AddApplicationServices();
 builder.Services.AddApiServices(builder.Configuration);

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,8 +23,31 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // builder.Services.AddRabbitMqEventBus(builder.Configuration);
 builder.Services.AddDbContext<BackendDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("BackendDbConnection"))
+    {
+        options.UseNpgsql(builder.Configuration.GetConnectionString("BackendDbConnection"),
+            foptions =>
+            {
+                foptions.EnableRetryOnFailure(maxRetryCount: 4, maxRetryDelay: TimeSpan.FromSeconds(1),
+                    errorCodesToAdd: []);
+            });
+        options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+        if (builder.Environment.IsDevelopment())
+        {
+            options.EnableDetailedErrors();
+            options.EnableSensitiveDataLogging();
+            options.ConfigureWarnings(waction =>
+            {
+                waction.Log(new EventId[]
+                {
+                    CoreEventId.FirstWithoutOrderByAndFilterWarning,
+                    CoreEventId.RowLimitingOperationWithoutOrderByWarning,
+                    RelationalEventId.MultipleCollectionIncludeWarning
+                });
+            });
+        }
+    }
 );
+
 
 builder.Services.AddGrpcClients(builder.Configuration);
 builder.Services.AddApplicationServices();
