@@ -25,4 +25,7 @@ public static class CacheKeyGenerator
     // backend
     public static string UserTrackingListKey(int id) => $"UserTrackList:TL{id}";
     public static string UserIdListKey() => "UserListId:List";
+
+    public static string UserRoleInfoKey(string userId) => $"UserRoleInfo:UI{userId}";
+    public static string UserPermissionsKey(string userId) => $"UserPermissionsKey:UI{userId}";
 }

@@ -67,8 +67,11 @@ public class AnalysisExecution
     public int Id { get; set; }
     public string PluginIdentifier { get; set; }
     public int TickerId { get; set; }
+
     public Timeframe Timeframe { get; set; }
-    public double Progress { get; set; } = 0;
+
+    public int ProgressCurrent { get; set; }
+    public int ProgressTotal { get; set; }
     public string ParamSet { get; set; }
     public string TradingParams { get; set; }
     public int UserId { get; set; }
@@ -76,14 +79,27 @@ public class AnalysisExecution
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
 
+    public double Progress
+    {
+        get
+        {
+            if (ProgressTotal == 0) return 0;
+            return ((double)ProgressCurrent) / ProgressTotal;
+        }
+    }
+
     public PluginStatus Status
     {
         get
         {
-            if (PluginExecutions.Count == 0) return PluginStatus.Init;
-            if (PluginExecutions.All(f => f.Status == PluginStatus.Init)) return PluginStatus.Init;
-            if (PluginExecutions.All(f => f.Status == PluginStatus.Success)) return PluginStatus.Success;
-            if (PluginExecutions.All(f => f.Status == PluginStatus.Failure)) return PluginStatus.Failure;
+            if (Progress == 0) return PluginStatus.Init;
+            if (Math.Abs(Progress - 1.0) <= 0)
+            {
+                return PluginExecutions.All(f => f.Status == PluginStatus.Success)
+                    ? PluginStatus.Success
+                    : PluginStatus.Failure;
+            }
+
             return PluginStatus.Running;
         }
     }

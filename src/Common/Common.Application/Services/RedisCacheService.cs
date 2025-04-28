@@ -1,6 +1,8 @@
-﻿using System.Text.Json;
-using Common.Application.Repositories;
+﻿using Common.Application.Repositories;
+using Common.Core.Serialization;
+using Newtonsoft.Json;
 using StackExchange.Redis;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 
 namespace Common.Application.Services;
@@ -12,7 +14,7 @@ public class RedisCacheService(IConnectionMultiplexer mux) : ICacheService
     public async Task SetAsync<T>(string key, T value, TimeSpan expiration)
     {
         // todo need retry policy to prevent recurrent price fetches.
-        var serialized = JsonSerializer.Serialize(value);
+        var serialized = JsonSerialization.ToJson(value);
 
         await _cache.StringSetAsync(key, serialized, expiration);
     }
@@ -20,9 +22,9 @@ public class RedisCacheService(IConnectionMultiplexer mux) : ICacheService
     public async Task<T?> GetAsync<T>(string key)
     {
         string? data = await _cache.StringGetAsync(key);
-        return data == null ? default : JsonSerializer.Deserialize<T>(data);
+        return data == null ? default : JsonSerialization.FromJson<T>(data);
     }
-    
+
     public async Task RemoveAsync(string key)
     {
         await _cache.KeyDeleteAsync(key);

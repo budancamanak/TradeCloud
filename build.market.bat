@@ -1,0 +1,1 @@
+docker build -f src\Market\Market.API\Dockerfile -t market-api .

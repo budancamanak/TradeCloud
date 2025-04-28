@@ -1,10 +1,17 @@
-using System.Reflection;
 using Backend.API;
 using Backend.Application;
 using Backend.Infrastructure;
 using Backend.Infrastructure.Data;
+using Common.Logging;
+using Common.Security.Abstraction;
+using Common.Security.Filters;
+using Common.Security.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,14 +23,54 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // builder.Services.AddRabbitMqEventBus(builder.Configuration);
 builder.Services.AddDbContext<BackendDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("BackendDbConnection"))
+    {
+        options.UseNpgsql(builder.Configuration.GetConnectionString("BackendDbConnection"),
+            foptions =>
+            {
+                foptions.EnableRetryOnFailure(maxRetryCount: 4, maxRetryDelay: TimeSpan.FromSeconds(1),
+                    errorCodesToAdd: []);
+            });
+        // options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+        if (builder.Environment.IsDevelopment())
+        {
+            options.EnableDetailedErrors();
+            options.EnableSensitiveDataLogging();
+            options.ConfigureWarnings(waction =>
+            {
+                waction.Log(new EventId[]
+                {
+                    CoreEventId.FirstWithoutOrderByAndFilterWarning,
+                    CoreEventId.RowLimitingOperationWithoutOrderByWarning,
+                    RelationalEventId.MultipleCollectionIncludeWarning
+                });
+            });
+        }
+    }
 );
 
+
 builder.Services.AddGrpcClients(builder.Configuration);
-builder.Services.AddApplicationServices(); 
+builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApiServices();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddScoped<ISecurityGrpcClient, SecurityGrpcClient>(); // your implementation
+builder.Services.AddScoped<PermissionAuthorizationFilter>();
 
+builder.Services.AddControllers(options => { options.Filters.Add<PermissionAuthorizationFilter>(); });
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(o =>
+    {
+        // var validator = new JwtTokenValidator(configuration);
+        // o.UseSecurityTokenValidators = true;
+        // o.SecurityTokenValidators.Add(validator);
+        o.MapInboundClaims = false;
+    });
+builder.Services.AddAuthorization();
 builder.Services.AddHttpLogging(options =>
 {
     options.LoggingFields = HttpLoggingFields.Duration | HttpLoggingFields.RequestMethod |
@@ -32,10 +79,14 @@ builder.Services.AddHttpLogging(options =>
                             HttpLoggingFields.RequestQuery;
     options.CombineLogs = true;
 });
+// builder.Services.AddSerilog((provider, configuration) =>
+//     LogHelper.ConfigureLogger("backend-api", builder.Configuration, provider, configuration));
 
+builder.Logging.ClearProviders();
+builder.Host.UseSerilog((context, configuration) =>
+    LogHelper.ConfigureLogger("backend-api", builder.Configuration, context, configuration), true);
 
 var app = builder.Build();
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -43,12 +94,20 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogHelper.EnrichFromRequest);
+
 app.UseHttpLogging();
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseExceptionHandler();
 
 app.MapControllers();
-
+app.MapHealthChecks("/health");
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                       ForwardedHeaders.XForwardedProto
+});
 app.Run();

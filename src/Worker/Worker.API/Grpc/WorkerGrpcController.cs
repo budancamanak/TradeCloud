@@ -8,13 +8,14 @@ using Worker.Application.Abstraction;
 
 namespace Worker.API.Grpc;
 
-public class WorkerGrpcController(IPluginHost pluginHost, ICacheService cache)
+public class WorkerGrpcController(IPluginHost pluginHost, ICacheService cache, ILogger<WorkerGrpcController> logger)
     : GrpcAvailablePluginsController.GrpcAvailablePluginsControllerBase
 {
     public override async Task<GrpcGetAvailablePluginsResponse> GetAvailablePlugins(
         GrpcGetAvailablePluginsRequest request,
         ServerCallContext context)
     {
+        logger.LogInformation("Getting available plugins");
         // var input = mapper.Map<GetPricesForPluginQuery>(request);
         // var data = await mediator.Send(input);
         // var output = mapper.Map<GrpcGetAvailablePluginsResponse>(data);
@@ -58,7 +59,8 @@ public class WorkerGrpcController(IPluginHost pluginHost, ICacheService cache)
         return new GrpcCanRunNewPluginResponse { CanRun = mr.IsSuccess };
     }
 
-    public override Task<GrpcIsPluginInQueueResponse> GrpcIsPluginInQueue(GrpcIsPluginInQueueRequest request, ServerCallContext context)
+    public override Task<GrpcIsPluginInQueueResponse> GrpcIsPluginInQueue(GrpcIsPluginInQueueRequest request,
+        ServerCallContext context)
     {
         var mr = pluginHost.IsPluginInQueue(request.PluginId);
         return Task.FromResult(new GrpcIsPluginInQueueResponse { InQueue = mr.IsSuccess });

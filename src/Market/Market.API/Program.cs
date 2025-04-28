@@ -1,4 +1,5 @@
 using Common.Application.Services;
+using Common.Logging;
 using Common.Messaging.Events;
 using Common.Messaging.Events.PriceFetchEvents;
 using Common.RabbitMQ;
@@ -10,6 +11,8 @@ using Market.Infrastructure;
 using Market.Infrastructure.Data;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,8 +21,29 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<MarketDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("MarketDbConnection"))
-);
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("MarketDbConnection"),
+        foptions =>
+        {
+            foptions.EnableRetryOnFailure(maxRetryCount: 4, maxRetryDelay: TimeSpan.FromSeconds(1),
+                errorCodesToAdd: []);
+        });
+    // options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+    if (builder.Environment.IsDevelopment())
+    {
+        options.EnableDetailedErrors();
+        options.EnableSensitiveDataLogging();
+        options.ConfigureWarnings(waction =>
+        {
+            waction.Log(new EventId[]
+            {
+                CoreEventId.FirstWithoutOrderByAndFilterWarning,
+                CoreEventId.RowLimitingOperationWithoutOrderByWarning,
+                RelationalEventId.MultipleCollectionIncludeWarning
+            });
+        });
+    }
+});
 
 builder.Services.AddRabbitMqEventBus(builder.Configuration, configure: (context, config) =>
 {
@@ -67,19 +91,17 @@ builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5238,
         listenOptions => { listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2; });
-
-    // HTTP/1.1 for other endpoints (e.g., MVC or REST)
     options.ListenAnyIP(5237, listenOptions =>
     {
         listenOptions.Protocols =
             Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols
-                .Http1AndHttp2; // Allow both HTTP/1.1 and HTTP/2, but prefer HTTP/1.1.
+                .Http1AndHttp2;
     });
-    // options.ConfigureEndpointDefaults(listenOptions =>
-    // {
-    //     listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
-    // });
 });
+builder.Logging.ClearProviders();
+builder.Host.UseSerilog((context, configuration) =>
+    LogHelper.ConfigureLogger("market-api", builder.Configuration, context, configuration), true);
+
 var app = builder.Build();
 app.Lifetime.ApplicationStarted.Register(() =>
 {
@@ -95,6 +117,7 @@ app.Lifetime.ApplicationStopping.Register(() =>
     var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
     logger.CreateLogger("ApplicationLifeCycle").LogWarning("MarketApi Stopping..");
 });
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -102,6 +125,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogHelper.EnrichFromRequest);
 app.UseHttpLogging();
 app.UseHttpsRedirection();
 
@@ -114,5 +138,5 @@ app.UseHangfireDashboard("/fetch_ops", new DashboardOptions
 });
 app.MapControllers();
 app.AddGrpcControllers();
-
+app.MapHealthChecks("/health");
 app.Run();

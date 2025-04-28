@@ -7,10 +7,11 @@ using Market.Application.Abstraction.Repositories;
 using Market.Domain.Entities;
 using Market.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Market.Infrastructure.Repositories;
 
-public class PriceRepository(MarketDbContext dbContext, IValidator<Price> validator)
+public class PriceRepository(MarketDbContext dbContext, IValidator<Price> validator, ILogger<PriceRepository> logger)
     : IPriceRepository
 {
     public Task<Price> GetByIdAsync(int tickerId)

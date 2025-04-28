@@ -2,6 +2,7 @@
 using AutoMapper;
 using Backend.API.Mappers;
 using Common.Grpc;
+using Common.Grpc.Interceptors;
 using Common.Web;
 using FluentValidation;
 
@@ -20,6 +21,7 @@ public static class DependencyInjection
         // services.AddExceptionHandler<GlobalExceptionHandler>();
         // services.AddProblemDetails();
     }
+
     public static void AddGrpcClients(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddGrpcClient<GrpcTickerController.GrpcTickerControllerClient>(cfg =>
@@ -30,5 +32,10 @@ public static class DependencyInjection
         {
             cfg.Address = new Uri(configuration["Worker:GrpcHost"]);
         });
+        services.AddTransient<AuthHeadersInterceptor>();
+        services.AddGrpcClient<GrpcAuthController.GrpcAuthControllerClient>(cfg =>
+        {
+            cfg.Address = new Uri(configuration["Security:GrpcHost"]);
+        }).AddInterceptor<AuthHeadersInterceptor>();
     }
 }

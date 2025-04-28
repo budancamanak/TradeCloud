@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Infrastructure.Data.Configurations;
 
-public static class PluginExecutionConfiguration
+public static class PluginExecutionConfigurations
 {
     public static void ApplyPluginExecutionConfigurations(this ModelBuilder modelBuilder)
     {

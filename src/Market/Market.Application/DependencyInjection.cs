@@ -2,7 +2,7 @@
 using Common.Application.Services;
 using Common.Web;
 using FluentValidation;
-using Market.Application.Behaviors;
+using Market.Application.Behaviours;
 using Market.Application.Exceptions;
 using Market.Application.Services;
 using Microsoft.Extensions.DependencyInjection;

@@ -4,16 +4,16 @@ using Common.Web.Exceptions;
 using Google.Protobuf.Collections;
 using Grpc.Core;
 using Market.Application.Abstraction.Repositories;
-using Market.Infrastructure.Services;
 
 namespace Market.API.Grpc;
 
-public class GrpcTickerController(ITickerRepository repository)
+public class GrpcTickerController(ITickerRepository repository, ILogger<GrpcTickerController> logger)
     : Common.Grpc.GrpcTickerController.GrpcTickerControllerBase
 {
     public override async Task<GrpcAvailableTickersResponse> GetAvailableTickers(GrpcGetAvailableTickersRequest request,
         ServerCallContext context)
     {
+        logger.LogInformation("Getting available ticker information");
         var items = await repository.GetAllAsync();
         var rep = new RepeatedField<GrpcTickerResponse>();
         foreach (var tick in items)
@@ -38,6 +38,7 @@ public class GrpcTickerController(ITickerRepository repository)
     public override async Task<GrpcTickerResponse> GetTickerWithId(GrpcGetTickerWithIdRequest request,
         ServerCallContext context)
     {
+        logger.LogInformation("Getting available ticker information with id:{tickerId}", request.TickerId);
         var item = await repository.GetByIdAsync(request.TickerId);
         Guard.Against.Null(item, message: "Couldn't find ticker");
         // todo need mapper here
@@ -54,8 +55,10 @@ public class GrpcTickerController(ITickerRepository repository)
     public override async Task<GrpcTickerResponse> GetTickerWithSymbol(GrpcGetTickerWithSymbolRequest request,
         ServerCallContext context)
     {
+        logger.LogInformation("Getting available ticker information with symbol:{symbol}", request.Symbol);
         var item = await repository.GetBySymbolAsync(request.Symbol);
-        Guard.Against.Null(item, message: "Couldn't find ticker",exceptionCreator:()=>new RequestValidationException("Couldn't find ticker"));
+        Guard.Against.Null(item, message: "Couldn't find ticker",
+            exceptionCreator: () => new RequestValidationException("Couldn't find ticker"));
         // todo need mapper here
         return new GrpcTickerResponse
         {

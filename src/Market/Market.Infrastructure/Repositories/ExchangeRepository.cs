@@ -8,10 +8,14 @@ using Market.Application.Exceptions;
 using Market.Domain.Entities;
 using Market.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Market.Infrastructure.Repositories;
 
-public class ExchangeRepository(MarketDbContext dbContext, IValidator<Exchange> validator) : IExchangeRepository
+public class ExchangeRepository(
+    MarketDbContext dbContext,
+    IValidator<Exchange> validator,
+    ILogger<ExchangeRepository> logger) : IExchangeRepository
 {
     public async Task<Exchange> GetByIdAsync(int id)
     {

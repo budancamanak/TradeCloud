@@ -53,7 +53,8 @@ public class PriceServiceTests : AbstractLoggableTest
         var validator = new PriceValidator();
         _fixture = new MarketDatabaseFixture("MarketDbPriceServiceTests");
         _fixture.SeedData();
-        var repository = new PriceRepository(_fixture.DbContext, validator);
+        var repoLogger = _loggerFactory.CreateLogger<PriceRepository>();
+        var repository = new PriceRepository(_fixture.DbContext, validator, repoLogger);
         var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new PriceMappingProfile()); });
         var mapper = mappingConfig.CreateMapper();
         var logger = _loggerFactory.CreateLogger<PriceService>();
