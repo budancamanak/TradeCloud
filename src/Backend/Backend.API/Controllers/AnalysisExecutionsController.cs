@@ -59,6 +59,7 @@ public class AnalysisExecutionsController(
     }
 
     [HttpGet("{executionId:int}/Details")]
+    [AllowAnon]
     public async Task<AnalysisExecutionDto> GetAnalysisExecutionDetails(int executionId, [FromQuery] int minimal = 0)
     {
         var request = new AnalysisExecutionDetailsRequest

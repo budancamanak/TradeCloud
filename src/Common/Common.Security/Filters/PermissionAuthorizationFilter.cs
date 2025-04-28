@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Common.Grpc;
 using Common.Security.Abstraction;
 using Common.Security.Attributes;
 using Common.Web.Http;
@@ -20,6 +21,14 @@ public class PermissionAuthorizationFilter(
         var metadata = endpoint?.Metadata;
         if (metadata == null) return;
         var token = context.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        var anonEnabled = metadata.GetOrderedMetadata<AllowAnonAttribute>().Count > 0;
+
+        if (string.IsNullOrWhiteSpace(token) && anonEnabled)
+        {
+            context.HttpContext.Items.Add("CurrentUser", "-1");
+            return;
+        }
+
         var tokenValidation = await securityClient.ValidateToken(token);
         if (!tokenValidation.IsValid)
         {
