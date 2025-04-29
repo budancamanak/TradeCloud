@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Security.Application.Features.Checks.RoleCheck;
 
-public class RoleCheckRequest : BaseCheckRequest, IRequest<MethodResponse>
+public class RoleCheckRequest : BaseCheckRequest<MethodResponse>
 {
     public required string Role { get; set; }
 }

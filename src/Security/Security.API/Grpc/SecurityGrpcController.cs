@@ -6,6 +6,7 @@ using Grpc.Core;
 using MediatR;
 using Security.Application.Abstraction.Repositories;
 using Security.Application.Abstraction.Services;
+using Security.Application.Features.Checks;
 using Security.Application.Features.Checks.PermissionCheck;
 using Security.Application.Features.Checks.RoleCheck;
 using Security.Application.Features.User.LoginUser;
@@ -15,22 +16,11 @@ using Status = Common.Core.Enums.Status;
 
 namespace Security.API.Grpc;
 
-public class SecurityGrpcController(
-    IUserService userService,
-    ITokenService tokenService,
-    IHttpContextAccessor contextAccessor,
-    IUserRepository repository,
-    IMapper mapper,
-    IMediator mediator)
+public class SecurityGrpcController(IMapper mapper, IMediator mediator)
     : GrpcAuthController.GrpcAuthControllerBase
 {
     public override async Task<CheckResponse> CheckPermission(CheckRequest grpcRequest, ServerCallContext context)
     {
-        // var clientIp = context.RequestHeaders.GetValue("ClientIP") ?? "";
-        // var valid = await tokenService.ValidateToken(request.Token, clientIp);
-        // if (!valid.IsValid) return new CheckResponse { Granted = false };
-        // var userPermissions = await userService.GetUserPermissions(valid.UserId);
-        // var hasPermission = userPermissions.FirstOrDefault(f => f.Name == request.Value) != null;
         // todo use automapper here
         var request = new PermissionCheckRequest
         {
@@ -53,11 +43,6 @@ public class SecurityGrpcController(
 
     public override async Task<CheckResponse> CheckRole(CheckRequest grpcRequest, ServerCallContext context)
     {
-        // var clientIp = context.RequestHeaders.GetValue("ClientIP") ?? "";
-        // var valid = await tokenService.ValidateToken(request.Token, clientIp);
-        // if (!valid.IsValid) return new CheckResponse { Granted = false };
-        // var userRoles = await userService.GetUserRoles(valid.UserId);
-        // var hasPermission = userRoles.Any(f => f.Name == request.Value);
         var request = new RoleCheckRequest
         {
             Role = grpcRequest.Value,
@@ -77,12 +62,15 @@ public class SecurityGrpcController(
         return base.CheckScope(request, context);
     }
 
-    public override async Task<ValidateTokenResponse> ValidateToken(ValidateTokenRequest request,
+    public override async Task<ValidateTokenResponse> ValidateToken(ValidateTokenRequest grpcRequest,
         ServerCallContext context)
     {
-        var ip = contextAccessor.GetClientIp();
-        var clientIp = context.RequestHeaders.GetValue("ClientIP") ?? "";
-        return await tokenService.ValidateToken(request.Token, clientIp);
+        var request = new BaseCheckRequest<ValidateTokenResponse>
+        {
+            Token = grpcRequest.Token,
+            ClientIp = context.RequestHeaders.GetValue("ClientIP") ?? ""
+        };
+        return await mediator.Send(request);
     }
 
     public override async Task<UserLoginResponse> LoginUser(UserLoginRequest grpcRequest, ServerCallContext context)
