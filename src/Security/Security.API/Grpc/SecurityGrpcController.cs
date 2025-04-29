@@ -6,6 +6,8 @@ using Grpc.Core;
 using MediatR;
 using Security.Application.Abstraction.Repositories;
 using Security.Application.Abstraction.Services;
+using Security.Application.Features.Checks.RoleCheck;
+using Security.Application.Features.User.LoginUser;
 using Security.Application.Features.User.RegisterUser;
 using Security.Domain.Entities;
 using Status = Common.Core.Enums.Status;
@@ -28,14 +30,9 @@ public class SecurityGrpcController(
         if (!valid.IsValid) return new CheckResponse { Granted = false };
         var userPermissions = await userService.GetUserPermissions(valid.UserId);
         var hasPermission = userPermissions.FirstOrDefault(f => f.Name == request.Value) != null;
-        if (hasPermission)
-            return new CheckResponse
-            {
-                Granted = true
-            };
         return new CheckResponse
         {
-            Granted = false
+            Granted = hasPermission
         };
     }
 
@@ -44,21 +41,24 @@ public class SecurityGrpcController(
         return base.CheckPolicy(request, context);
     }
 
-    public override async Task<CheckResponse> CheckRole(CheckRequest request, ServerCallContext context)
+    public override async Task<CheckResponse> CheckRole(CheckRequest grpcRequest, ServerCallContext context)
     {
-        var clientIp = context.RequestHeaders.GetValue("ClientIP") ?? "";
-        var valid = await tokenService.ValidateToken(request.Token, clientIp);
-        if (!valid.IsValid) return new CheckResponse { Granted = false };
-        var userRoles = await userService.GetUserRoles(valid.UserId);
-        var hasPermission = userRoles.Any(f => f.Name == request.Value);
-        if (hasPermission)
-            return new CheckResponse
-            {
-                Granted = true
-            };
+        // var clientIp = context.RequestHeaders.GetValue("ClientIP") ?? "";
+        // var valid = await tokenService.ValidateToken(request.Token, clientIp);
+        // if (!valid.IsValid) return new CheckResponse { Granted = false };
+        // var userRoles = await userService.GetUserRoles(valid.UserId);
+        // var hasPermission = userRoles.Any(f => f.Name == request.Value);
+        var request = new RoleCheckRequest
+        {
+            Role = grpcRequest.Value,
+            Token = grpcRequest.Token,
+            ClientIp = context.RequestHeaders.GetValue("ClientIP") ?? ""
+        };
+        var mr = await mediator.Send(request);
+        // todo return message here as well to inform back?
         return new CheckResponse
         {
-            Granted = false
+            Granted = mr.IsSuccess
         };
     }
 
@@ -71,15 +71,15 @@ public class SecurityGrpcController(
         ServerCallContext context)
     {
         var ip = contextAccessor.GetClientIp();
-        Console.WriteLine(context.Host);
         var clientIp = context.RequestHeaders.GetValue("ClientIP") ?? "";
         return await tokenService.ValidateToken(request.Token, clientIp);
     }
 
-    public override async Task<UserLoginResponse> LoginUser(UserLoginRequest request, ServerCallContext context)
+    public override async Task<UserLoginResponse> LoginUser(UserLoginRequest grpcRequest, ServerCallContext context)
     {
-        var clientIp = context.RequestHeaders.GetValue("ClientIP") ?? "";
-        var mr = await userService.LoginUser(request.Email, request.Password, clientIp);
+        var request = mapper.Map<LoginUserRequest>(grpcRequest,
+            opts => { opts.Items["ClientIP"] = (context.RequestHeaders.GetValue("ClientIP") ?? ""); });
+        var mr = await mediator.Send(request);
         return new UserLoginResponse
         {
             Message = mr.Message,
@@ -93,12 +93,6 @@ public class SecurityGrpcController(
     {
         var request = mapper.Map<RegisterUserRequest>(grpcRequest);
         var mr = await mediator.Send(request, context.CancellationToken);
-        if (!mr.IsSuccess)
-            return new UserRegisterResponse
-            {
-                Message = mr.Message,
-                Success = mr.IsSuccess
-            };
         return new UserRegisterResponse
         {
             Message = mr.Message,

@@ -8,7 +8,7 @@ public class MethodResponse
     public object Data { get; set; }
 
 
-    private MethodResponse()
+    public MethodResponse()
     {
     }
 
