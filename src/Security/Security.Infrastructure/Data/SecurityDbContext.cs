@@ -9,6 +9,7 @@ public class SecurityDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<Permission> Permissions { get; set; }
+    public DbSet<UserLogin> UserLogins { get; set; }
 
     public SecurityDbContext(DbContextOptions<SecurityDbContext> options) : base(options)
     {

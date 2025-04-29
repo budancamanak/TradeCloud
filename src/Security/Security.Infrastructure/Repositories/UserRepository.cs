@@ -198,4 +198,12 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
         if (result == 0) return MethodResponse.Error("Failed to remove role from user");
         return MethodResponse.Success(user.Id, "Role removed from user");
     }
+
+    public async Task<UserLogin?> GetUserLoginInfo(string token)
+    {
+        Guard.Against.NullOrWhiteSpace(token);
+        var info =await dbContext.UserLogins.FirstOrDefaultAsync(f => f.Token == token);
+        Guard.Against.Null(info);
+        return info;
+    }
 }

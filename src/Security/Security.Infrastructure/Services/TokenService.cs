@@ -1,10 +1,13 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Common.Application.Repositories;
+using Common.Application.Services;
 using Common.Grpc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using Security.Application.Abstraction.Repositories;
 using Security.Application.Abstraction.Services;
 using Security.Domain.Entities;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
@@ -12,7 +15,8 @@ using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegiste
 
 namespace Security.Infrastructure.Services;
 
-public sealed class TokenService(IConfiguration configuration) : ITokenService
+public sealed class TokenService(IConfiguration configuration, ICacheService cache, IUserRepository repository)
+    : ITokenService
 {
     public string GenerateToken(User user, string clientIp)
     {
@@ -85,7 +89,7 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
         var issuedIp = tokenValidationResult.ClaimsIdentity.FindFirst(JwtRegisteredClaimNames.Address)?.Value;
         // todo enabled below. and check ip from jwt with the one we saved to UserLogins
         // todo might also use redis instead of going to db directly
-        if (string.IsNullOrWhiteSpace(issuedIp) && false)
+        if (string.IsNullOrWhiteSpace(issuedIp))
         {
             return new ValidateTokenResponse
             {
@@ -94,6 +98,39 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
             };
         }
 
+        var loginInfo = await cache.GetAsync<UserLogin>(CacheKeyGenerator.UserTokenInfoKey(token));
+        if (loginInfo == null)
+        {
+            loginInfo = await repository.GetUserLoginInfo(token);
+            if (loginInfo == null)
+            {
+                return new ValidateTokenResponse
+                {
+                    IsValid = false,
+                    UserId = "Login info not found."
+                };
+            }
+        }
+
+        if (loginInfo.ExpirationDate >= DateTime.UtcNow)
+        {
+            return new ValidateTokenResponse
+            {
+                IsValid = false,
+                UserId = "Login info expired."
+            };
+        }
+
+        if (loginInfo.ClientIP != issuedIp)
+        {
+            return new ValidateTokenResponse
+            {
+                IsValid = false,
+                UserId = "Issued IP address is not valid."
+            };
+        }
+        // refresh cache here again.
+        await cache.SetAsync(CacheKeyGenerator.UserTokenInfoKey(token), loginInfo, TimeSpan.FromMinutes(15));
         return new ValidateTokenResponse
         {
             IsValid = true,

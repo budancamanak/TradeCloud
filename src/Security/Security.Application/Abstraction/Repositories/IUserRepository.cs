@@ -19,4 +19,5 @@ public interface IUserRepository : IAsyncRepository<User>
     Task<List<Permission>> GetUserPermissions(int userId);
     Task<MethodResponse> AddRoleToUser(int userId, Roles eRole);
     Task<MethodResponse> RemoveRoleFromUser(int userId, int roleId);
+    Task<UserLogin?> GetUserLoginInfo(string token);
 }

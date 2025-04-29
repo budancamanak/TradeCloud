@@ -38,7 +38,7 @@ public class UserService(
         // todo generate jwt token
         var token = tokenService.GenerateToken(user, clientIp);
         var expDate = DateTime.UtcNow.AddMinutes(configuration.GetValue<int>("Jwt:Expiration"));
-        var mr = await repository.AddUserLogin(user, new UserLogin
+        var loginInfo = new UserLogin
         {
             Token = token,
             ExpirationDate = expDate,
@@ -46,10 +46,12 @@ public class UserService(
             UserAgent = "UserAgent",
             UserId = user.Id,
             ClientIP = clientIp
-        });
+        };
+        var mr = await repository.AddUserLogin(user, loginInfo);
         await cache.SetAsync(CacheKeyGenerator.UserRoleInfoKey(user.Id.ToString()),
             JsonConvert.SerializeObject(user.UserRoles),
             TimeSpan.FromMinutes(15));
+        await cache.SetAsync(CacheKeyGenerator.UserTokenInfoKey(token), loginInfo, TimeSpan.FromMinutes(15));
         return mr.WithData(token);
     }
 

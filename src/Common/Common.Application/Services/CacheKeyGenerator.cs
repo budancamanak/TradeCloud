@@ -28,4 +28,6 @@ public static class CacheKeyGenerator
 
     public static string UserRoleInfoKey(string userId) => $"UserRoleInfo:UI{userId}";
     public static string UserPermissionsKey(string userId) => $"UserPermissionsKey:UI{userId}";
+
+    public static string UserTokenInfoKey(string token) => $"UserTokenInfoKey:UTI{token}";
 }
