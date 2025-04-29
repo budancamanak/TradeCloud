@@ -6,6 +6,7 @@ using Grpc.Core;
 using MediatR;
 using Security.Application.Abstraction.Repositories;
 using Security.Application.Abstraction.Services;
+using Security.Application.Features.Checks.PermissionCheck;
 using Security.Application.Features.Checks.RoleCheck;
 using Security.Application.Features.User.LoginUser;
 using Security.Application.Features.User.RegisterUser;
@@ -23,16 +24,25 @@ public class SecurityGrpcController(
     IMediator mediator)
     : GrpcAuthController.GrpcAuthControllerBase
 {
-    public override async Task<CheckResponse> CheckPermission(CheckRequest request, ServerCallContext context)
+    public override async Task<CheckResponse> CheckPermission(CheckRequest grpcRequest, ServerCallContext context)
     {
-        var clientIp = context.RequestHeaders.GetValue("ClientIP") ?? "";
-        var valid = await tokenService.ValidateToken(request.Token, clientIp);
-        if (!valid.IsValid) return new CheckResponse { Granted = false };
-        var userPermissions = await userService.GetUserPermissions(valid.UserId);
-        var hasPermission = userPermissions.FirstOrDefault(f => f.Name == request.Value) != null;
+        // var clientIp = context.RequestHeaders.GetValue("ClientIP") ?? "";
+        // var valid = await tokenService.ValidateToken(request.Token, clientIp);
+        // if (!valid.IsValid) return new CheckResponse { Granted = false };
+        // var userPermissions = await userService.GetUserPermissions(valid.UserId);
+        // var hasPermission = userPermissions.FirstOrDefault(f => f.Name == request.Value) != null;
+        // todo use automapper here
+        var request = new PermissionCheckRequest
+        {
+            Permission = grpcRequest.Value,
+            Token = grpcRequest.Token,
+            ClientIp = context.RequestHeaders.GetValue("ClientIP") ?? ""
+        };
+        var mr = await mediator.Send(request);
+        // todo return message here as well to inform back?
         return new CheckResponse
         {
-            Granted = hasPermission
+            Granted = mr.IsSuccess
         };
     }
 

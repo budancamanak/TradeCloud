@@ -5,5 +5,5 @@ namespace Security.Application.Features.Checks.RoleCheck;
 
 public class RoleCheckRequest : BaseCheckRequest, IRequest<MethodResponse>
 {
-    public string Role { get; set; }
+    public required string Role { get; set; }
 }

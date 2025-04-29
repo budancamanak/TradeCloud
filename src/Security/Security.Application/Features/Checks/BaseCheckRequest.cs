@@ -2,6 +2,6 @@
 
 public abstract class BaseCheckRequest
 {
-    public string Token { get; set; }
-    public string ClientIp { get; set; }
+    public required string Token { get; set; }
+    public required string ClientIp { get; set; }
 }
