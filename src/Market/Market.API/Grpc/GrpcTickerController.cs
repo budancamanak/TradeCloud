@@ -8,7 +8,7 @@ using Market.Application.Abstraction.Repositories;
 namespace Market.API.Grpc;
 
 public class GrpcTickerController(ITickerRepository repository, ILogger<GrpcTickerController> logger)
-    : Common.Grpc.GrpcTickerController.GrpcTickerControllerBase
+    : Common.Grpc.GrpcTickerService.GrpcTickerServiceBase
 {
     public override async Task<GrpcAvailableTickersResponse> GetAvailableTickers(GrpcGetAvailableTickersRequest request,
         ServerCallContext context)

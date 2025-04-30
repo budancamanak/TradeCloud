@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Market.API.Grpc;
 
-public class MarketGrpcController(IMapper mapper, IMediator mediator) : GrpcPriceController.GrpcPriceControllerBase
+public class MarketGrpcController(IMapper mapper, IMediator mediator) : GrpcPriceService.GrpcPriceServiceBase
 {
     public override async Task<GrpcGetPricesResponse> GetPricesForPlugin(GrpcGetPricesRequest request,
         ServerCallContext context)

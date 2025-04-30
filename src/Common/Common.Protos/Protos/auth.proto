@@ -3,49 +3,12 @@
 option csharp_namespace = "Common.Grpc";
 import "google/protobuf/timestamp.proto";
 
-service GrpcAuthController {
+service GrpcAuthService {
   rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
-  rpc LoginUser(UserLoginRequest) returns (UserLoginResponse);
-  rpc RegisterUser(UserRegisterRequest) returns (UserRegisterResponse);
-  rpc UserInfo(UserInfoRequest) returns (UserInfoResponse);
   rpc CheckPermission(CheckRequest) returns (CheckResponse);
   rpc CheckRole(CheckRequest) returns (CheckResponse);
   rpc CheckScope(CheckRequest) returns (CheckResponse);
   rpc CheckPolicy(CheckRequest) returns (CheckResponse);
-}
-
-message UserLoginRequest{
-  string email = 1;
-  string password = 2;
-}
-
-message UserLoginResponse{
-  bool success = 1;
-  string token = 2;
-  string message = 3;
-}
-
-message UserRegisterRequest{
-  string email = 1;
-  string nickname = 2;
-  string password = 3;
-  string passwordConfirm = 4;
-}
-
-message UserRegisterResponse{
-  bool success = 1;
-  string message = 3;
-}
-
-message UserInfoRequest{
-  string token = 1;
-}
-
-message UserInfoResponse{
-  string userId = 1;
-  string email = 2;
-  string nickname = 3;
-  string userType = 4;
 }
 
 message ValidateTokenRequest {
@@ -56,10 +19,12 @@ message ValidateTokenResponse {
   bool isValid = 1;
   string userId = 2;
 }
+
 message CheckRequest {
   string token = 1;
   string value = 2;
 }
+
 message CheckResponse {
   bool granted = 1;
 }

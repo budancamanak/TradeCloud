@@ -1,8 +1,9 @@
-﻿using FluentValidation;
+﻿using Common.Core.Models;
+using FluentValidation;
 
 namespace Security.Application.Features.Checks.RoleCheck;
 
-public class RoleCheckRequestValidator : BaseCheckRequestValidator<RoleCheckRequest>
+public class RoleCheckRequestValidator : BaseCheckRequestValidator<RoleCheckRequest, MethodResponse>
 {
     public RoleCheckRequestValidator() : base()
     {

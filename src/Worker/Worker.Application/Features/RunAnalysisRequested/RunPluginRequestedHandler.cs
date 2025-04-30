@@ -19,7 +19,7 @@ public class RunAnalysisRequestedHandler(
     ILogger<RunAnalysisRequestedHandler> logger,
     IEventBus eventBus,
     IBackgroundJobClient jobClient,
-    GrpcPriceController.GrpcPriceControllerClient client) : IRequestHandler<RunAnalysisRequest, MethodResponse>
+    GrpcPriceService.GrpcPriceServiceClient client) : IRequestHandler<RunAnalysisRequest, MethodResponse>
 {
     public async Task<MethodResponse> Handle(RunAnalysisRequest request, CancellationToken cancellationToken)
     {

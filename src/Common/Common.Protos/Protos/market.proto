@@ -4,6 +4,16 @@ option csharp_namespace = "Common.Grpc";
 import "google/protobuf/timestamp.proto";
 import "customTypes.proto";
 
+service GrpcPriceService {
+  rpc GetPricesForPlugin(GrpcGetPricesRequest) returns (GrpcGetPricesResponse);
+}
+
+service GrpcTickerService{
+  rpc GetTickerWithId(GrpcGetTickerWithIdRequest) returns (GrpcTickerResponse);
+  rpc GetTickerWithSymbol(GrpcGetTickerWithSymbolRequest) returns (GrpcTickerResponse);
+  rpc GetAvailableTickers(GrpcGetAvailableTickersRequest) returns (GrpcAvailableTickersResponse);
+}
+
 message GrpcGetPricesRequest {
   int32 ticker = 1;
   int32 pluginId = 2;
@@ -14,11 +24,6 @@ message GrpcGetPricesRequest {
 
 message GrpcGetPricesResponse {
   repeated GrpcPrice prices = 1;
-}
-
-
-service GrpcPriceController {
-  rpc GetPricesForPlugin(GrpcGetPricesRequest) returns (GrpcGetPricesResponse);
 }
 
 message GrpcPrice {
@@ -37,6 +42,7 @@ message GrpcTickerResponse{
   string exchangeName = 4;
   int32 decimalPoint = 5;
 }
+
 message GrpcAvailableTickersResponse{
   repeated GrpcTickerResponse tickers = 1;
 }
@@ -44,14 +50,11 @@ message GrpcAvailableTickersResponse{
 message GrpcGetTickerWithIdRequest{
   int32 tickerId = 1;
 }
+
 message GrpcGetTickerWithSymbolRequest{
   string symbol = 1;
 }
+
 message GrpcGetAvailableTickersRequest{
 }
 
-service GrpcTickerController{
-  rpc GetTickerWithId(GrpcGetTickerWithIdRequest) returns (GrpcTickerResponse);
-  rpc GetTickerWithSymbol(GrpcGetTickerWithSymbolRequest) returns (GrpcTickerResponse);
-  rpc GetAvailableTickers(GrpcGetAvailableTickersRequest) returns (GrpcAvailableTickersResponse);
-}

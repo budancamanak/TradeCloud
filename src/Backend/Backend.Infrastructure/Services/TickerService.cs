@@ -6,7 +6,7 @@ using Common.Grpc;
 
 namespace Backend.Infrastructure.Services;
 
-public class TickerService(ICacheService cache, GrpcTickerController.GrpcTickerControllerClient grpcClient)
+public class TickerService(ICacheService cache, GrpcTickerService.GrpcTickerServiceClient grpcClient)
     : ITickerService
 {
     public async Task<List<TickerDto>> GetAvailableTickers()

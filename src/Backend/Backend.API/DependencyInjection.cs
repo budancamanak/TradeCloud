@@ -24,16 +24,16 @@ public static class DependencyInjection
 
     public static void AddGrpcClients(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddGrpcClient<GrpcTickerController.GrpcTickerControllerClient>(cfg =>
+        services.AddGrpcClient<GrpcTickerService.GrpcTickerServiceClient>(cfg =>
         {
             cfg.Address = new Uri(configuration["Market:GrpcHost"]);
         });
-        services.AddGrpcClient<GrpcAvailablePluginsController.GrpcAvailablePluginsControllerClient>(cfg =>
+        services.AddGrpcClient<GrpcAvailablePluginsService.GrpcAvailablePluginsServiceClient>(cfg =>
         {
             cfg.Address = new Uri(configuration["Worker:GrpcHost"]);
         });
         services.AddTransient<AuthHeadersInterceptor>();
-        services.AddGrpcClient<GrpcAuthController.GrpcAuthControllerClient>(cfg =>
+        services.AddGrpcClient<GrpcAuthService.GrpcAuthServiceClient>(cfg =>
         {
             cfg.Address = new Uri(configuration["Security:GrpcHost"]);
         }).AddInterceptor<AuthHeadersInterceptor>();

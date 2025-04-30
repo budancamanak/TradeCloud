@@ -3,12 +3,18 @@
 option csharp_namespace = "Common.Grpc";
 //import "google/protobuf/api.proto";
 
+service GrpcAvailablePluginsService{
+  rpc GetAvailablePlugins(GrpcGetAvailablePluginsRequest) returns (GrpcGetAvailablePluginsResponse);
+  rpc GetAvailablePluginWithIdentifier(GrpcGetAvailablePluginWithIdentifierRequest) returns (GrpcAvailablePluginInfoResponse);
+  rpc GrpcCanRunNewPlugin(GrpcCanRunNewPluginRequest) returns (GrpcCanRunNewPluginResponse);
+  rpc GrpcIsPluginInQueue(GrpcIsPluginInQueueRequest) returns (GrpcIsPluginInQueueResponse);
+}
+
 message GrpcGetAvailablePluginsRequest{
 
 }
 
-//todo rename: add Request to messages
-message GrpcGetAvailablePluginWithIdentifier{
+message GrpcGetAvailablePluginWithIdentifierRequest{
   string identifier = 1;
 }
 
@@ -20,13 +26,11 @@ message GrpcIsPluginInQueueRequest{
   int32 pluginId = 1;
 }
 
-///// responses
 message GrpcGetAvailablePluginsResponse{
-  repeated GrpcAvailablePluginInfo plugins = 1;
+  repeated GrpcAvailablePluginInfoResponse plugins = 1;
 }
 
-//todo rename: add Response to messages
-message GrpcAvailablePluginInfo{
+message GrpcAvailablePluginInfoResponse{
   string name = 1;
   string identifier = 2;
   string version = 3;
@@ -40,9 +44,3 @@ message GrpcIsPluginInQueueResponse{
   bool inQueue = 1;
 }
 
-service GrpcAvailablePluginsController{
-  rpc GetAvailablePlugins(GrpcGetAvailablePluginsRequest) returns (GrpcGetAvailablePluginsResponse);
-  rpc GetAvailablePluginWithIdentifier(GrpcGetAvailablePluginWithIdentifier) returns (GrpcAvailablePluginInfo);
-  rpc GrpcCanRunNewPlugin(GrpcCanRunNewPluginRequest) returns (GrpcCanRunNewPluginResponse);
-  rpc GrpcIsPluginInQueue(GrpcIsPluginInQueueRequest) returns (GrpcIsPluginInQueueResponse);
-}

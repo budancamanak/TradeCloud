@@ -3,13 +3,14 @@ using Common.Security.Abstraction;
 
 namespace Common.Security.Services;
 
-public class SecurityGrpcClient(GrpcAuthController.GrpcAuthControllerClient grpcClient) : ISecurityGrpcClient
+public class SecurityGrpcClient(GrpcAuthService.GrpcAuthServiceClient grpcClient) : ISecurityGrpcClient
 {
     public async Task<ValidateTokenResponse> ValidateToken(string token)
     {
-        var result= await grpcClient.ValidateTokenAsync(new ValidateTokenRequest { Token = token });
+        var result = await grpcClient.ValidateTokenAsync(new ValidateTokenRequest { Token = token });
         return result;
     }
+
     public async Task<bool> HasPermissionAsync(string token, string permission)
     {
         var response = await grpcClient.CheckPermissionAsync(new CheckRequest() { Token = token, Value = permission });

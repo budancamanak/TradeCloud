@@ -10,7 +10,7 @@ namespace Market.API.Controllers;
 [Route("[controller]")]
 public class PriceController(IMediator mediator, ILogger<PriceController> logger) : ControllerBase
 {
-    private readonly GrpcPriceController.GrpcPriceControllerClient _client;
+    private readonly GrpcPriceService.GrpcPriceServiceClient _client;
 
     // todo skip controller. !! implement grpc !!
     [HttpPost]

@@ -16,7 +16,7 @@ public class RunPluginRequestedHandler(
     ILogger<RunPluginRequestedHandler> logger,
     IEventBus eventBus,
     IBackgroundJobClient jobClient,
-    GrpcPriceController.GrpcPriceControllerClient client) : IRequestHandler<RunPluginRequest, MethodResponse>
+    GrpcPriceService.GrpcPriceServiceClient client) : IRequestHandler<RunPluginRequest, MethodResponse>
 {
     public async Task<MethodResponse> Handle(RunPluginRequest request, CancellationToken cancellationToken)
     {

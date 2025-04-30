@@ -2,8 +2,8 @@
 
 namespace Security.Application.Features.Checks;
 
-public class BaseCheckRequestValidator<T> : AbstractValidator<T>
-    where T : BaseCheckRequest
+public class BaseCheckRequestValidator<T, TV> : AbstractValidator<T>
+    where T : BaseCheckRequest<TV>
 {
     public BaseCheckRequestValidator()
     {

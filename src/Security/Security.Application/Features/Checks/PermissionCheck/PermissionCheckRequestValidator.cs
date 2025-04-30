@@ -1,8 +1,9 @@
-﻿using FluentValidation;
+﻿using Common.Core.Models;
+using FluentValidation;
 
 namespace Security.Application.Features.Checks.PermissionCheck;
 
-public class PermissionCheckRequestValidator : BaseCheckRequestValidator<PermissionCheckRequest>
+public class PermissionCheckRequestValidator : BaseCheckRequestValidator<PermissionCheckRequest, MethodResponse>
 {
     public PermissionCheckRequestValidator() : base()
     {

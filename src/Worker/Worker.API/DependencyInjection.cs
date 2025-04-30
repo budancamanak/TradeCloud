@@ -12,7 +12,7 @@ public static class DependencyInjection
         // services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         // services.AddExceptionHandler<GlobalExceptionHandler>();
         // services.AddProblemDetails();
-        services.AddGrpcClient<GrpcPriceController.GrpcPriceControllerClient>(cfg =>
+        services.AddGrpcClient<GrpcPriceService.GrpcPriceServiceClient>(cfg =>
         {
             cfg.Address = new Uri(configuration["Market:GrpcHost"]);
         });

@@ -23,6 +23,9 @@
         <Protobuf Include="../Common.Protos/Protos/auth.proto" GrpcServices="Both">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Protobuf>
+        <Protobuf Include="../Common.Protos/Protos/user.proto" GrpcServices="Both">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Protobuf>
 <!--        <Protobuf Include="../Protos/auth.proto" GrpcServices="Both"/>-->
 <!--        <Protobuf Include="../Protos/worker.proto" GrpcServices="Both"/>-->
     </ItemGroup>

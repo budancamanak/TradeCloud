@@ -10,7 +10,7 @@ public class GrpcAvailablePluginsMappingProfile : Profile
 {
     public GrpcAvailablePluginsMappingProfile()
     {
-        CreateMap<RepeatedField<GrpcAvailablePluginInfo>, List<PluginInfo>>()
+        CreateMap<RepeatedField<GrpcAvailablePluginInfoResponse>, List<PluginInfo>>()
             .ConvertUsing(src =>
                 src.Select(x =>
                     new PluginInfo(x.Name, x.Identifier, x.Version)

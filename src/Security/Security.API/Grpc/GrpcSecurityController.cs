@@ -1,23 +1,17 @@
 ﻿using AutoMapper;
 using Common.Grpc;
-using Common.Security.Enums;
-using Common.Web.Http;
 using Grpc.Core;
 using MediatR;
-using Security.Application.Abstraction.Repositories;
-using Security.Application.Abstraction.Services;
 using Security.Application.Features.Checks;
 using Security.Application.Features.Checks.PermissionCheck;
 using Security.Application.Features.Checks.RoleCheck;
 using Security.Application.Features.User.LoginUser;
 using Security.Application.Features.User.RegisterUser;
-using Security.Domain.Entities;
-using Status = Common.Core.Enums.Status;
 
 namespace Security.API.Grpc;
 
-public class SecurityGrpcController(IMapper mapper, IMediator mediator)
-    : GrpcAuthController.GrpcAuthControllerBase
+public class GrpcSecurityController(IMapper mapper, IMediator mediator)
+    : GrpcAuthService.GrpcAuthServiceBase
 {
     public override async Task<CheckResponse> CheckPermission(CheckRequest grpcRequest, ServerCallContext context)
     {
@@ -73,33 +67,5 @@ public class SecurityGrpcController(IMapper mapper, IMediator mediator)
         return await mediator.Send(request);
     }
 
-    public override async Task<UserLoginResponse> LoginUser(UserLoginRequest grpcRequest, ServerCallContext context)
-    {
-        var request = mapper.Map<LoginUserRequest>(grpcRequest,
-            opts => { opts.Items["ClientIP"] = (context.RequestHeaders.GetValue("ClientIP") ?? ""); });
-        var mr = await mediator.Send(request);
-        return new UserLoginResponse
-        {
-            Message = mr.Message,
-            Success = mr.IsSuccess,
-            Token = mr.Data?.ToString()
-        };
-    }
 
-    public override async Task<UserRegisterResponse> RegisterUser(UserRegisterRequest grpcRequest,
-        ServerCallContext context)
-    {
-        var request = mapper.Map<RegisterUserRequest>(grpcRequest);
-        var mr = await mediator.Send(request, context.CancellationToken);
-        return new UserRegisterResponse
-        {
-            Message = mr.Message,
-            Success = mr.IsSuccess
-        };
-    }
-
-    public override Task<UserInfoResponse> UserInfo(UserInfoRequest request, ServerCallContext context)
-    {
-        return base.UserInfo(request, context);
-    }
 }

@@ -1,0 +1,45 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Common.Grpc";
+import "google/protobuf/timestamp.proto";
+
+
+service GrpcUserService{
+  rpc LoginUser(UserLoginRequest) returns (UserLoginResponse);
+  rpc RegisterUser(UserRegisterRequest) returns (UserRegisterResponse);
+  rpc UserInfo(UserInfoRequest) returns (UserInfoResponse);
+}
+
+message UserLoginRequest{
+  string email = 1;
+  string password = 2;
+}
+
+message UserLoginResponse{
+  bool success = 1;
+  string token = 2;
+  string message = 3;
+}
+
+message UserRegisterRequest{
+  string email = 1;
+  string nickname = 2;
+  string password = 3;
+  string passwordConfirm = 4;
+}
+
+message UserRegisterResponse{
+  bool success = 1;
+  string message = 3;
+}
+
+message UserInfoRequest{
+  string token = 1;
+}
+
+message UserInfoResponse{
+  string userId = 1;
+  string email = 2;
+  string nickname = 3;
+  string userType = 4;
+}

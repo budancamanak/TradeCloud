@@ -9,7 +9,7 @@ using Worker.Application.Abstraction;
 namespace Worker.API.Grpc;
 
 public class WorkerGrpcController(IPluginHost pluginHost, ICacheService cache, ILogger<WorkerGrpcController> logger)
-    : GrpcAvailablePluginsController.GrpcAvailablePluginsControllerBase
+    : GrpcAvailablePluginsService.GrpcAvailablePluginsServiceBase
 {
     public override async Task<GrpcGetAvailablePluginsResponse> GetAvailablePlugins(
         GrpcGetAvailablePluginsRequest request,
@@ -27,7 +27,7 @@ public class WorkerGrpcController(IPluginHost pluginHost, ICacheService cache, I
         {
             Plugins =
             {
-                plugins.Select(f => new GrpcAvailablePluginInfo
+                plugins.Select(f => new GrpcAvailablePluginInfoResponse
                 {
                     Identifier = f.Identifier,
                     Name = f.Name,
@@ -38,13 +38,13 @@ public class WorkerGrpcController(IPluginHost pluginHost, ICacheService cache, I
         return response;
     }
 
-    public override async Task<GrpcAvailablePluginInfo> GetAvailablePluginWithIdentifier(
-        GrpcGetAvailablePluginWithIdentifier request, ServerCallContext context)
+    public override async Task<GrpcAvailablePluginInfoResponse> GetAvailablePluginWithIdentifier(
+        GrpcGetAvailablePluginWithIdentifierRequest request, ServerCallContext context)
     {
         // var plugins = await cache.GetAsync<List<IPlugin.PluginInfo>>("AvailablePlugins");
         var item = pluginHost.Plugins().FirstOrDefault(f => f.GetPluginInfo().Identifier == request.Identifier);
         // var item = plugins.FirstOrDefault(f => f.Identifier == request.Identifier);
-        return await Task.FromResult(new GrpcAvailablePluginInfo
+        return await Task.FromResult(new GrpcAvailablePluginInfoResponse
         {
             Identifier = item.GetPluginInfo().Identifier,
             Name = item.GetPluginInfo().Name,

@@ -8,7 +8,7 @@ namespace Backend.Infrastructure.Services;
 
 public class PluginService(
     ICacheService cache,
-    GrpcAvailablePluginsController.GrpcAvailablePluginsControllerClient grpcClient) : IPluginService
+    GrpcAvailablePluginsService.GrpcAvailablePluginsServiceClient grpcClient) : IPluginService
 {
     public async Task<List<PluginInfo>> GetAvailablePlugins()
     {
@@ -30,7 +30,7 @@ public class PluginService(
     {
         var cached = await cache.GetAsync<PluginInfo>(CacheKeyGenerator.AvailablePluginKey(identifier));
         if (cached != null && !string.IsNullOrWhiteSpace(cached.Name)) return cached;
-        var response = await grpcClient.GetAvailablePluginWithIdentifierAsync(new GrpcGetAvailablePluginWithIdentifier
+        var response = await grpcClient.GetAvailablePluginWithIdentifierAsync(new GrpcGetAvailablePluginWithIdentifierRequest
         {
             Identifier = identifier
         });
