@@ -21,11 +21,12 @@ public class RoleCheckRequestHandler(
             return MethodResponse.Error(string.Join(" && ", validated.Errors));
         }
 
-        logger.LogWarning("Controlling token for role check. IP: {ClientIp}",request.ClientIp);
+        logger.LogWarning("Controlling token for role check. IP: {ClientIp}", request.ClientIp);
         var valid = await tokenService.ValidateToken(request.Token, request.ClientIp);
         if (!valid.IsValid) return MethodResponse.Error("Token is invalid");
         var userRoles = await userService.GetUserRoles(valid.UserId);
-        var hasPermission = userRoles.Any(f => f.Name == request.Role);
+        var hasPermission = userRoles.Any(f => request.Roles.FirstOrDefault(rr => rr == f.Name) != null);
+        // var hasPermission = userRoles.Any(f => f.Name == request.Role);
         return new MethodResponse { IsSuccess = hasPermission };
     }
 }

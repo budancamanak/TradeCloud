@@ -36,33 +36,42 @@ public class PermissionAuthorizationFilter(
             return;
         }
 
+        var isValid = false;
+
         foreach (var attr in metadata.GetOrderedMetadata<HasPermissionAttribute>())
         {
-            if (await securityClient.HasPermissionAsync(token, attr.Permission.ToString())) continue;
-            context.Result = new ForbidResult();
-            return;
+            if (!await securityClient.HasPermissionAsync(token, attr.Permissions)) continue;
+            isValid = true;
+            break;
         }
 
         foreach (var attr in metadata.GetOrderedMetadata<HasRoleAttribute>())
         {
-            if (await securityClient.HasRoleAsync(token, attr.Role.ToString())) continue;
+            if (!await securityClient.HasRoleAsync(token, attr.Roles)) continue;
+            isValid = true;
+            break;
+        }
+
+        if (!isValid)
+        {
             context.Result = new ForbidResult();
             return;
         }
 
-        foreach (var attr in metadata.GetOrderedMetadata<HasScopeAttribute>())
-        {
-            if (await securityClient.HasScopeAsync(token, attr.Scope)) continue;
-            context.Result = new ForbidResult();
-            return;
-        }
-
-        foreach (var attr in metadata.GetOrderedMetadata<HasPolicyAttribute>())
-        {
-            if (await securityClient.HasPolicyAsync(token, attr.Policy)) continue;
-            context.Result = new ForbidResult();
-            return;
-        }
+        // todo will be implemented & enabled later
+        // foreach (var attr in metadata.GetOrderedMetadata<HasScopeAttribute>())
+        // {
+        //     if (await securityClient.HasScopeAsync(token, attr.Scope)) continue;
+        //     context.Result = new ForbidResult();
+        //     return;
+        // }
+        //
+        // foreach (var attr in metadata.GetOrderedMetadata<HasPolicyAttribute>())
+        // {
+        //     if (await securityClient.HasPolicyAsync(token, attr.Policy)) continue;
+        //     context.Result = new ForbidResult();
+        //     return;
+        // }
 
         context.HttpContext.Items.Add("CurrentUser", tokenValidation.UserId);
     }

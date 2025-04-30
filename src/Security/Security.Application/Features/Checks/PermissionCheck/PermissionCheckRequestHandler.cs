@@ -26,7 +26,8 @@ public class PermissionCheckRequestHandler(
         var valid = await tokenService.ValidateToken(request.Token, request.ClientIp);
         if (!valid.IsValid) return MethodResponse.Error("Token is invalid");
         var userPermissions = await userService.GetUserPermissions(valid.UserId);
-        var hasPermission = userPermissions.FirstOrDefault(f => f.Name == request.Permission) != null;
+        var hasPermission = userPermissions.Any(f => request.Permissions.FirstOrDefault(rp => rp == f.Name) != null);
+        // var hasPermission = userPermissions.FirstOrDefault(f => f.Name == request.Permission) != null;
         return new MethodResponse { IsSuccess = hasPermission };
     }
 }

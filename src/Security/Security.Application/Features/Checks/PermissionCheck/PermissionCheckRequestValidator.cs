@@ -7,7 +7,7 @@ public class PermissionCheckRequestValidator : BaseCheckRequestValidator<Permiss
 {
     public PermissionCheckRequestValidator() : base()
     {
-        RuleFor(f => f.Permission)
+        RuleFor(f => f.Permissions)
             .NotNull().WithMessage("CheckRequest.Permission can't be null")
             .NotEmpty().WithMessage("CheckRequest.Permission can't be empty");
     }

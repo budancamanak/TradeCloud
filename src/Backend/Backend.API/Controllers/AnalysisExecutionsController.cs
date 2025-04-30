@@ -32,7 +32,8 @@ public class AnalysisExecutionsController(
     IMapper mapper)
 {
     [HttpGet("/AvailablePlugins")]
-    [HasPermission(Permissions.Enum.RunAnalysis)]
+    [HasPermission(Permissions.Enum.RunAnalysis, Permissions.Enum.ScheduleTask)]
+    [HasRole(Roles.Enum.Admin, Roles.Enum.Analyst, Roles.Enum.Trader)]
     public async Task<List<PluginInfo>> GetAvailablePlugins()
     {
         var currentUser = contextAccessor.CurrentUser();

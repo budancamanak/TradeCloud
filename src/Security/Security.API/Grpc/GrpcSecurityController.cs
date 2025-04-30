@@ -18,7 +18,7 @@ public class GrpcSecurityController(IMapper mapper, IMediator mediator)
         // todo use automapper here
         var request = new PermissionCheckRequest
         {
-            Permission = grpcRequest.Value,
+            Permissions = grpcRequest.Value.ToList(),
             Token = grpcRequest.Token,
             ClientIp = context.RequestHeaders.GetValue("ClientIP") ?? ""
         };
@@ -39,7 +39,7 @@ public class GrpcSecurityController(IMapper mapper, IMediator mediator)
     {
         var request = new RoleCheckRequest
         {
-            Role = grpcRequest.Value,
+            Roles = grpcRequest.Value.ToList(),
             Token = grpcRequest.Token,
             ClientIp = context.RequestHeaders.GetValue("ClientIP") ?? ""
         };
@@ -66,6 +66,4 @@ public class GrpcSecurityController(IMapper mapper, IMediator mediator)
         };
         return await mediator.Send(request);
     }
-
-
 }

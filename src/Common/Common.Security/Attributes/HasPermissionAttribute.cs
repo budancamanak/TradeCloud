@@ -3,7 +3,7 @@ using Common.Security.Enums;
 namespace Common.Security.Attributes;
 
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
-public class HasPermissionAttribute(Permissions.Enum permission) : Attribute
+public class HasPermissionAttribute(params Permissions.Enum[] permissions) : Attribute
 {
-    public Permissions.Enum Permission { get; } = permission;
+    public Permissions.Enum[] Permissions { get; } = permissions;
 }

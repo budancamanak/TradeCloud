@@ -7,7 +7,7 @@ public class RoleCheckRequestValidator : BaseCheckRequestValidator<RoleCheckRequ
 {
     public RoleCheckRequestValidator() : base()
     {
-        RuleFor(f => f.Role)
+        RuleFor(f => f.Roles)
             .NotNull().WithMessage("CheckRequest.Role can't be null")
             .NotEmpty().WithMessage("CheckRequest.Role can't be empty");
     }
