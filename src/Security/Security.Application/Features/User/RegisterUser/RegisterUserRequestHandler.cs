@@ -25,7 +25,6 @@ public class RegisterUserRequestHandler(
         {
             return MethodResponse.Error(string.Join(" && ", validated.Errors));
         }
-        // await validator.ValidateAndThrowAsync(request, cancellationToken);
 
         logger.LogWarning("Registering user with email: {Email} and username: {Username}", request.Email,
             request.Username);
