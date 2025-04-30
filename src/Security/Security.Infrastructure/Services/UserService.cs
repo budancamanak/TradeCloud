@@ -72,9 +72,11 @@ public class UserService(
         }
     }
 
-    public Task<MethodResponse> LogoutUser(string token)
+    public async Task<MethodResponse> LogoutUser(string token)
     {
-        return Task.FromResult(MethodResponse.Error("Not implemented yet"));
+        // todo set UserLogin as expired as well.
+        await cache.SetAsync(CacheKeyGenerator.UserTokenInfoKey(token), "", TimeSpan.FromSeconds(1));
+        return MethodResponse.Success("User logged out");
     }
 
     public async Task<List<Permission>> GetUserPermissions(string userId)
