@@ -37,5 +37,9 @@ public static class DependencyInjection
         {
             cfg.Address = new Uri(configuration["Security:GrpcHost"]);
         }).AddInterceptor<AuthHeadersInterceptor>();
+        services.AddGrpcClient<GrpcUserService.GrpcUserServiceClient>(cfg =>
+        {
+            cfg.Address = new Uri(configuration["Security:GrpcHost"]);
+        }).AddInterceptor<AuthHeadersInterceptor>();
     }
 }

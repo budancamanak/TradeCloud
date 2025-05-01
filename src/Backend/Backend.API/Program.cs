@@ -1,7 +1,9 @@
 using Backend.API;
 using Backend.Application;
+using Backend.Application.Abstraction.Services;
 using Backend.Infrastructure;
 using Backend.Infrastructure.Data;
+using Backend.Infrastructure.Services;
 using Common.Logging;
 using Common.Security.Abstraction;
 using Common.Security.Filters;
@@ -55,6 +57,7 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApiServices();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<ISecurityGrpcClient, SecurityGrpcClient>(); // your implementation
+builder.Services.AddScoped<IUserGrpcClient, UserGrpcClient>(); // your implementation
 builder.Services.AddScoped<PermissionAuthorizationFilter>();
 
 builder.Services.AddControllers(options => { options.Filters.Add<PermissionAuthorizationFilter>(); });
