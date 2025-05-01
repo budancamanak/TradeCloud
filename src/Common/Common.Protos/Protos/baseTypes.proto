@@ -1,0 +1,10 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Common.Grpc";
+
+package baseTypes;
+
+message GrpcMethodResponse{
+  bool success = 1;
+  string message = 2;
+}

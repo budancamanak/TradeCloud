@@ -2,12 +2,37 @@
 
 option csharp_namespace = "Common.Grpc";
 import "google/protobuf/timestamp.proto";
+import "baseTypes.proto";
 
 
 service GrpcUserService{
   rpc LoginUser(UserLoginRequest) returns (UserLoginResponse);
   rpc RegisterUser(UserRegisterRequest) returns (UserRegisterResponse);
   rpc UserInfo(UserInfoRequest) returns (UserInfoResponse);
+  rpc AddRoleToUser(GrpcAddRoleToUserRequest) returns (baseTypes.GrpcMethodResponse);
+  rpc RemoveRoleFromUser(GrpcRemoveRoleFromUserRequest) returns (baseTypes.GrpcMethodResponse);
+  rpc AddPermissionToRole(GrpcAddPermissionToRoleRequest) returns (baseTypes.GrpcMethodResponse);
+  rpc RemovePermissionFromRole(GrpcRemovePermissionFromRoleRequest) returns (baseTypes.GrpcMethodResponse);
+}
+
+message GrpcAddRoleToUserRequest{
+  int32 userId = 1;
+  int32 roleId = 2;
+}
+
+message GrpcRemoveRoleFromUserRequest{
+  int32 userId = 1;
+  int32 roleId = 2;
+}
+
+message GrpcAddPermissionToRoleRequest{
+  int32 roleId = 1;
+  int32 permissionId = 2;
+}
+
+message GrpcRemovePermissionFromRoleRequest{
+  int32 roleId = 1;
+  int32 permissionId = 2;
 }
 
 message UserLoginRequest{
@@ -30,7 +55,7 @@ message UserRegisterRequest{
 
 message UserRegisterResponse{
   bool success = 1;
-  string message = 3;
+  string message = 2;
 }
 
 message UserInfoRequest{

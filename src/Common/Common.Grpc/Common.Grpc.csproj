@@ -11,13 +11,16 @@
         <ProjectReference Include="..\Common.Web\Common.Web.csproj" />
     </ItemGroup>
     <ItemGroup>
+        <Protobuf Include="../Common.Protos/Protos/baseTypes.proto" GrpcServices="Both">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Protobuf>
+        <Protobuf Include="../Common.Protos/Protos/customTypes.proto" GrpcServices="Both">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Protobuf>
         <Protobuf Include="../Common.Protos/Protos/market.proto" GrpcServices="Both">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Protobuf>
         <Protobuf Include="../Common.Protos/Protos/worker.proto" GrpcServices="Both">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Protobuf>
-        <Protobuf Include="../Common.Protos/Protos/customTypes.proto" GrpcServices="Both">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Protobuf>
         <Protobuf Include="../Common.Protos/Protos/auth.proto" GrpcServices="Both">
