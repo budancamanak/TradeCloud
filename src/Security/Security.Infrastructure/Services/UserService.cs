@@ -75,7 +75,20 @@ public class UserService(
     public async Task<MethodResponse> LogoutUser(string token)
     {
         // todo set UserLogin as expired as well.
-        await cache.SetAsync(CacheKeyGenerator.UserTokenInfoKey(token), "", TimeSpan.FromSeconds(1));
+        var loginInfo = await cache.GetAsync<UserLogin>(CacheKeyGenerator.UserTokenInfoKey(token));
+        if (loginInfo != null)
+        {
+            loginInfo.IsLoggedOut = true;
+        }
+
+        await cache.SetAsync(CacheKeyGenerator.UserTokenInfoKey(token), loginInfo, TimeSpan.FromSeconds(1));
+
+        loginInfo = await repository.GetUserLoginInfo(token);
+        if (loginInfo != null)
+        {
+            await repository.SetUserLoginInfoLoggedOut(token, true);
+        }
+
         return MethodResponse.Success("User logged out");
     }
 

@@ -183,6 +183,7 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
         {
             permissions.AddRange(userRole.Permissions);
         }
+
         return permissions.Distinct().ToList();
     }
 
@@ -202,8 +203,19 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
     public async Task<UserLogin?> GetUserLoginInfo(string token)
     {
         Guard.Against.NullOrWhiteSpace(token);
-        var info =await dbContext.UserLogins.FirstOrDefaultAsync(f => f.Token == token);
+        var info = await dbContext.UserLogins.FirstOrDefaultAsync(f => f.Token == token);
         Guard.Against.Null(info);
         return info;
+    }
+
+    public async Task<MethodResponse> SetUserLoginInfoLoggedOut(string token, bool loggedOut)
+    {
+        Guard.Against.NullOrEmpty(token);
+        var existing = await dbContext.UserLogins.FirstOrDefaultAsync(f => f.Token == token);
+        Guard.Against.Null(existing);
+        existing.IsLoggedOut = loggedOut;
+        var result = await dbContext.SaveChangesAsync();
+        if (result == 0) return MethodResponse.Error("Failed to update User Login");
+        return MethodResponse.Success(result, "User Login updated");
     }
 }

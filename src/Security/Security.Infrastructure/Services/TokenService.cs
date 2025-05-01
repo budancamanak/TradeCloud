@@ -119,6 +119,15 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
                         UserId = "Login info not found."
                     };
                 }
+
+                if (loginInfo.IsLoggedOut)
+                {
+                    return new ValidateTokenResponse
+                    {
+                        IsValid = false,
+                        UserId = "User is already logged out."
+                    };
+                }
             }
 
             if (loginInfo.ExpirationDate >= DateTime.UtcNow)
