@@ -14,7 +14,7 @@ public class AddRoleToUserRequestValidator : AbstractValidator<AddRoleToUserRequ
         {
             var role = Roles.FromValue(i);
             if (role != null) return;
-            context.AddFailure(context.PropertyPath, "RoleId is not recognized");
+            context.AddFailure(context.PropertyPath, "AddRoleToUserRequest.RoleId is not recognized");
         }));
     }
 }

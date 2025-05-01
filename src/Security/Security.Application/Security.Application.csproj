@@ -21,7 +21,6 @@
     <ItemGroup>
       <Folder Include="Features\User\AddPermissionToRole\" />
       <Folder Include="Features\User\RemovePermissionFromRole\" />
-      <Folder Include="Features\User\RemoveRoleFromUser\" />
       <Folder Include="Mappers\" />
     </ItemGroup>
 
