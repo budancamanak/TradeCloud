@@ -36,6 +36,7 @@ public static class DependencyInjection
         serviceCollection.AddTransient<ITokenService, TokenService>();
 
         serviceCollection.AddScoped<IUserRepository, UserRepository>();
+        serviceCollection.AddScoped<IRoleRepository, RoleRepository>();
 
         // services.AddScoped<IValidator<PluginExecution>, PluginExecutionsValidator>();
         // services.AddScoped<IValidator<TrackList>, TrackListValidator>();

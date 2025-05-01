@@ -9,15 +9,15 @@ public class UserRegisterMappingProfile : Profile
 {
     public UserRegisterMappingProfile()
     {
-        CreateMap<UserRegisterModel, UserRegisterRequest>()
-            .ConvertUsing(src => new UserRegisterRequest
+        CreateMap<UserRegisterModel, GrpcUserRegisterRequest>()
+            .ConvertUsing(src => new GrpcUserRegisterRequest
             {
                 Email = src.Email,
                 Nickname = src.Username,
                 Password = src.Password
             });
 
-        CreateMap<UserRegisterRequest, RegisterUserRequest>().ConvertUsing(src=>new RegisterUserRequest
+        CreateMap<GrpcUserRegisterRequest, RegisterUserRequest>().ConvertUsing(src=>new RegisterUserRequest
         {
             Email = src.Email,
             Password = src.Password,

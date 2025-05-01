@@ -6,9 +6,9 @@ import "baseTypes.proto";
 
 
 service GrpcUserService{
-  rpc LoginUser(UserLoginRequest) returns (UserLoginResponse);
-  rpc RegisterUser(UserRegisterRequest) returns (UserRegisterResponse);
-  rpc UserInfo(UserInfoRequest) returns (UserInfoResponse);
+  rpc LoginUser(GrpcUserLoginRequest) returns (GrpcUserLoginResponse);
+  rpc RegisterUser(GrpcUserRegisterRequest) returns (GrpcUserRegisterResponse);
+  rpc UserInfo(GrpcUserInfoRequest) returns (GrpcUserInfoResponse);
   rpc AddRoleToUser(GrpcAddRoleToUserRequest) returns (baseTypes.GrpcMethodResponse);
   rpc RemoveRoleFromUser(GrpcRemoveRoleFromUserRequest) returns (baseTypes.GrpcMethodResponse);
   rpc AddPermissionToRole(GrpcAddPermissionToRoleRequest) returns (baseTypes.GrpcMethodResponse);
@@ -35,34 +35,34 @@ message GrpcRemovePermissionFromRoleRequest{
   int32 permissionId = 2;
 }
 
-message UserLoginRequest{
+message GrpcUserLoginRequest{
   string email = 1;
   string password = 2;
 }
 
-message UserLoginResponse{
+message GrpcUserLoginResponse{
   bool success = 1;
   string token = 2;
   string message = 3;
 }
 
-message UserRegisterRequest{
+message GrpcUserRegisterRequest{
   string email = 1;
   string nickname = 2;
   string password = 3;
   string passwordConfirm = 4;
 }
 
-message UserRegisterResponse{
+message GrpcUserRegisterResponse{
   bool success = 1;
   string message = 2;
 }
 
-message UserInfoRequest{
+message GrpcUserInfoRequest{
   string token = 1;
 }
 
-message UserInfoResponse{
+message GrpcUserInfoResponse{
   string userId = 1;
   string email = 2;
   string nickname = 3;

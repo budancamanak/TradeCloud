@@ -16,12 +16,12 @@ namespace Security.API.Grpc;
 
 public class GrpcUserController(IMapper mapper, IMediator mediator) : GrpcUserService.GrpcUserServiceBase
 {
-    public override async Task<UserLoginResponse> LoginUser(UserLoginRequest grpcRequest, ServerCallContext context)
+    public override async Task<GrpcUserLoginResponse> LoginUser(GrpcUserLoginRequest grpcRequest, ServerCallContext context)
     {
         var request = mapper.Map<LoginUserRequest>(grpcRequest,
             opts => { opts.Items["ClientIP"] = (context.RequestHeaders.GetValue("ClientIP") ?? ""); });
         var mr = await mediator.Send(request);
-        return new UserLoginResponse
+        return new GrpcUserLoginResponse
         {
             Message = mr.Message,
             Success = mr.IsSuccess,
@@ -29,19 +29,19 @@ public class GrpcUserController(IMapper mapper, IMediator mediator) : GrpcUserSe
         };
     }
 
-    public override async Task<UserRegisterResponse> RegisterUser(UserRegisterRequest grpcRequest,
+    public override async Task<GrpcUserRegisterResponse> RegisterUser(GrpcUserRegisterRequest grpcRequest,
         ServerCallContext context)
     {
         var request = mapper.Map<RegisterUserRequest>(grpcRequest);
         var mr = await mediator.Send(request, context.CancellationToken);
-        return new UserRegisterResponse
+        return new GrpcUserRegisterResponse
         {
             Message = mr.Message,
             Success = mr.IsSuccess
         };
     }
 
-    public override Task<UserInfoResponse> UserInfo(UserInfoRequest request, ServerCallContext context)
+    public override Task<GrpcUserInfoResponse> UserInfo(GrpcUserInfoRequest request, ServerCallContext context)
     {
         return base.UserInfo(request, context);
     }

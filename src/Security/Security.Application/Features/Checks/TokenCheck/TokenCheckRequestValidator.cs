@@ -2,7 +2,7 @@
 
 namespace Security.Application.Features.Checks.TokenCheck;
 
-public class TokenCheckRequestValidator : BaseCheckRequestValidator<TokenCheckRequest, ValidateTokenResponse>
+public class TokenCheckRequestValidator : BaseCheckRequestValidator<TokenCheckRequest, GrpcValidateTokenResponse>
 {
     public TokenCheckRequestValidator() : base()
     {

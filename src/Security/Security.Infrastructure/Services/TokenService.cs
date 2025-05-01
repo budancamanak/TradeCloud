@@ -49,7 +49,7 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
         }
     }
 
-    public async Task<ValidateTokenResponse> ValidateToken(string token, string clientIp)
+    public async Task<GrpcValidateTokenResponse> ValidateToken(string token, string clientIp)
     {
         try
         {
@@ -69,7 +69,7 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
             var tokenValidationResult = await handler.ValidateTokenAsync(token, pars);
             if (!tokenValidationResult.IsValid || tokenValidationResult.Exception != null)
             {
-                return new ValidateTokenResponse
+                return new GrpcValidateTokenResponse
                 {
                     IsValid = false,
                     UserId = tokenValidationResult.Exception.Message
@@ -78,7 +78,7 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
 
             if (!tokenValidationResult.ClaimsIdentity.IsAuthenticated)
             {
-                return new ValidateTokenResponse
+                return new GrpcValidateTokenResponse
                 {
                     IsValid = false,
                     UserId = "Token is valid but not authenticated"
@@ -88,7 +88,7 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
             var user = tokenValidationResult.ClaimsIdentity.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
             if (string.IsNullOrWhiteSpace(user))
             {
-                return new ValidateTokenResponse
+                return new GrpcValidateTokenResponse
                 {
                     IsValid = false,
                     UserId = "Token is valid but not authenticated"
@@ -100,7 +100,7 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
             // todo might also use redis instead of going to db directly
             if (string.IsNullOrWhiteSpace(issuedIp))
             {
-                return new ValidateTokenResponse
+                return new GrpcValidateTokenResponse
                 {
                     IsValid = false,
                     UserId = "Issued IP address not found."
@@ -113,7 +113,7 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
                 loginInfo = await repository.GetUserLoginInfo(token);
                 if (loginInfo == null)
                 {
-                    return new ValidateTokenResponse
+                    return new GrpcValidateTokenResponse
                     {
                         IsValid = false,
                         UserId = "Login info not found."
@@ -122,7 +122,7 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
 
                 if (loginInfo.IsLoggedOut)
                 {
-                    return new ValidateTokenResponse
+                    return new GrpcValidateTokenResponse
                     {
                         IsValid = false,
                         UserId = "User is already logged out."
@@ -132,7 +132,7 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
 
             if (loginInfo.ExpirationDate >= DateTime.UtcNow)
             {
-                return new ValidateTokenResponse
+                return new GrpcValidateTokenResponse
                 {
                     IsValid = false,
                     UserId = "Login info expired."
@@ -141,7 +141,7 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
 
             if (loginInfo.ClientIP != issuedIp)
             {
-                return new ValidateTokenResponse
+                return new GrpcValidateTokenResponse
                 {
                     IsValid = false,
                     UserId = "Issued IP address is not valid."
@@ -150,7 +150,7 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
 
             // refresh cache here again.
             await cache.SetAsync(CacheKeyGenerator.UserTokenInfoKey(token), loginInfo, TimeSpan.FromMinutes(15));
-            return new ValidateTokenResponse
+            return new GrpcValidateTokenResponse
             {
                 IsValid = true,
                 UserId = user
@@ -158,7 +158,7 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
         }
         catch (Exception ex)
         {
-            return new ValidateTokenResponse
+            return new GrpcValidateTokenResponse
             {
                 IsValid = false,
                 UserId = ex.Message

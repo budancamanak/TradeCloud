@@ -10,7 +10,7 @@ using Security.Infrastructure.Data;
 
 namespace Security.Infrastructure.Repositories;
 
-public class RoleRepository(SecurityDbContext dbContext, IValidator<Role> validator) : IRoleRepository
+public class RoleRepository(SecurityDbContext dbContext) : IRoleRepository
 {
     public async Task<Role> GetByIdAsync(int id)
     {

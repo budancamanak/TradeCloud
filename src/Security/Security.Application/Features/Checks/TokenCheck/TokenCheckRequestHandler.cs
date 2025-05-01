@@ -10,15 +10,15 @@ public class TokenCheckRequestHandler(
     ILogger<TokenCheckRequestHandler> logger,
     ITokenService tokenService,
     IValidator<TokenCheckRequest> validator)
-    : IRequestHandler<TokenCheckRequest, ValidateTokenResponse>
+    : IRequestHandler<TokenCheckRequest, GrpcValidateTokenResponse>
 {
-    public async Task<ValidateTokenResponse> Handle(TokenCheckRequest request,
+    public async Task<GrpcValidateTokenResponse> Handle(TokenCheckRequest request,
         CancellationToken cancellationToken)
     {
         var validated = await validator.ValidateAsync(request, cancellationToken);
         if (validated is { IsValid: false })
         {
-            return new ValidateTokenResponse
+            return new GrpcValidateTokenResponse
             {
                 IsValid = validated.IsValid,
                 UserId = string.Join(" && ", validated.Errors)

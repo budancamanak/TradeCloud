@@ -2,6 +2,6 @@
 
 namespace Security.Application.Features.Checks.TokenCheck;
 
-public class TokenCheckRequest : BaseCheckRequest<ValidateTokenResponse>
+public class TokenCheckRequest : BaseCheckRequest<GrpcValidateTokenResponse>
 {
 }
