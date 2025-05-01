@@ -13,6 +13,7 @@ public static class UserLoginConfigurations
         ent.Property(f => f.Token).IsRequired().ValueGeneratedNever();
         ent.Property(f => f.UserId).IsRequired();
         ent.Property(f => f.LoginDate).IsRequired();
+        ent.Property(f => f.IsLoggedOut).IsRequired().HasDefaultValue(false);
         ent.Property(f => f.ExpirationDate).IsRequired();
         ent.Property(f => f.UserAgent).HasMaxLength(255);
         ent.Property(f => f.ClientIP).HasMaxLength(50);

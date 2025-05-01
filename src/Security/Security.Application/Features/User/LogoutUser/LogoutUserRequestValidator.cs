@@ -3,6 +3,6 @@ using Security.Application.Features.Checks;
 
 namespace Security.Application.Features.User.LogoutUser;
 
-public class LogoutUserRequest : BaseCheckRequest<MethodResponse>
+public class LogoutUserRequestValidator : BaseCheckRequestValidator<LogoutUserRequest, MethodResponse>
 {
 }

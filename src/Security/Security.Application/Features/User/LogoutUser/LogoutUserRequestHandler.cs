@@ -8,12 +8,12 @@ using Security.Application.Features.Checks;
 namespace Security.Application.Features.User.LogoutUser;
 
 public class LogoutUserRequestHandler(
-    IValidator<BaseCheckRequest<MethodResponse>> validator,
+    IValidator<LogoutUserRequest> validator,
     IUserService userService,
     ITokenService tokenService)
-    : IRequestHandler<BaseCheckRequest<MethodResponse>, MethodResponse>
+    : IRequestHandler<LogoutUserRequest, MethodResponse>
 {
-    public async Task<MethodResponse> Handle(BaseCheckRequest<MethodResponse> request,
+    public async Task<MethodResponse> Handle(LogoutUserRequest request,
         CancellationToken cancellationToken)
     {
         var validated = await validator.ValidateAsync(request, cancellationToken);

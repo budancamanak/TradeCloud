@@ -5,6 +5,7 @@ using MediatR;
 using Security.Application.Features.Checks;
 using Security.Application.Features.Checks.PermissionCheck;
 using Security.Application.Features.Checks.RoleCheck;
+using Security.Application.Features.Checks.TokenCheck;
 using Security.Application.Features.User.LoginUser;
 using Security.Application.Features.User.RegisterUser;
 
@@ -59,7 +60,7 @@ public class GrpcSecurityController(IMapper mapper, IMediator mediator)
     public override async Task<ValidateTokenResponse> ValidateToken(ValidateTokenRequest grpcRequest,
         ServerCallContext context)
     {
-        var request = new BaseCheckRequest<ValidateTokenResponse>
+        var request = new TokenCheckRequest
         {
             Token = grpcRequest.Token,
             ClientIp = context.RequestHeaders.GetValue("ClientIP") ?? ""

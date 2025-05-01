@@ -4,15 +4,15 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Security.Application.Abstraction.Services;
 
-namespace Security.Application.Features.Checks;
+namespace Security.Application.Features.Checks.TokenCheck;
 
 public class TokenCheckRequestHandler(
     ILogger<TokenCheckRequestHandler> logger,
     ITokenService tokenService,
-    IValidator<BaseCheckRequest<ValidateTokenResponse>> validator)
-    : IRequestHandler<BaseCheckRequest<ValidateTokenResponse>, ValidateTokenResponse>
+    IValidator<TokenCheckRequest> validator)
+    : IRequestHandler<TokenCheckRequest, ValidateTokenResponse>
 {
-    public async Task<ValidateTokenResponse> Handle(BaseCheckRequest<ValidateTokenResponse> request,
+    public async Task<ValidateTokenResponse> Handle(TokenCheckRequest request,
         CancellationToken cancellationToken)
     {
         var validated = await validator.ValidateAsync(request, cancellationToken);
