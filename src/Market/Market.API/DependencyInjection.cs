@@ -15,7 +15,7 @@ public static class DependencyInjection
 
     public static void AddGrpcControllers(this WebApplication app)
     {
-        app.MapGrpcService<MarketGrpcController>();
+        app.MapGrpcService<GrpcPriceController>();
         app.MapGrpcService<GrpcTickerController>();
     }
 }

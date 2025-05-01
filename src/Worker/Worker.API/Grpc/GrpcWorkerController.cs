@@ -8,7 +8,7 @@ using Worker.Application.Abstraction;
 
 namespace Worker.API.Grpc;
 
-public class WorkerGrpcController(IPluginHost pluginHost, ICacheService cache, ILogger<WorkerGrpcController> logger)
+public class GrpcWorkerController(IPluginHost pluginHost, ICacheService cache, ILogger<GrpcWorkerController> logger)
     : GrpcAvailablePluginsService.GrpcAvailablePluginsServiceBase
 {
     public override async Task<GrpcGetAvailablePluginsResponse> GetAvailablePlugins(

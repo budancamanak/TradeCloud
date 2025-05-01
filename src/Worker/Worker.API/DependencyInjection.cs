@@ -20,6 +20,6 @@ public static class DependencyInjection
 
     public static void AddGrpcControllers(this WebApplication app)
     {
-        app.MapGrpcService<WorkerGrpcController>();
+        app.MapGrpcService<GrpcWorkerController>();
     }
 }
