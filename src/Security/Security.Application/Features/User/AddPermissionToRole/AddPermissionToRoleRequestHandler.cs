@@ -18,19 +18,27 @@ public class AddPermissionToRoleRequestHandler(
 {
     public async Task<MethodResponse> Handle(AddPermissionToRoleRequest request, CancellationToken cancellationToken)
     {
-        var validated = await validator.ValidateAsync(request, cancellationToken);
-        if (validated is { IsValid: false })
+        try
         {
-            return MethodResponse.Error(string.Join(" && ", validated.Errors));
+            var validated = await validator.ValidateAsync(request, cancellationToken);
+            if (validated is { IsValid: false })
+            {
+                return MethodResponse.Error(string.Join(" && ", validated.Errors));
+            }
+
+            var permission = Permissions.FromValue(request.PermissionId)!;
+            var role = Roles.FromValue(request.RoleId)!;
+
+            logger.LogWarning("Adding permission[{Permission}] to role[{Role}]", permission.Name, role.Name);
+
+            var mr = await repository.AddPermissionToRole(role, permission);
+            if (mr.IsSuccess)
+                return MethodResponse.Success($"Permission[{permission.Name}] added to Role[{role.Name}].");
+            return MethodResponse.Success($"Failed to add Permission[{permission.Name}] from Role[{role.Name}].");
         }
-
-        var permission = Permissions.FromValue(request.PermissionId)!;
-        var role = Roles.FromValue(request.RoleId)!;
-
-        logger.LogWarning("Adding permission[{Permission}] to role[{Role}]", permission.Name, role.Name);
-
-        var mr = await repository.AddPermissionToRole(role, permission);
-        if (mr.IsSuccess) return MethodResponse.Success($"Permission[{permission.Name}] added to Role[{role.Name}].");
-        return MethodResponse.Success($"Failed to add Permission[{permission.Name}] from Role[{role.Name}].");
+        catch (Exception e)
+        {
+            return MethodResponse.Error(e.Message);
+        }
     }
 }

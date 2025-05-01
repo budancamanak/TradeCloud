@@ -36,6 +36,14 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
         return item;
     }
 
+    public async Task<User> FindUserByEmail(string email)
+    {
+        Guard.Against.NullOrWhiteSpace(email);
+        var item = await dbContext.Users.FirstOrDefaultAsync(f => f.Email == email);
+        Guard.Against.Null(item);
+        return item;
+    }
+
     public async Task<MethodResponse> AddUserLogin(User user, UserLogin login)
     {
         Guard.Against.Null(user);

@@ -16,19 +16,26 @@ public class LogoutUserRequestHandler(
     public async Task<MethodResponse> Handle(LogoutUserRequest request,
         CancellationToken cancellationToken)
     {
-        var validated = await validator.ValidateAsync(request, cancellationToken);
-        if (validated is { IsValid: false })
+        try
         {
-            return MethodResponse.Error(string.Join(" && ", validated.Errors));
-        }
+            var validated = await validator.ValidateAsync(request, cancellationToken);
+            if (validated is { IsValid: false })
+            {
+                return MethodResponse.Error(string.Join(" && ", validated.Errors));
+            }
 
-        var validateTokenResponse = await tokenService.ValidateToken(request.Token, request.ClientIp);
-        if (!validateTokenResponse.IsValid)
+            var validateTokenResponse = await tokenService.ValidateToken(request.Token, request.ClientIp);
+            if (!validateTokenResponse.IsValid)
+            {
+                return MethodResponse.Error(validateTokenResponse.UserId);
+            }
+
+            var mr = await userService.LogoutUser(request.Token);
+            return mr;
+        }
+        catch (Exception e)
         {
-            return MethodResponse.Error(validateTokenResponse.UserId);
+            return MethodResponse.Error(e.Message);
         }
-
-        var mr = await userService.LogoutUser(request.Token);
-        return mr;
     }
 }

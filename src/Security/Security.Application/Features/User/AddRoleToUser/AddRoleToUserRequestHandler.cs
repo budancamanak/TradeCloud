@@ -20,21 +20,29 @@ public class AddRoleToUserRequestHandler(
 {
     public async Task<MethodResponse> Handle(AddRoleToUserRequest request, CancellationToken cancellationToken)
     {
-        var validated = await validator.ValidateAsync(request, cancellationToken);
-        if (validated is { IsValid: false })
+        try
         {
-            return MethodResponse.Error(string.Join(" && ", validated.Errors));
+            var validated = await validator.ValidateAsync(request, cancellationToken);
+            if (validated is { IsValid: false })
+            {
+                return MethodResponse.Error(string.Join(" && ", validated.Errors));
+            }
+
+            var user = await repository.GetByIdAsync(request.UserId);
+            Guard.Against.Null(user);
+            var role = Roles.FromValue(request.RoleId)!;
+
+            logger.LogWarning("Adding role[{Role}] to user with Id: {UserId} and username: {Username}", role.Name,
+                user.Id,
+                user.Username);
+
+            var mr = await repository.AddRoleToUser(user.Id, role);
+            if (mr.IsSuccess) return MethodResponse.Success($"Role[{role.Name}] added to user[{user.Username}].");
+            return MethodResponse.Success($"Failed to add Role[{role.Name}] to user[{user.Username}].");
         }
-
-        var user = await repository.GetByIdAsync(request.UserId);
-        Guard.Against.Null(user);
-        var role = Roles.FromValue(request.RoleId)!;
-
-        logger.LogWarning("Adding role[{Role}] to user with Id: {UserId} and username: {Username}", role.Name, user.Id,
-            user.Username);
-
-        var mr = await repository.AddRoleToUser(user.Id, role);
-        if (mr.IsSuccess) return MethodResponse.Success($"Role[{role.Name}] added to user[{user.Username}].");
-        return MethodResponse.Success($"Failed to add Role[{role.Name}] to user[{user.Username}].");
+        catch (Exception e)
+        {
+            return MethodResponse.Error(e.Message);
+        }
     }
 }

@@ -130,7 +130,7 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
                 }
             }
 
-            if (loginInfo.ExpirationDate >= DateTime.UtcNow)
+            if (loginInfo.ExpirationDate < DateTime.UtcNow)
             {
                 return new GrpcValidateTokenResponse
                 {
@@ -139,7 +139,7 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
                 };
             }
 
-            if (loginInfo.ClientIP != issuedIp)
+            if (clientIp != issuedIp)
             {
                 return new GrpcValidateTokenResponse
                 {

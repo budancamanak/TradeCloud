@@ -37,11 +37,11 @@ public class UserService(
         }
     }
 
-    public async Task<MethodResponse> LoginUser(string username, string password, string clientIp)
+    public async Task<MethodResponse> LoginUser(string email, string password, string clientIp)
     {
         try
         {
-            var user = await repository.FindUserByUsername(username);
+            var user = await repository.FindUserByEmail(email);
             Guard.Against.Null(user);
             var passMatch = BCrypt.Net.BCrypt.Verify(password, user.Password);
             if (!passMatch) return MethodResponse.Error("Password mismatch");

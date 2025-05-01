@@ -18,14 +18,21 @@ public class LoginUserRequestHandler(
 {
     public async Task<MethodResponse> Handle(LoginUserRequest request, CancellationToken cancellationToken)
     {
-        var validated = await validator.ValidateAsync(request, cancellationToken);
-        if (validated is { IsValid: false })
+        try
         {
-            return MethodResponse.Error(string.Join(" && ", validated.Errors));
-        }
+            var validated = await validator.ValidateAsync(request, cancellationToken);
+            if (validated is { IsValid: false })
+            {
+                return MethodResponse.Error(string.Join(" && ", validated.Errors));
+            }
 
-        logger.LogWarning("Logging user in with email: {Email}, IP: {ClientIp}", request.Email, request.ClientIp);
-        var mr = await userService.LoginUser(request.Email, request.Password, request.ClientIp);
-        return mr;
+            logger.LogWarning("Logging user in with email: {Email}, IP: {ClientIp}", request.Email, request.ClientIp);
+            var mr = await userService.LoginUser(request.Email, request.Password, request.ClientIp);
+            return mr;
+        }
+        catch (Exception e)
+        {
+            return MethodResponse.Error(e.Message);
+        }
     }
 }

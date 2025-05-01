@@ -24,6 +24,6 @@ public class UserLoginMappingProfile : Profile
         //     PasswordConfirm = src.PasswordConfirm
         // });
         CreateMap<GrpcUserLoginRequest, LoginUserRequest>()
-            .ForMember(f => f.ClientIp, opt => opt.MapFrom((_, _, _, context) => context.Items["ClientIp"]));
+            .ForMember(f => f.ClientIp, opt => opt.MapFrom((_, _, _, context) => context.Items["ClientIP"]));
     }
 }

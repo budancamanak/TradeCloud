@@ -10,6 +10,7 @@ public interface IUserRepository : IAsyncRepository<User>
 {
     Task<List<User>> GetUsersWithStatus(Status status);
     Task<User> FindUserByUsername(string username);
+    Task<User> FindUserByEmail(string email);
     Task<MethodResponse> AddUserLogin(User user, UserLogin login);
     Task<MethodResponse> CheckUsernameAvailability(string username);
     Task<MethodResponse> CheckEmailAvailability(string email);
