@@ -17,7 +17,7 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
     {
         Guard.Against.NegativeOrZero(id);
         var user = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == id);
-        Guard.Against.Null(user);
+        Guard.Against.NotFound(id, user);
         return user;
     }
 
@@ -31,17 +31,17 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
     public async Task<User> FindUserByUsername(string username)
     {
         Guard.Against.NullOrWhiteSpace(username);
-        var item = await dbContext.Users.FirstOrDefaultAsync(f => f.Username == username);
-        Guard.Against.Null(item);
-        return item;
+        var user = await dbContext.Users.FirstOrDefaultAsync(f => f.Username == username);
+        Guard.Against.NotFound(username, user);
+        return user;
     }
 
     public async Task<User> FindUserByEmail(string email)
     {
         Guard.Against.NullOrWhiteSpace(email);
-        var item = await dbContext.Users.FirstOrDefaultAsync(f => f.Email == email);
-        Guard.Against.Null(item);
-        return item;
+        var user = await dbContext.Users.FirstOrDefaultAsync(f => f.Email == email);
+        Guard.Against.NotFound(email, user);
+        return user;
     }
 
     public async Task<MethodResponse> AddUserLogin(User user, UserLogin login)

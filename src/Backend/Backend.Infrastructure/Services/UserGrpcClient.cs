@@ -22,23 +22,45 @@ public class UserGrpcClient(GrpcUserService.GrpcUserServiceClient grpcClient) : 
         };
     }
 
-    public Task<MethodResponse> RegisterUserAsync(string username, string email, string password,
+    public async Task<MethodResponse> RegisterUserAsync(string username, string email, string password,
         string passwordConfirm)
     {
-        throw new NotImplementedException();
+        var request = new GrpcUserRegisterRequest
+        {
+            Email = email,
+            Nickname = username,
+            Password = password,
+            PasswordConfirm = passwordConfirm
+        };
+        var mr = await grpcClient.RegisterUserAsync(request);
+        return new MethodResponse
+        {
+            Message = mr.Message,
+            IsSuccess = mr.Success
+        };
     }
 
-    public Task<MethodResponse> UserInfoAsync(string token)
+    public Task<MethodResponse> UserInfoAsync(string token, int userId)
     {
         throw new NotImplementedException();
     }
 
-    public Task<MethodResponse> AddRoleToUserAsync(string token, int roleId)
+    public async Task<MethodResponse> AddRoleToUserAsync(string token, int userId, int roleId)
     {
-        throw new NotImplementedException();
+        var request = new GrpcAddRoleToUserRequest
+        {
+            RoleId = roleId,
+            UserId = userId
+        };
+        var mr = await grpcClient.AddRoleToUserAsync(request);
+        return new MethodResponse
+        {
+            Message = mr.Message,
+            IsSuccess = mr.Success
+        };
     }
 
-    public Task<MethodResponse> RemoveRoleFromUserAsync(string token, int roleId)
+    public Task<MethodResponse> RemoveRoleFromUserAsync(string token, int userId, int roleId)
     {
         throw new NotImplementedException();
     }
