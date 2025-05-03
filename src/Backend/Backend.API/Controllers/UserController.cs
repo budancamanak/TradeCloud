@@ -80,7 +80,7 @@ public class UserController(
 
 
     [HttpPost("/Role/{roleId:int}/Permission/{permissionId:int}")]
-    [HasPermission(Permissions.Enum.AssignRoles, Permissions.Enum.ManageUsers)]
+    [HasPermission(Permissions.Enum.AssignRoles)]
     [HasRole(Roles.Enum.Admin)]
     public async Task<MethodResponse> AddPermissionToRole(int roleId, int permissionId)
     {
@@ -96,7 +96,7 @@ public class UserController(
     }
 
     [HttpDelete("/Role/{roleId:int}/Permission/{permissionId:int}")]
-    [HasPermission(Permissions.Enum.AssignRoles, Permissions.Enum.ManageUsers)]
+    [HasPermission(Permissions.Enum.AssignRoles)]
     [HasRole(Roles.Enum.Admin)]
     public async Task<MethodResponse> RemovePermissionFromRole(int roleId, int permissionId)
     {

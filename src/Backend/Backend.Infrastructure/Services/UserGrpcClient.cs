@@ -60,18 +60,48 @@ public class UserGrpcClient(GrpcUserService.GrpcUserServiceClient grpcClient) : 
         };
     }
 
-    public Task<MethodResponse> RemoveRoleFromUserAsync(string token, int userId, int roleId)
+    public async Task<MethodResponse> RemoveRoleFromUserAsync(string token, int userId, int roleId)
     {
-        throw new NotImplementedException();
+        var request = new GrpcRemoveRoleFromUserRequest
+        {
+            RoleId = roleId,
+            UserId = userId
+        };
+        var mr = await grpcClient.RemoveRoleFromUserAsync(request);
+        return new MethodResponse
+        {
+            Message = mr.Message,
+            IsSuccess = mr.Success
+        };
     }
 
-    public Task<MethodResponse> AddPermissionToRoleAsync(string token, int roleId, int permissionId)
+    public async Task<MethodResponse> AddPermissionToRoleAsync(string token, int roleId, int permissionId)
     {
-        throw new NotImplementedException();
+        var request = new GrpcAddPermissionToRoleRequest
+        {
+            RoleId = roleId,
+            PermissionId = permissionId
+        };
+        var mr = await grpcClient.AddPermissionToRoleAsync(request);
+        return new MethodResponse
+        {
+            Message = mr.Message,
+            IsSuccess = mr.Success
+        };
     }
 
-    public Task<MethodResponse> RemovePermissionFromRoleAsync(string token, int roleId, int permissionId)
+    public async Task<MethodResponse> RemovePermissionFromRoleAsync(string token, int roleId, int permissionId)
     {
-        throw new NotImplementedException();
+        var request = new GrpcRemovePermissionFromRoleRequest
+        {
+            RoleId = roleId,
+            PermissionId = permissionId
+        };
+        var mr = await grpcClient.RemovePermissionFromRoleAsync(request);
+        return new MethodResponse
+        {
+            Message = mr.Message,
+            IsSuccess = mr.Success
+        };
     }
 }
