@@ -2,6 +2,7 @@
 using Common.Application.Repositories;
 using Common.Application.Services;
 using Common.Core.DTOs;
+using Common.Logging.Events.Backend;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -21,7 +22,8 @@ public class ListAvailableTickersRequestHandler(
         logger.LogInformation("Handling ListAvailableTickersRequest");
         var key = CacheKeyGenerator.AvailableTickers();
         var tickers = await cache.GetAsync<List<TickerDto>>(key);
-        logger.LogInformation("Fetched tickers from cache. Ticker count: {}", tickers?.Count);
+        logger.LogInformation(TrackListLogEvents.ListAvailableTickers, "Fetched tickers from cache. Ticker count: {}",
+            tickers?.Count);
         // todo use grpc to fetch & update cache
         return tickers;
     }
