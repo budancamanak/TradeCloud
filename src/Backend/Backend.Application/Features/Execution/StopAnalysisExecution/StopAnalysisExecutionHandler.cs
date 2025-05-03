@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Backend.Application.Abstraction.Repositories;
 using Common.Core.Models;
+using Common.Logging.Events.Backend;
 using Common.Messaging.Abstraction;
 using Common.Messaging.Events.AnalysisExecution;
 using FluentValidation;
@@ -20,9 +21,11 @@ public class StopAnalysisExecutionHandler(
 {
     public async Task<MethodResponse> Handle(StopAnalysisExecutionRequest request, CancellationToken cancellationToken)
     {
-        logger.LogDebug("Validating  stop analysis request");
+        logger.LogDebug(AnalysisExecutionLogEvents.StopAnalysisExecution,
+            "Validating stop analysis[{AnalysisExecution}] request", request.AnalysisExecutionId);
         await validator.ValidateAndThrowAsync(request, cancellationToken);
-        logger.LogInformation("StopAnalysisExecutionHandler> Fetching plugins of {}", request.AnalysisExecutionId);
+        logger.LogInformation(AnalysisExecutionLogEvents.StopAnalysisExecution,
+            "Stopping analysis execution> Fetching plugins of {AnalysisExecution}", request.AnalysisExecutionId);
         await analysisExecutionRepository.SetAnalysisExecutionProgress(request.AnalysisExecutionId, 100, 100);
         var executions = await pluginRepository.GetPluginOfAnalysis(request.AnalysisExecutionId);
         var @event = new StopAnalysisEvent
@@ -31,8 +34,9 @@ public class StopAnalysisExecutionHandler(
             EventId = Guid.NewGuid(),
             PluginExecutionIds = executions.Select(s => s.Id).ToArray()
         };
-        logger.LogInformation("Sending stop event to message broker on PluginExecutionIds:{}",
-            string.Join(",", @event.PluginExecutionIds));
+        logger.LogInformation(
+            "Sending stop event of analysis[{AnalysisExecution}] to message broker on PluginExecutionIds:{PluginExecutions}",
+            request.AnalysisExecutionId, string.Join(",", @event.PluginExecutionIds));
         await messageBroker.PublishAsync(@event);
         return MethodResponse.Success("Done");
     }
