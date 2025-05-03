@@ -7,6 +7,7 @@ using Common.Security.Attributes;
 using Common.Security.Enums;
 using Common.Web.Http;
 using MassTransit.Mediator;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.API.Controllers;
@@ -55,8 +56,58 @@ public class UserController(
         // var result = await mediator.Send(request);
         // return result;
         var token = contextAccessor?.HttpContext?.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-
+        if (string.IsNullOrWhiteSpace(token))
+            return MethodResponse.Error("Unauthorized");
         var mr = await userGrpcClient.AddRoleToUserAsync(token, userId, roleId);
+        return mr;
+    }
+
+    [HttpDelete("/User/{userId:int}/Role/{roleId:int}")]
+    [HasPermission(Permissions.Enum.AssignRoles, Permissions.Enum.ManageUsers)]
+    [HasRole(Roles.Enum.Admin)]
+    public async Task<MethodResponse> RemoveRoleFromUser(int userId, int roleId)
+    {
+        // var currentUser = contextAccessor.CurrentUser();
+        // var request = new ListAvailablePluginsRequest();
+        // var result = await mediator.Send(request);
+        // return result;
+        var token = contextAccessor?.HttpContext?.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+        if (string.IsNullOrWhiteSpace(token))
+            return MethodResponse.Error("Unauthorized");
+        var mr = await userGrpcClient.RemoveRoleFromUserAsync(token, userId, roleId);
+        return mr;
+    }
+
+
+    [HttpPost("/Role/{roleId:int}/Permission/{permissionId:int}")]
+    [HasPermission(Permissions.Enum.AssignRoles, Permissions.Enum.ManageUsers)]
+    [HasRole(Roles.Enum.Admin)]
+    public async Task<MethodResponse> AddPermissionToRole(int roleId, int permissionId)
+    {
+        // var currentUser = contextAccessor.CurrentUser();
+        // var request = new ListAvailablePluginsRequest();
+        // var result = await mediator.Send(request);
+        // return result;
+        var token = contextAccessor?.HttpContext?.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+        if (string.IsNullOrWhiteSpace(token))
+            return MethodResponse.Error("Unauthorized");
+        var mr = await userGrpcClient.AddPermissionToRoleAsync(token, roleId, permissionId);
+        return mr;
+    }
+
+    [HttpDelete("/Role/{roleId:int}/Permission/{permissionId:int}")]
+    [HasPermission(Permissions.Enum.AssignRoles, Permissions.Enum.ManageUsers)]
+    [HasRole(Roles.Enum.Admin)]
+    public async Task<MethodResponse> RemovePermissionFromRole(int roleId, int permissionId)
+    {
+        // var currentUser = contextAccessor.CurrentUser();
+        // var request = new ListAvailablePluginsRequest();
+        // var result = await mediator.Send(request);
+        // return result;
+        var token = contextAccessor?.HttpContext?.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+        if (string.IsNullOrWhiteSpace(token))
+            return MethodResponse.Error("Unauthorized");
+        var mr = await userGrpcClient.RemovePermissionFromRoleAsync(token, roleId, permissionId);
         return mr;
     }
 }
