@@ -5,6 +5,7 @@ using Backend.Application.Abstraction.Services;
 using Backend.Domain.Entities;
 using Common.Core.Enums;
 using Common.Core.Models;
+using Common.Logging.Events.Backend;
 using Common.Web.Exceptions;
 using FluentValidation;
 using MediatR;
@@ -26,9 +27,12 @@ public class CreateAnalysisExecutionRequestHandler(
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
         var ticker = await tickerService.GetTickerWithSymbol(request.Symbol);
-        Guard.Against.Null(ticker, exceptionCreator: () => new RequestValidationException("Failed to find ticker"));
+        Guard.Against.Null(ticker,
+            exceptionCreator: () => new RequestValidationException($"Failed to find ticker {request.Symbol}"));
         var plugin = await pluginService.GetPluginInfo(request.PluginIdentifier);
-        Guard.Against.Null(plugin, exceptionCreator: () => new RequestValidationException("Failed to find plugin"));
+        Guard.Against.Null(plugin,
+            exceptionCreator: () =>
+                new RequestValidationException($"Failed to find plugin {request.PluginIdentifier}"));
         var item = mapper.Map<CreateAnalysisExecutionRequest, AnalysisExecution>(request,
             opts =>
             {
@@ -39,9 +43,18 @@ public class CreateAnalysisExecutionRequestHandler(
             }
         );
         Guard.Against.Null(item, message: "Request mapping failed");
-        logger.LogWarning("Creating analysis execution for [{}] in request handler. For {} @ {}",
+        logger.LogInformation(AnalysisExecutionLogEvents.CreateAnalysisExecution,
+            "Creating analysis execution for [{Identifier}] in request handler. For {Symbol} @ {Timeframe}",
             item.PluginIdentifier, request.Symbol, request.Timeframe.GetStringRepresentation());
         var mr = await repository.AddAsync(item);
+        if (mr.IsSuccess)
+            logger.LogInformation(AnalysisExecutionLogEvents.CreateAnalysisExecution,
+                "Created analysis execution for [{Identifier}] in request handler. For {Symbol} @ {Timeframe}",
+                item.PluginIdentifier, request.Symbol, request.Timeframe.GetStringRepresentation());
+        else
+            logger.LogInformation(AnalysisExecutionLogEvents.CreateAnalysisExecution,
+                "Failed to create analysis execution for [{Identifier}] in request handler. For {Symbol} @ {Timeframe}. Reason: {Reason}",
+                item.PluginIdentifier, request.Symbol, request.Timeframe.GetStringRepresentation(), mr.Message);
         return mr;
     }
 }

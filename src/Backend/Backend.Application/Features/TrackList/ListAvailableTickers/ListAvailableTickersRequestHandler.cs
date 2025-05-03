@@ -19,7 +19,7 @@ public class ListAvailableTickersRequestHandler(
     public async Task<List<TickerDto>> Handle(ListAvailableTickersRequest request, CancellationToken cancellationToken)
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
-        logger.LogInformation("Handling ListAvailableTickersRequest");
+        logger.LogInformation(TrackListLogEvents.ListAvailableTickers,"Handling ListAvailableTickersRequest");
         var key = CacheKeyGenerator.AvailableTickers();
         var tickers = await cache.GetAsync<List<TickerDto>>(key);
         logger.LogInformation(TrackListLogEvents.ListAvailableTickers, "Fetched tickers from cache. Ticker count: {}",

@@ -4,6 +4,7 @@ using Backend.Application.Abstraction.Repositories;
 using Backend.Application.Abstraction.Services;
 using Common.Core.DTOs.Backend;
 using Common.Core.Enums;
+using Common.Logging.Events.Backend;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -24,11 +25,12 @@ public class AnalysisExecutionDetailsRequestHandler(
         CancellationToken cancellationToken)
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
-        logger.LogWarning("Getting execution details : {AnalysisExecutionId}", request.AnalysisExecutionId);
+        logger.LogInformation(AnalysisExecutionLogEvents.AnalysisExecutionDetails,
+            "Getting execution details : {AnalysisExecutionId}", request.AnalysisExecutionId);
         var analysis = await analysisExecutionRepository.GetByIdAsync(request.AnalysisExecutionId);
-        Guard.Against.Null(analysis);
+        Guard.Against.Null(analysis, message: $"Failed to find analysis with {request.AnalysisExecutionId}");
         var pluginInfo = await pluginService.GetPluginInfo(analysis.PluginIdentifier);
-        Guard.Against.Null(pluginInfo);
+        Guard.Against.Null(pluginInfo, message: $"Failed to find plugin with {analysis.PluginIdentifier}");
 
         var result = new AnalysisExecutionDto
         {
