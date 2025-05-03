@@ -2,6 +2,8 @@
 using Common.Application.Repositories;
 using Common.Grpc;
 using Common.Plugin.Abstraction;
+using Common.Security.Attributes;
+using Common.Security.Enums;
 using Grpc.Core;
 using MediatR;
 using Worker.Application.Abstraction;
@@ -11,6 +13,8 @@ namespace Worker.API.Grpc;
 public class GrpcWorkerController(IPluginHost pluginHost, ICacheService cache, ILogger<GrpcWorkerController> logger)
     : GrpcAvailablePluginsService.GrpcAvailablePluginsServiceBase
 {
+    [HasPermission(Permissions.Enum.RunAnalysis, Permissions.Enum.ManageScripts)]
+    [HasRole(Roles.Enum.Admin)]
     public override async Task<GrpcGetAvailablePluginsResponse> GetAvailablePlugins(
         GrpcGetAvailablePluginsRequest request,
         ServerCallContext context)
@@ -38,6 +42,8 @@ public class GrpcWorkerController(IPluginHost pluginHost, ICacheService cache, I
         return response;
     }
 
+    [HasPermission(Permissions.Enum.RunAnalysis, Permissions.Enum.ManageScripts)]
+    [HasRole(Roles.Enum.Admin)]
     public override async Task<GrpcAvailablePluginInfoResponse> GetAvailablePluginWithIdentifier(
         GrpcGetAvailablePluginWithIdentifierRequest request, ServerCallContext context)
     {
@@ -52,6 +58,8 @@ public class GrpcWorkerController(IPluginHost pluginHost, ICacheService cache, I
         });
     }
 
+    [HasPermission(Permissions.Enum.RunAnalysis, Permissions.Enum.ManageScripts)]
+    [HasRole(Roles.Enum.Admin)]
     public override async Task<GrpcCanRunNewPluginResponse> GrpcCanRunNewPlugin(GrpcCanRunNewPluginRequest request,
         ServerCallContext context)
     {
@@ -59,6 +67,8 @@ public class GrpcWorkerController(IPluginHost pluginHost, ICacheService cache, I
         return new GrpcCanRunNewPluginResponse { CanRun = mr.IsSuccess };
     }
 
+    [HasPermission(Permissions.Enum.RunAnalysis, Permissions.Enum.ManageScripts)]
+    [HasRole(Roles.Enum.Admin)]
     public override Task<GrpcIsPluginInQueueResponse> GrpcIsPluginInQueue(GrpcIsPluginInQueueRequest request,
         ServerCallContext context)
     {

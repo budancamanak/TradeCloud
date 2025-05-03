@@ -32,6 +32,7 @@
       <ProjectReference Include="..\..\Common\Common.Grpc\Common.Grpc.csproj" />
       <ProjectReference Include="..\..\Common\Common.Logging\Common.Logging.csproj" />
       <ProjectReference Include="..\..\Common\Common.RabbitMQ\Common.RabbitMQ.csproj" />
+      <ProjectReference Include="..\..\Common\Common.Security\Common.Security.csproj" />
       <ProjectReference Include="..\Worker.Application\Worker.Application.csproj" />
       <ProjectReference Include="..\Worker.Infrastructure\Worker.Infrastructure.csproj" />
     </ItemGroup>

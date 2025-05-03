@@ -6,6 +6,7 @@ using Common.Core.DTOs;
 using Common.Core.DTOs.Backend;
 using Common.Core.Models;
 using Common.Security.Attributes;
+using Common.Security.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,8 @@ public class TrackListController(
     IMediator mediator)
 {
     [HttpGet("/AvailableTickers")]
+    [HasPermission(Permissions.Enum.ManageTrackList)]
+    [HasRole(Roles.Enum.Viewer)]
     public async Task<List<TickerDto>> GetAvailableTickers()
     {
         var request = new ListAvailableTickersRequest();
@@ -27,6 +30,8 @@ public class TrackListController(
     }
 
     [HttpGet]
+    [HasPermission(Permissions.Enum.ManageTrackList)]
+    [HasRole(Roles.Enum.Viewer)]
     public async Task<List<TrackListDto>> GetUserTrackList([FromQuery] ListUserTrackListRequest request)
     {
         var result = await mediator.Send(request);
@@ -34,6 +39,8 @@ public class TrackListController(
     }
 
     [HttpPost]
+    [HasPermission(Permissions.Enum.ManageTrackList)]
+    [HasRole(Roles.Enum.Viewer)]
     public async Task<MethodResponse> AddTickerToUserTrackList([FromBody] AddTickerToTrackListRequest request)
     {
         var result = await mediator.Send(request);
@@ -41,6 +48,8 @@ public class TrackListController(
     }
 
     [HttpDelete("User/{userId:int}/Ticker/{tickerId:int}")]
+    [HasPermission(Permissions.Enum.ManageTrackList)]
+    [HasRole(Roles.Enum.Viewer)]
     public async Task<MethodResponse> RemoveTickerFromUserTrackList(int userId, int tickerId)
     {
         var request = new RemoveUserTrackListRequest { UserId = userId, TickerId = tickerId };

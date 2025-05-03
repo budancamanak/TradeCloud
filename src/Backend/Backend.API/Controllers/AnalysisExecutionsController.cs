@@ -16,6 +16,7 @@ using Common.Web.Http;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using StackExchange.Redis;
 
 namespace Backend.API.Controllers;
 
@@ -32,8 +33,8 @@ public class AnalysisExecutionsController(
     IMapper mapper)
 {
     [HttpGet("/AvailablePlugins")]
-    [HasPermission(Permissions.Enum.RunAnalysis, Permissions.Enum.ScheduleTask)]
-    [HasRole(Roles.Enum.Admin, Roles.Enum.Analyst, Roles.Enum.Trader)]
+    [HasPermission(Permissions.Enum.RunAnalysis, Permissions.Enum.ManageScripts)]
+    [HasRole(Roles.Enum.Admin, Roles.Enum.Analyst, Roles.Enum.ScriptDeveloper)]
     public async Task<List<PluginInfo>> GetAvailablePlugins()
     {
         var currentUser = contextAccessor.CurrentUser();
@@ -44,7 +45,8 @@ public class AnalysisExecutionsController(
 
 
     [HttpGet("/ActivePlugins")]
-    [HasRole(Roles.Enum.Analyst)]
+    [HasPermission(Permissions.Enum.RunAnalysis, Permissions.Enum.ManageScripts)]
+    [HasRole(Roles.Enum.Admin, Roles.Enum.Analyst, Roles.Enum.ScriptDeveloper)]
     public async Task<List<PluginExecutionsDto>> GetActivePlugins([FromQuery] ListActivePluginsRequest request)
     {
         var result = await mediator.Send(request);
@@ -52,6 +54,8 @@ public class AnalysisExecutionsController(
     }
 
     [HttpGet("User/{userId:int}/Info")]
+    [HasPermission(Permissions.Enum.ViewResults)]
+    [HasRole(Roles.Enum.Admin, Roles.Enum.Analyst, Roles.Enum.ScriptDeveloper, Roles.Enum.QA)]
     public async Task<List<UserAnalysisExecutionDto>> GetUserAnalysisExecutionInfos(int userId,
         [FromQuery] PluginStatus? status = null)
     {
@@ -61,7 +65,8 @@ public class AnalysisExecutionsController(
     }
 
     [HttpGet("{executionId:int}/Details")]
-    [AllowAnon]
+    [HasPermission(Permissions.Enum.ViewResults)]
+    [HasRole(Roles.Enum.Admin, Roles.Enum.Analyst, Roles.Enum.ScriptDeveloper, Roles.Enum.QA)]
     public async Task<AnalysisExecutionDto> GetAnalysisExecutionDetails(int executionId, [FromQuery] int minimal = 0)
     {
         var request = new AnalysisExecutionDetailsRequest
@@ -72,7 +77,8 @@ public class AnalysisExecutionsController(
 
 
     [HttpPost]
-    // [HasPermission("RunAnalysis")]
+    [HasPermission(Permissions.Enum.RunAnalysis)]
+    [HasRole(Roles.Enum.Admin, Roles.Enum.Analyst, Roles.Enum.ScriptDeveloper)]
     public async Task<MethodResponse> CreateAnalysisExecution([FromBody] CreateAnalysisExecutionModel model)
     {
         var request = mapper.Map<CreateAnalysisExecutionRequest>(model);
@@ -81,7 +87,8 @@ public class AnalysisExecutionsController(
     }
 
     [HttpPatch]
-    // [HasPermission("RunAnalysis")]
+    [HasPermission(Permissions.Enum.RunAnalysis)]
+    [HasRole(Roles.Enum.Admin, Roles.Enum.Analyst, Roles.Enum.ScriptDeveloper)]
     public async Task<MethodResponse> RunAnalysisExecution([FromBody] RunAnalysisExecutionRequest request)
     {
         var result = await mediator.Send(request);
@@ -89,7 +96,8 @@ public class AnalysisExecutionsController(
     }
 
     [HttpDelete("{executionId:int}")]
-    // [HasPermission("RunAnalysis")]
+    [HasPermission(Permissions.Enum.RunAnalysis)]
+    [HasRole(Roles.Enum.Admin, Roles.Enum.Analyst, Roles.Enum.ScriptDeveloper)]
     public async Task<MethodResponse> StopAnalysisExecution(int executionId)
     {
         var request = new StopAnalysisExecutionRequest { AnalysisExecutionId = executionId };

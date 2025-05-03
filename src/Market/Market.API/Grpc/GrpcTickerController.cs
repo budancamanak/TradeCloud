@@ -1,5 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using Common.Grpc;
+using Common.Security.Attributes;
+using Common.Security.Enums;
 using Common.Web.Exceptions;
 using Google.Protobuf.Collections;
 using Grpc.Core;
@@ -10,6 +12,8 @@ namespace Market.API.Grpc;
 public class GrpcTickerController(ITickerRepository repository, ILogger<GrpcTickerController> logger)
     : Common.Grpc.GrpcTickerService.GrpcTickerServiceBase
 {
+    [HasPermission(Permissions.Enum.ViewMarketData)]
+    [HasRole(Roles.Enum.Admin)]
     public override async Task<GrpcAvailableTickersResponse> GetAvailableTickers(GrpcGetAvailableTickersRequest request,
         ServerCallContext context)
     {
@@ -35,6 +39,8 @@ public class GrpcTickerController(ITickerRepository repository, ILogger<GrpcTick
         return result;
     }
 
+    [HasPermission(Permissions.Enum.ViewMarketData)]
+    [HasRole(Roles.Enum.Admin)]
     public override async Task<GrpcTickerResponse> GetTickerWithId(GrpcGetTickerWithIdRequest request,
         ServerCallContext context)
     {
@@ -52,6 +58,8 @@ public class GrpcTickerController(ITickerRepository repository, ILogger<GrpcTick
         };
     }
 
+    [HasPermission(Permissions.Enum.ViewMarketData)]
+    [HasRole(Roles.Enum.Admin)]
     public override async Task<GrpcTickerResponse> GetTickerWithSymbol(GrpcGetTickerWithSymbolRequest request,
         ServerCallContext context)
     {
