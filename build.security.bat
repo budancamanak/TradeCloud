@@ -1,0 +1,1 @@
+docker build -f src\Security\Security.API\Dockerfile -t security-api .
