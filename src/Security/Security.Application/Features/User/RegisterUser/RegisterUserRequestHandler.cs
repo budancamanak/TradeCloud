@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Common.Core.Enums;
 using Common.Core.Models;
+using Common.Logging.Events.Security;
 using Common.Security.Enums;
 using FluentValidation;
 using MediatR;
@@ -28,7 +29,8 @@ public class RegisterUserRequestHandler(
                 return MethodResponse.Error(string.Join(" && ", validated.Errors));
             }
 
-            logger.LogWarning("Registering user with email: {Email} and username: {Username}", request.Email,
+            logger.LogWarning(UserLogEvents.RegisterUser,
+                "Registering user with email: {Email} and username: {Username}", request.Email,
                 request.Username);
             var mr = await userService.RegisterUser(new Domain.Entities.User
             {
@@ -38,13 +40,29 @@ public class RegisterUserRequestHandler(
                 Status = Status.Active,
                 CreatedDate = DateTime.UtcNow
             });
-            if (!mr.IsSuccess) return mr;
+            if (!mr.IsSuccess)
+            {
+                logger.LogCritical(UserLogEvents.RegisterUser,
+                    "Failed to register user with email: {Email} and username: {Username}. Reason: {Reason}",
+                    request.Email,
+                    request.Username, mr.Message);
+                return mr;
+            }
+
             mr = await repository.AddRoleToUser(mr.Id, Roles.Viewer);
             if (mr.IsSuccess) return MethodResponse.Success("User registered successfully with Viewer role.");
+            logger.LogCritical(UserLogEvents.RegisterUser,
+                "Failed to add View Role to user with email: {Email} and username: {Username}. Reason: {Reason}",
+                request.Email,
+                request.Username, mr.Message);
             return MethodResponse.Success("User registered but failed to add Viewer role");
         }
         catch (Exception e)
         {
+            logger.LogCritical(UserLogEvents.RegisterUser,
+                "Failed to register user with email: {Email} and username: {Username}. Reason: {Reason}",
+                request.Email,
+                request.Username, e.Message);
             return MethodResponse.Error(e.Message);
         }
     }

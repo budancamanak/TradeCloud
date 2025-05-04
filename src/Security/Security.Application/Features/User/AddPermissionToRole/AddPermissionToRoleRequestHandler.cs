@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Common.Core.Models;
+using Common.Logging.Events.Security;
 using Common.Security.Enums;
 using FluentValidation;
 using MediatR;
@@ -18,6 +19,8 @@ public class AddPermissionToRoleRequestHandler(
 {
     public async Task<MethodResponse> Handle(AddPermissionToRoleRequest request, CancellationToken cancellationToken)
     {
+        Permissions? permission = null;
+        Roles? role = null;
         try
         {
             var validated = await validator.ValidateAsync(request, cancellationToken);
@@ -26,18 +29,25 @@ public class AddPermissionToRoleRequestHandler(
                 return MethodResponse.Error(string.Join(" && ", validated.Errors));
             }
 
-            var permission = Permissions.FromValue(request.PermissionId)!;
-            var role = Roles.FromValue(request.RoleId)!;
+            permission = Permissions.FromValue(request.PermissionId)!;
+            role = Roles.FromValue(request.RoleId)!;
 
-            logger.LogWarning("Adding permission[{Permission}] to role[{Role}]", permission.Name, role.Name);
+            logger.LogWarning(UserLogEvents.AddPermissionToRole, "Adding permission[{Permission}] to role[{Role}]",
+                permission.Name, role.Name);
 
             var mr = await repository.AddPermissionToRole(role, permission);
             if (mr.IsSuccess)
                 return MethodResponse.Success($"Permission[{permission.Name}] added to Role[{role.Name}].");
-            return MethodResponse.Success($"Failed to add Permission[{permission.Name}] from Role[{role.Name}].");
+            logger.LogCritical(UserLogEvents.AddPermissionToRole,
+                "Failed to add permission[{Permission}] to role[{Role}]. Reason: {Reason}",
+                permission?.Name, role?.Name, mr.Message);
+            return MethodResponse.Success($"Failed to add Permission[{permission?.Name}] from Role[{role?.Name}].");
         }
         catch (Exception e)
         {
+            logger.LogCritical(UserLogEvents.AddPermissionToRole,
+                "Failed to add permission[{Permission}] to role[{Role}]. Reason: {Reason}",
+                permission?.Name, role?.Name, e.Message);
             return MethodResponse.Error(e.Message);
         }
     }
