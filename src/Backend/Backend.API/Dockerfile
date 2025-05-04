@@ -20,6 +20,7 @@ COPY ["src/Common/Common.Application/Common.Application.csproj", "./src/Common/C
 COPY ["src/Common/Common.Grpc/Common.Grpc.csproj", "./src/Common/Common.Grpc/"]
 COPY ["src/Common/Common.Logging/Common.Logging.csproj", "./src/Common/Common.Logging/"]
 COPY ["src/Common/Common.RabbitMQ/Common.RabbitMQ.csproj", "./src/Common/Common.RabbitMQ/"]
+COPY ["src/Common/Common.Security/Common.Security.csproj", "./src/Common/Common.Security/"]
 COPY ["src/Backend/Backend.Domain/Backend.Domain.csproj", "./src/Backend/Backend.Domain/"]
 COPY ["src/Backend/Backend.Application/Backend.Application.csproj", "./src/Backend/Backend.Application/"]
 COPY ["src/Backend/Backend.Infrastructure/Backend.Infrastructure.csproj", "./src/Backend/Backend.Infrastructure/"]

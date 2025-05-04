@@ -19,6 +19,7 @@ COPY ["src/Common/Common.Logging/Common.Logging.csproj", "./src/Common/Common.Lo
 COPY ["src/Common/Common.Web/Common.Web.csproj", "./src/Common/Common.Web/"]
 COPY ["src/Common/Common.Application/Common.Application.csproj", "./src/Common/Common.Application/"]
 COPY ["src/Common/Common.Grpc/Common.Grpc.csproj", "./src/Common/Common.Grpc/"]
+COPY ["src/Common/Common.Security/Common.Security.csproj", "./src/Common/Common.Security/"]
 COPY ["src/Common/Common.RabbitMQ/Common.RabbitMQ.csproj", "./src/Common/Common.RabbitMQ/"]
 COPY ["src/Market/Market.Domain/Market.Domain.csproj", "./src/Market/Market.Domain/"]
 COPY ["src/Market/Market.Application/Market.Application.csproj", "./src/Market/Market.Application/"]

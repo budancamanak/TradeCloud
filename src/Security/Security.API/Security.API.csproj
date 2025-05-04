@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>32447988-360e-4bf5-a7b3-edfa32b684e2</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,6 +28,12 @@
     <ProjectReference Include="..\..\Common\Common.Grpc\Common.Grpc.csproj" />
     <ProjectReference Include="..\..\Common\Common.Logging\Common.Logging.csproj" />
     <ProjectReference Include="..\Security.Infrastructure\Security.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\.dockerignore">
+      <Link>.dockerignore</Link>
+    </Content>
   </ItemGroup>
 
 </Project>
