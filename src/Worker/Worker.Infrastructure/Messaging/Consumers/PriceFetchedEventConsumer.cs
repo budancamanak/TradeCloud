@@ -1,4 +1,5 @@
 ﻿using Common.Core.Enums;
+using Common.Logging.Events;
 using Common.Messaging.Events.PriceFetchEvents;
 using MassTransit;
 using MediatR;
@@ -56,10 +57,10 @@ public class PriceFetchedEventConsumer(
 {
     public async Task Consume(ConsumeContext<PriceFetchedIntegrationEvent> context)
     {
-        logger.LogWarning("CONSUMED >> Price fetch finished");
         var message = context.Message;
-        logger.LogWarning("CONSUMED >> pluginId {}, eventId:{} @ {}", message.PluginId, message.EventId,
-            message.CreatedDate);
+        logger.LogInformation(MQEvents.PriceFetchedEvent,
+            "Price fetch finished for pluginId {PluginId}, eventId:{EventId} @ {Date}", message.PluginId,
+            message.EventId, message.CreatedDate);
         var request = pluginHost.GetRequestFor(message.PluginId);
         var mr = await mediator.Send(request);
         return;

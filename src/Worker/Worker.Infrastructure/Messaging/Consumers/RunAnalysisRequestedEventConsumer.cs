@@ -1,22 +1,26 @@
 ﻿using AutoMapper;
+using Common.Logging.Events;
 using Common.Messaging.Abstraction;
 using Common.Messaging.Events.AnalysisExecution;
 using MassTransit;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Worker.Application.Features.RunAnalysisRequested;
 
 namespace Worker.Infrastructure.Messaging.Consumers;
 
 public class RunAnalysisRequestedEventConsumer(
+    ILogger<RunAnalysisRequestedEventConsumer> logger,
     IMapper mapper,
     IMediator mediator,
-    IPublishEndpoint publishEndpoint,
     IEventBus eventBus)
     : IConsumer<RunAnalysisRequestedEvent>
 {
     public async Task Consume(ConsumeContext<RunAnalysisRequestedEvent> context)
     {
-        // var message = context.Message;
+        logger.LogInformation(MQEvents.RunAnalysisRequestedEvent,
+            "Run analysis event requested for Analysis {AnalysisExecution}, eventId:{TickerId} @ {TimeFrame}",
+            context.Message.ExecutionId, context.Message.Ticker, context.Message.Timeframe);
         var message = mapper.Map<RunAnalysisRequest>(context.Message);
         var mr = await mediator.Send(message);
         if (mr.IsSuccess)
@@ -24,14 +28,6 @@ public class RunAnalysisRequestedEventConsumer(
             // await eventBus.PublishAsync(new PluginStatusEvent(message.ExecutionId, PluginStatus.Queued));
             return;
         }
-
-        /***
-         * this will be run analysis requested event consumer
-         *
-         * .
-         *
-         */
-
 
         throw new NotImplementedException(mr.Message);
     }

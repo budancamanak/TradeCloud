@@ -1,4 +1,5 @@
 ﻿using Common.Core.Enums;
+using Common.Logging.Events.Worker;
 using Common.Messaging.Abstraction;
 using Common.Messaging.Events.PluginExecution;
 using Common.Plugin.Abstraction;
@@ -12,47 +13,45 @@ public class RabbitMQPluginMessageBroker(IEventBus eventBus, ILogger<RabbitMQPlu
 {
     public async Task OnPluginStarted(IPlugin plugin, int executionId)
     {
-        logger.LogWarning("OnPluginStarted: {}", plugin.GetPluginInfo());
+        logger.LogWarning(WorkerLogEvents.PluginMessageBroker, "OnPluginStarted: {PluginInfo}", plugin.GetPluginInfo());
         await eventBus.PublishAsync(new PluginStatusEvent(executionId, PluginStatus.Running));
-        //await eventBus.PublishAsync(new PluginStartedEvent(plugin.GetPluginInfo().Identifier));
     }
 
     public async Task OnPluginSucceeded(IPlugin plugin, int executionId)
     {
-        logger.LogWarning("OnPluginSucceeded: {}", plugin.GetPluginInfo());
-        // await eventBus.PublishAsync(new PluginProgressEvent(executionId, 1.0d));
+        logger.LogWarning(WorkerLogEvents.PluginMessageBroker, "OnPluginSucceeded: {PluginInfo}",
+            plugin.GetPluginInfo());
         await eventBus.PublishAsync(new PluginStatusEvent(executionId, PluginStatus.Success));
-        // await eventBus.PublishAsync(new PluginSucceededEvent(plugin.GetPluginInfo().Identifier));
     }
 
     public async Task OnPluginFailed(IPlugin plugin, int executionId, Exception exception)
     {
-        logger.LogWarning("OnPluginFailed: {} - {}", plugin.GetPluginInfo(), exception);
+        logger.LogWarning(WorkerLogEvents.PluginMessageBroker, "OnPluginFailed: {PluginInfo} - Reason:{Reason}",
+            plugin.GetPluginInfo(), exception);
         await eventBus.PublishAsync(new PluginStatusEvent(executionId, PluginStatus.Failure));
-        // await eventBus.PublishAsync(
-        //     new PluginFailedEvent(plugin.GetPluginInfo().Identifier, exception));
     }
 
     public async Task OnPluginProgress(IPlugin plugin, int executionId, int current, int total)
     {
-        // logger.LogWarning("OnPluginProgress:{}/{} %{} -> {}", current, total, (double)current / total,
-        //     plugin.GetPluginInfo());
+        logger.LogDebug(WorkerLogEvents.PluginMessageBroker,
+            "OnPluginProgress:{Current}/{Total} %{Percentage} -> {PluginInfo}", current, total,
+            (double)current / total,
+            plugin.GetPluginInfo());
         await eventBus.PublishAsync(new PluginProgressEvent(executionId, (double)current / total));
     }
 
     public async Task OnAnalysisProgress(IPlugin plugin, int analysisExecution, int increment, int total)
     {
+        logger.LogDebug(WorkerLogEvents.PluginMessageBroker,
+            "OnPluginProgress:{Total}  -> {PluginInfo}", total,
+            plugin.GetPluginInfo());
         await eventBus.PublishAsync(new AnalysisExecutionProgressEvent(analysisExecution, increment, total));
     }
 
     public async Task OnPluginSignal(IPlugin plugin, int executionId, PluginSignal signal)
     {
-        logger.LogWarning("OnPluginSignal:{} {}", signal, plugin.GetPluginInfo());
+        logger.LogWarning(WorkerLogEvents.PluginMessageBroker, "OnPluginSignal:{Signal} for {PluginInfo}", signal,
+            plugin.GetPluginInfo());
         await eventBus.PublishAsync(new PluginSignalEvent(executionId, signal));
-    }
-
-    public void Log(string arg)
-    {
-        logger.LogWarning("Log from plugin: {}", arg);
     }
 }

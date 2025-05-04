@@ -4,6 +4,7 @@ using Common.Application.Repositories;
 using Common.Application.Services;
 using Common.Core.Enums;
 using Common.Core.Models;
+using Common.Logging.Events.Worker;
 using Common.Plugin.Abstraction;
 using Common.Plugin.Models;
 using Microsoft.Extensions.Configuration;
@@ -46,7 +47,7 @@ public class PluginHost : IPluginHost
         var max = configuration["Plugins:MaxConcurrentPluginRun"];
         _maxActivePlugin = string.IsNullOrWhiteSpace(max) ? 5 : int.Parse(max);
         if (_pluginsLoaded) return;
-        logger.LogInformation("Loading plugins");
+        logger.LogInformation(WorkerLogEvents.PluginHost, "Loading plugins");
         _pluginLoader = new PluginLoader(scopeFactory, configuration, cache, _messageBroker, this, logger);
         _pluginsLoaded = true;
     }
@@ -57,13 +58,6 @@ public class PluginHost : IPluginHost
     {
         return _waitingAnalysisRequests.TryAdd(request.ExecutionId, request);
     }
-
-    // public RunPluginRequest GetRequestFor(int pluginId)
-    // {
-    //     var item = _waitingPluginRequests.GetValueOrDefault(pluginId);
-    //     if (item == null) throw new NotFoundException(pluginId.ToString(), "Plugin Request Not found ");
-    //     return item;
-    // }
 
     public RunAnalysisRequest GetRequestFor(int pluginId)
     {
@@ -77,28 +71,24 @@ public class PluginHost : IPluginHost
         _waitingAnalysisRequests.TryRemove(pluginId, out _);
     }
 
-    public async Task<MethodResponse> RunPlugin(int pluginId)
+    public async Task<List<PluginRunInfo>> GetPluginToRun(int analysisId)
     {
-        // plugin.Run(prices!);
-        return MethodResponse.Success("Plugin ran");
-    }
-
-    public async Task<List<PluginRunInfo>> GetPluginToRun(int pluginId)
-    {
-        _logger.LogInformation("PluginHost.RunPlugin requested: {}", pluginId);
+        _logger.LogInformation(WorkerLogEvents.PluginHost,
+            "PluginHost.RunPlugin requested for Analysis[{AnalysisExecution}]",
+            analysisId);
         var items = new List<PluginRunInfo>();
-        var request = _waitingAnalysisRequests.GetValueOrDefault(pluginId);
-        if (request == null) throw new NotFoundException(pluginId.ToString(), "Plugin not found in waiting list");
+        var request = _waitingAnalysisRequests.GetValueOrDefault(analysisId);
+        if (request == null) throw new NotFoundException(analysisId.ToString(), "Analysis not found in waiting list");
         foreach (var info in request.PluginInfos)
         {
             var priceCacheKey = CacheKeyGenerator.PluginKey(request.StartDate,
                 request.EndDate, request.Ticker, request.Timeframe.TimeFrameFromString());
             var tickerCacheKey = CacheKeyGenerator.TickerKey(request.Ticker);
             var plugin = _pluginLoader.CreatePlugin(request.Identifier);
-            _logger.LogInformation("Executing plugin: {}", pluginId);
+            _logger.LogInformation(WorkerLogEvents.PluginHost, "Executing plugin with Id:{PluginId}",
+                info.PluginExecutionId);
             await _cache.SetAsync(CacheKeyGenerator.ActivePluginParamsKey(info.PluginExecutionId),
                 new PluginParamModel { TradingParams = "", ParamSet = info.PluginParameters }, TimeSpan.MaxValue);
-            // return new Tuple<IPlugin, string, string>(plugin, cacheKey, tickerCacheKey);
             items.Add(new PluginRunInfo
             {
                 Plugin = plugin,
@@ -131,7 +121,7 @@ public class PluginHost : IPluginHost
     {
         if (!_activePlugins.TryGetValue(pluginId, out var status))
             throw new ArgumentException("Plugin not found in active list");
-        _logger.LogInformation("Plugin[{}]'s status is {}", pluginId, status);
+        _logger.LogDebug(WorkerLogEvents.PluginHost, "Plugin[{PluginId}]'s status is {Status}", pluginId, status);
     }
 
     public void OnPluginFinished(int pluginId)

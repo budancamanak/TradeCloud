@@ -1,4 +1,5 @@
-﻿using Common.Messaging.Events.AnalysisExecution;
+﻿using Common.Logging.Events;
+using Common.Messaging.Events.AnalysisExecution;
 using Common.Plugin.Abstraction;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -11,10 +12,14 @@ public class StopAnalysisExecutionConsumer(
 {
     public Task Consume(ConsumeContext<StopAnalysisEvent> context)
     {
+        logger.LogInformation(MQEvents.StopAnalysisEvent,
+            "Run analysis event requested for PluginIds[{AnalysisExecution}] @ {Date}",
+            string.Join(",", context.Message.PluginExecutionIds), context.Message.CreatedDate);
         logger.LogInformation("Consuming stop analysis event");
         foreach (var executionId in context.Message.PluginExecutionIds)
         {
-            logger.LogInformation("Processing stop analysis event: {}", executionId);
+            logger.LogInformation(MQEvents.StopAnalysisEvent, "Processing stop analysis event: PluginId[{PluginId}]",
+                executionId);
             stateManager.OnPluginStopped(executionId);
         }
 

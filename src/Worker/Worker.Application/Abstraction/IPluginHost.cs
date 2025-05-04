@@ -8,15 +8,8 @@ public interface IPluginHost : IPluginStateManager
 {
     IList<IPlugin> Plugins();
     bool AddAnalysisToQueue(RunAnalysisRequest requested);
-
     void RemovePluginFromQueue(int pluginId);
-
-    // RunPluginRequest GetRequestFor(int pluginId);
     RunAnalysisRequest GetRequestFor(int pluginId);
-
-    Task<MethodResponse> RunPlugin(int pluginId);
-
-    // Tuple<IPlugin,string,string> GetPluginToRun(int requestExecutionId);
     Task<List<PluginRunInfo>> GetPluginToRun(int requestExecutionId);
     Task<MethodResponse> CanNewPluginRun();
     MethodResponse IsPluginInQueue(int pluginId);

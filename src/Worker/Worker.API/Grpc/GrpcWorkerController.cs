@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Common.Application.Repositories;
 using Common.Grpc;
+using Common.Logging.Events.Worker;
 using Common.Plugin.Abstraction;
 using Common.Security.Attributes;
 using Common.Security.Enums;
@@ -19,12 +20,7 @@ public class GrpcWorkerController(IPluginHost pluginHost, ICacheService cache, I
         GrpcGetAvailablePluginsRequest request,
         ServerCallContext context)
     {
-        logger.LogInformation("Getting available plugins");
-        // var input = mapper.Map<GetPricesForPluginQuery>(request);
-        // var data = await mediator.Send(input);
-        // var output = mapper.Map<GrpcGetAvailablePluginsResponse>(data);
-        // return output;
-        // throw new NotImplementedException("");
+        logger.LogInformation(WorkerLogEvents.GrpcWorkerAPI, "Getting available plugins");
         var plugins = pluginHost.Plugins().Select(f => f.GetPluginInfo()).ToList();
 
         var response = new GrpcGetAvailablePluginsResponse
@@ -47,9 +43,7 @@ public class GrpcWorkerController(IPluginHost pluginHost, ICacheService cache, I
     public override async Task<GrpcAvailablePluginInfoResponse> GetAvailablePluginWithIdentifier(
         GrpcGetAvailablePluginWithIdentifierRequest request, ServerCallContext context)
     {
-        // var plugins = await cache.GetAsync<List<IPlugin.PluginInfo>>("AvailablePlugins");
         var item = pluginHost.Plugins().FirstOrDefault(f => f.GetPluginInfo().Identifier == request.Identifier);
-        // var item = plugins.FirstOrDefault(f => f.Identifier == request.Identifier);
         return await Task.FromResult(new GrpcAvailablePluginInfoResponse
         {
             Identifier = item.GetPluginInfo().Identifier,

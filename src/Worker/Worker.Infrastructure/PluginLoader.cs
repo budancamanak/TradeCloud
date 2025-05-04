@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Common.Application.Repositories;
+using Common.Logging.Events.Worker;
 using Common.Plugin.Abstraction;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +30,7 @@ public class PluginLoader : IPluginLoader
         _pluginFolder = configuration["Plugins:Folder"];
         if (string.IsNullOrWhiteSpace(_pluginFolder))
             _pluginFolder = $"{Path.GetDirectoryName(typeof(PluginLoader).Assembly.Location)}";
+        logger.LogWarning(WorkerLogEvents.PluginLoader, "Using {PluginPath} to load plugins from", _pluginFolder);
         _plugins = LoadPlugins();
     }
 
@@ -70,7 +72,8 @@ public class PluginLoader : IPluginLoader
         }
 
         if (count == 0) yield break;
-        _logger.LogInformation("Loading {} plugins from: {}", count, pluginPath);
+        _logger.LogInformation(WorkerLogEvents.PluginLoader, "Loading {Count} plugins from: {PluginPath}", count,
+            pluginPath);
     }
 
     private IPlugin? CreatePlugin(Type type)

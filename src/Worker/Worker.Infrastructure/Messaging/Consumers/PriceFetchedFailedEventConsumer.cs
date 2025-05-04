@@ -1,11 +1,18 @@
-﻿using MassTransit;
+﻿using Common.Logging.Events;
+using Common.Messaging.Events.PriceFetchEvents;
+using MassTransit;
+using Microsoft.Extensions.Logging;
 
 namespace Worker.Infrastructure.Messaging.Consumers;
 
-public class PriceFetchedFailedEventConsumer : IConsumer<PriceFetchedFailedEventConsumer>
+public class PriceFetchedFailedEventConsumer(
+    ILogger<PriceFetchedFailedEventConsumer> logger) : IConsumer<PriceFetchedFailedIntegrationEvent>
 {
-    public Task Consume(ConsumeContext<PriceFetchedFailedEventConsumer> context)
+    public Task Consume(ConsumeContext<PriceFetchedFailedIntegrationEvent> context)
     {
-        throw new NotImplementedException();
+        logger.LogInformation(MQEvents.PriceFetchedFailedEvent,
+            "Price fetch finished for pluginId {PluginId}, @ {Date}. Reason: {Reason}", context.Message.PluginId,
+            context.Message.CreatedDate, context.Message.Message);
+        return Task.CompletedTask;
     }
 }

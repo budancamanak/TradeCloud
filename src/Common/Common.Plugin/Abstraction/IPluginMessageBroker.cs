@@ -10,5 +10,4 @@ public interface IPluginMessageBroker
     Task OnPluginProgress(IPlugin plugin,int executionId, int current, int total);
     Task OnAnalysisProgress(IPlugin plugin,int executionId, int increment, int total);
     Task OnPluginSignal(IPlugin plugin,int executionId, PluginSignal signal);
-    void Log(string arg);
 }
