@@ -29,6 +29,7 @@ public static class LogHelper
             .Enrich.FromLogContext()
             .Enrich.WithExceptionDetails()
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.AspNetCore.HttpLogging.HttpLoggingMiddleware", LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
             .WriteTo.Console();
 
