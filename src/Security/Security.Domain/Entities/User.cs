@@ -14,4 +14,9 @@ public class User
 
     public virtual ICollection<UserLogin> UserLogins { get; set; } = [];
     public virtual ICollection<Role> UserRoles { get; set; } = [];
+
+    public override string ToString()
+    {
+        return $"Id:{Id}, Username:{Username}, Email:{Email}, Status:{Status}";
+    }
 }

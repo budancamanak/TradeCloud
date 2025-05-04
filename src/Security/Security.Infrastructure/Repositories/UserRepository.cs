@@ -16,7 +16,7 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
     public async Task<User> GetByIdAsync(int id)
     {
         Guard.Against.NegativeOrZero(id);
-        var user = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == id);
+        var user = await dbContext.Users.FindAsync(id);
         Guard.Against.NotFound(id, user);
         return user;
     }
@@ -79,7 +79,7 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
         Guard.Against.NegativeOrZero(item.Id);
         // todo implement User validators
         await validator.ValidateAndThrowAsync(item);
-        var existing = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == item.Id);
+        var existing = await dbContext.Users.FindAsync(item.Id);
         Guard.Against.NotFound(item.Id, existing);
 
         existing.Username = item.Username;
@@ -93,7 +93,7 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
     {
         Guard.Against.Null(item);
         Guard.Against.NegativeOrZero(item.Id);
-        var existing = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == item.Id);
+        var existing = await dbContext.Users.FindAsync(item.Id);
         Guard.Against.NotFound(item.Id, existing);
         if (item.Username != existing.Username || item.Email != existing.Email)
             throw new ArgumentException("User info mismatch");
@@ -103,7 +103,7 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
     public async Task<MethodResponse> DeleteAsync(int id)
     {
         Guard.Against.NegativeOrZero(id);
-        var existing = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == id);
+        var existing = await dbContext.Users.FindAsync(id);
         Guard.Against.NotFound(id, existing);
         return await _DeleteUser(existing);
     }
@@ -139,7 +139,7 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
         Guard.Against.NegativeOrZero(id);
         Guard.Against.NullOrWhiteSpace(password);
         var existing =
-            await dbContext.Users.FirstOrDefaultAsync(f => f.Id == id);
+            await dbContext.Users.FindAsync(id);
         Guard.Against.Null(existing, "User not found");
         existing.Password = BCrypt.Net.BCrypt.HashPassword(password, 12);
         var result = await dbContext.SaveChangesAsync();
@@ -151,7 +151,7 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
     {
         Guard.Against.NegativeOrZero(id);
         Guard.Against.Null(status);
-        var existing = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == id);
+        var existing = await dbContext.Users.FindAsync(id);
         Guard.Against.Null(existing);
         existing.Status = status;
         var result = await dbContext.SaveChangesAsync();
@@ -164,7 +164,7 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
         Guard.Against.NegativeOrZero(userId);
         var item = await dbContext.Users.Include(user => user.UserRoles).FirstOrDefaultAsync(f => f.Id == userId);
         Guard.Against.Null(item);
-        var role = await dbContext.Roles.FirstOrDefaultAsync(f => f.Id == eRole.Value);
+        var role = await dbContext.Roles.FindAsync(eRole.Value);
         Guard.Against.Null(role);
         item.UserRoles.Add(role);
         var result = await dbContext.SaveChangesAsync();

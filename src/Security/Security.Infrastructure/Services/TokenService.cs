@@ -4,7 +4,9 @@ using System.Text;
 using Common.Application.Repositories;
 using Common.Application.Services;
 using Common.Grpc;
+using Common.Logging.Events.Security;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Security.Application.Abstraction.Repositories;
@@ -15,7 +17,11 @@ using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegiste
 
 namespace Security.Infrastructure.Services;
 
-public sealed class TokenService(IConfiguration configuration, ICacheService cache, IUserRepository repository)
+public sealed class TokenService(
+    ILogger<TokenService> logger,
+    IConfiguration configuration,
+    ICacheService cache,
+    IUserRepository repository)
     : ITokenService
 {
     public string GenerateToken(User user, string clientIp)
@@ -45,6 +51,8 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
         }
         catch (Exception e)
         {
+            logger.LogCritical(UserLogEvents.TokenService,
+                "Failed to generate token for user[{User}]. Reason: {Reason}", user.ToString(), e.Message);
             return string.Empty;
         }
     }
@@ -158,6 +166,8 @@ public sealed class TokenService(IConfiguration configuration, ICacheService cac
         }
         catch (Exception ex)
         {
+            logger.LogCritical(UserLogEvents.TokenService,
+                "Failed to validate token[{Token}]. Reason: {Reason}", token, ex.Message);
             return new GrpcValidateTokenResponse
             {
                 IsValid = false,

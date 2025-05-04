@@ -3,7 +3,9 @@ using Common.Application.Repositories;
 using Common.Application.Services;
 using Common.Core.Models;
 using Common.Core.Serialization;
+using Common.Logging.Events.Security;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Security.Application.Abstraction.Repositories;
@@ -13,6 +15,7 @@ using Security.Domain.Entities;
 namespace Security.Infrastructure.Services;
 
 public class UserService(
+    ILogger<UserService> logger,
     IUserRepository repository,
     ITokenService tokenService,
     ICacheService cache,
@@ -33,6 +36,7 @@ public class UserService(
         }
         catch (Exception e)
         {
+            logger.LogCritical(UserLogEvents.UserService, "Failed to register user. Reason: {Reason}", e.Message);
             return MethodResponse.Error(e.Message);
         }
     }
@@ -68,6 +72,7 @@ public class UserService(
         }
         catch (Exception e)
         {
+            logger.LogCritical(UserLogEvents.UserService, "Failed to login user. Reason: {Reason}", e.Message);
             return MethodResponse.Error(e.Message);
         }
     }
@@ -75,21 +80,29 @@ public class UserService(
     public async Task<MethodResponse> LogoutUser(string token)
     {
         // todo set UserLogin as expired as well.
-        var loginInfo = await cache.GetAsync<UserLogin>(CacheKeyGenerator.UserTokenInfoKey(token));
-        if (loginInfo != null)
+        try
         {
-            loginInfo.IsLoggedOut = true;
+            var loginInfo = await cache.GetAsync<UserLogin>(CacheKeyGenerator.UserTokenInfoKey(token));
+            if (loginInfo != null)
+            {
+                loginInfo.IsLoggedOut = true;
+            }
+
+            await cache.SetAsync(CacheKeyGenerator.UserTokenInfoKey(token), loginInfo, TimeSpan.FromSeconds(1));
+
+            loginInfo = await repository.GetUserLoginInfo(token);
+            if (loginInfo != null)
+            {
+                await repository.SetUserLoginInfoLoggedOut(token, true);
+            }
+
+            return MethodResponse.Success("User logged out");
         }
-
-        await cache.SetAsync(CacheKeyGenerator.UserTokenInfoKey(token), loginInfo, TimeSpan.FromSeconds(1));
-
-        loginInfo = await repository.GetUserLoginInfo(token);
-        if (loginInfo != null)
+        catch (Exception e)
         {
-            await repository.SetUserLoginInfoLoggedOut(token, true);
+            logger.LogCritical(UserLogEvents.UserService, "Failed to logout user. Reason: {Reason}", e.Message);
+            return MethodResponse.Error(e.Message);
         }
-
-        return MethodResponse.Success("User logged out");
     }
 
     public async Task<List<Permission>> GetUserPermissions(string userId)
@@ -105,6 +118,8 @@ public class UserService(
         }
         catch (Exception e)
         {
+            logger.LogCritical(UserLogEvents.UserService,
+                "Failed to get user[{UserId}] permissions user. Reason: {Reason}", userId, e.Message);
             return [];
         }
     }
@@ -122,6 +137,8 @@ public class UserService(
         }
         catch (Exception e)
         {
+            logger.LogCritical(UserLogEvents.UserService, "Failed to get user[{UserId}] roles user. Reason: {Reason}",
+                userId, e.Message);
             return [];
         }
     }
