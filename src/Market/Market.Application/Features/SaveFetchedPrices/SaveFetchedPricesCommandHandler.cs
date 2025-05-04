@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Common.Core.DTOs;
 using Common.Core.Models;
+using Common.Logging.Events.Market;
 using Common.Messaging.Abstraction;
 using Common.Messaging.Events.PriceFetchEvents;
 using FluentValidation;
@@ -29,9 +30,13 @@ public class SaveFetchedPricesCommandHandler(
                 opt.Items["TickerId"] = request.TickerId;
                 opt.Items["TimeFrame"] = request.TimeFrame;
             });
-        logger.LogInformation("Prices fetched for plugin[{}]. Saving.. {}", request.PluginId, dtos.Count);
+        logger.LogInformation(MarketLogEvents.PriceFetchCompleted,
+            "Prices fetched for plugin[{PluginId}]. Saving.. Count:{Count}",
+            request.PluginId, dtos.Count);
         var mr = await priceService.SaveMissingPricesAsync(dtos, request.CacheKey);
-        logger.LogInformation("Prices fetched for plugin[{}]. Saved.. {}", request.PluginId, mr);
+        logger.LogInformation(MarketLogEvents.PriceFetchCompleted,
+            "Prices fetched for plugin[{PluginId}]. Saved.. Response: {Result}",
+            request.PluginId, mr);
         if (mr.IsSuccess)
             await bus.PublishAsync(new PriceFetchedIntegrationEvent(request.PluginId));
         else

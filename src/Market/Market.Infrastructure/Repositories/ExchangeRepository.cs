@@ -51,8 +51,7 @@ public class ExchangeRepository(
         Guard.Against.NegativeOrZero(exchange.Id);
         var existing = await dbContext.Exchanges.FirstOrDefaultAsync(f => f.Id == exchange.Id);
         Guard.Against.NotFound(exchange.Id, existing);
-
-
+        
         existing.Name = exchange.Name;
         existing.ConnectionUrl = exchange.ConnectionUrl;
         var result = await dbContext.SaveChangesAsync();

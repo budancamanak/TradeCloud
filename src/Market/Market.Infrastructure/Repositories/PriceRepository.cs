@@ -145,12 +145,5 @@ public class PriceRepository(MarketDbContext dbContext, IValidator<Price> valida
     {
         throw new NotImplementedException("not supported");
     }
-
-    // private async Task<MethodResponse> _DeletePrice(Price existing)
-    // {
-    //     dbContext.Prices.Remove(existing);
-    //     var result = await dbContext.SaveChangesAsync();
-    //     if (result == 0) return MethodResponse.Error("Failed to delete price");
-    //     return MethodResponse.Success(result, "Price deleted");
-    // }
+    
 }

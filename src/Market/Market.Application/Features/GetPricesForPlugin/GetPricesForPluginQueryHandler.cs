@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using Common.Core.DTOs;
+using Common.Logging.Events.Market;
 using FluentValidation;
 using Hangfire;
 using Market.Application.Abstraction.Services;
@@ -24,15 +25,15 @@ public class GetPricesForPluginQueryHandler(
     public async Task<IList<PriceDto>> Handle(GetPricesForPluginQuery request, CancellationToken cancellationToken)
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
-        // var fetchRequest =await tickerService.CreateFetchRequest(request.PluginId, request.TickerId, request.Timeframe);
         var fetchRequest = await tickerService.CreateFetchRequest(request);
         Guard.Against.Null(fetchRequest);
         var prices = await priceService.GetPricesForPluginAsync(request.CacheKey, request.PluginId,
             request.TickerId, request.Timeframe, request.StartDate, request.EndDate);
         if (!fetchCalculatorService.CheckPriceFetchIfNeeded(prices, request.StartDate, request.EndDate))
         {
-            logger.LogInformation("Price information is enough for plugin[{}] to run. cache key:{}", request.PluginId,
-                request.CacheKey);
+            logger.LogInformation(MarketLogEvents.GetPricesForPluginQuery,
+                "Price information is enough for plugin[{PluginId}] to run. cache key:{CacheKey}",
+                request.PluginId, request.CacheKey);
             await priceService.CachePrices(prices, request.CacheKey);
             return prices;
         }
@@ -40,12 +41,13 @@ public class GetPricesForPluginQueryHandler(
         var pages = PriceFetchPageCalculator.ToPages(request.Timeframe, request.StartDate, request.EndDate,
             Constants.PriceFetchLimit);
 
-        logger.LogDebug(
-            "Starting background job to fetch prices for plugin[{}], total pages:{}, {}", request.PluginId, pages.Count,
-            request);
+        logger.LogInformation(MarketLogEvents.GetPricesForPluginQuery,
+            "Starting background job to fetch prices for plugin[{PluginId}], total pages:{TotalPages},Request: {Request}",
+            request.PluginId, pages.Count, request);
         var identifier =
             jobClient.Enqueue(() => fetchJob.StartFetchPrices(pages, fetchRequest, CancellationToken.None));
-        logger.LogInformation("Started background job with id[{}] to fetch prices for plugin[{}]", identifier,
+        logger.LogInformation(MarketLogEvents.GetPricesForPluginQuery,
+            "Started background job with id[{JobId}] to fetch prices for plugin[{PluginId}]", identifier,
             request.PluginId);
         return new List<PriceDto>();
     }
