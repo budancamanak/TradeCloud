@@ -14,12 +14,12 @@ namespace Backend.Infrastructure.Repositories;
 public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<AnalysisExecution> validator)
     : IAnalysisExecutionRepository
 {
-    public Task<AnalysisExecution> GetByIdAsync(int id)
+    public async Task<AnalysisExecution> GetByIdAsync(int id)
     {
         Guard.Against.NegativeOrZero(id);
-        var item = dbContext.AnalysisExecutions.FirstOrDefault(f => f.Id == id);
-        Guard.Against.Null(item, nameof(item));
-        return Task.FromResult(item);
+        var item = await dbContext.AnalysisExecutions.FindAsync(id);
+        Guard.Against.Null(item, message: $"Failed to find analysis execution with Id[{id}]");
+        return item;
     }
 
     public async Task<List<AnalysisExecution>> GetAllAsync()
@@ -31,7 +31,7 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
     {
         Guard.Against.Null(item);
         await validator.ValidateAndThrowAsync(item);
-        var existing = dbContext.AnalysisExecutions.FirstOrDefault(f => f.Id == item.Id);
+        var existing = await dbContext.AnalysisExecutions.FindAsync(item.Id);
         Guard.Against.NonNull(existing, "Plugin already registered", AlreadySavedException.Creator);
         existing = dbContext.AnalysisExecutions.FirstOrDefault(f =>
             f.PluginIdentifier == item.PluginIdentifier && f.Timeframe == item.Timeframe &&
@@ -48,7 +48,7 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
     {
         Guard.Against.Null(item);
         await validator.ValidateAndThrowAsync(item);
-        var existing = dbContext.AnalysisExecutions.FirstOrDefault(f => f.Id == item.Id);
+        var existing = await dbContext.AnalysisExecutions.FindAsync(item.Id);
         Guard.Against.Null(existing);
         existing.ParamSet = item.ParamSet;
         existing.TradingParams = item.TradingParams;
@@ -63,14 +63,21 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
         return MethodResponse.Error("Failed to update execution");
     }
 
-    public Task<MethodResponse> DeleteAsync(AnalysisExecution item)
+    public async Task<MethodResponse> DeleteAsync(AnalysisExecution item)
     {
-        throw new NotImplementedException();
+        Guard.Against.Null(item);
+        return await DeleteAsync(item.Id);
     }
 
-    public Task<MethodResponse> DeleteAsync(int id)
+    public async Task<MethodResponse> DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        Guard.Against.NegativeOrZero(id);
+        var existing = await dbContext.AnalysisExecutions.FindAsync(id);
+        Guard.Against.Null(existing);
+        dbContext.AnalysisExecutions.Remove(existing);
+        var result = await dbContext.SaveChangesAsync();
+        if (result > 0) return MethodResponse.Success(result, $"Analysis Execution[{id}] deleted");
+        return MethodResponse.Error($"Failed to delete Analysis Execution[{id}]");
     }
 
     public async Task<List<AnalysisExecution>> GetUserAnalysisExecutions(int userId)

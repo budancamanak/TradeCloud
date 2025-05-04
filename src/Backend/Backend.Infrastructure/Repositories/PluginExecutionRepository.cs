@@ -17,7 +17,7 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
     public async Task<PluginExecution> GetByIdAsync(int id)
     {
         Guard.Against.NegativeOrZero(id);
-        var item = await dbContext.PluginExecutions.FirstOrDefaultAsync(f => f.Id == id);
+        var item = await dbContext.PluginExecutions.FindAsync(id);
         Guard.Against.Null(item);
         return item;
     }
@@ -31,7 +31,7 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
     {
         Guard.Against.Null(item);
         await validator.ValidateAndThrowAsync(item);
-        var existing = dbContext.PluginExecutions.FirstOrDefault(f =>
+        var existing = await dbContext.PluginExecutions.FirstOrDefaultAsync(f =>
             f.AnalysisExecutionId == item.AnalysisExecutionId && f.ParamSet == item.ParamSet &&
             f.Status != PluginStatus.Failure && f.Status != PluginStatus.Success);
         Guard.Against.NonNull(existing, "Plugin already registered", AlreadySavedException.Creator);
@@ -45,7 +45,7 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
     {
         Guard.Against.Null(item);
         await validator.ValidateAndThrowAsync(item);
-        var existing = dbContext.PluginExecutions.FirstOrDefault(f => f.Id == item.Id);
+        var existing = await dbContext.PluginExecutions.FindAsync(item.Id);
         Guard.Against.Null(existing);
         existing.Status = item.Status;
         existing.ParamSet = item.ParamSet;
@@ -56,14 +56,22 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
         return MethodResponse.Error("Failed to update execution");
     }
 
-    public Task<MethodResponse> DeleteAsync(PluginExecution item)
+    public async Task<MethodResponse> DeleteAsync(PluginExecution item)
     {
-        throw new NotImplementedException();
+        Guard.Against.Null(item);
+        await validator.ValidateAndThrowAsync(item);
+        return await DeleteAsync(item.Id);
     }
 
-    public Task<MethodResponse> DeleteAsync(int id)
+    public async Task<MethodResponse> DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        Guard.Against.NegativeOrZero(id);
+        var existing = await dbContext.PluginExecutions.FindAsync(id);
+        Guard.Against.Null(existing);
+        dbContext.PluginExecutions.Remove(existing);
+        var result = await dbContext.SaveChangesAsync();
+        if (result > 0) return MethodResponse.Success(result, "Execution deleted");
+        return MethodResponse.Error("Failed to delete execution");
     }
 
     public Task<PluginExecution> GetNextWaitingPluginExecution()

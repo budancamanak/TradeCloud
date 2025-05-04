@@ -26,8 +26,9 @@ public class TrackListRepository(BackendDbContext dbContext, IValidator<TrackLis
     {
         Guard.Against.Null(item);
         await validator.ValidateAndThrowAsync(item);
-        var existing =
-            await dbContext.TrackLists.FirstOrDefaultAsync(f => f.TickerId == item.TickerId && f.UserId == item.UserId);
+        var existing = await dbContext.TrackLists.FindAsync(item.TickerId, item.UserId);
+        // var existing =
+        //     await dbContext.TrackLists.FirstOrDefaultAsync(f => f.TickerId == item.TickerId && f.UserId == item.UserId);
         Guard.Against.NonNull(existing, "TrackList already registered", AlreadySavedException.Creator);
         await dbContext.TrackLists.AddAsync(item);
         var result = await dbContext.SaveChangesAsync();
@@ -44,7 +45,15 @@ public class TrackListRepository(BackendDbContext dbContext, IValidator<TrackLis
     {
         Guard.Against.Null(item);
         await validator.ValidateAndThrowAsync(item);
-        var existing = dbContext.TrackLists.FirstOrDefault(f => f.TickerId == item.TickerId && f.UserId == item.UserId);
+        return await DeleteAsync(item.UserId, item.TickerId);
+    }
+
+    public async Task<MethodResponse> DeleteAsync(int userId, int tickerId)
+    {
+        Guard.Against.NegativeOrZero(userId);
+        Guard.Against.NegativeOrZero(tickerId);
+        var existing = await dbContext.TrackLists.FindAsync(userId, tickerId);
+        // var existing = dbContext.TrackLists.FirstOrDefault(f => f.TickerId == item.TickerId && f.UserId == item.UserId);
         Guard.Against.Null(existing);
         dbContext.TrackLists.Remove(existing);
         var result = await dbContext.SaveChangesAsync();
@@ -64,6 +73,6 @@ public class TrackListRepository(BackendDbContext dbContext, IValidator<TrackLis
 
     public async Task<TrackList?> GetUserTrackListAsync(int userId, int tickerId)
     {
-        return await dbContext.TrackLists.FirstOrDefaultAsync(f => f.UserId == userId && f.TickerId == tickerId);
+        return await dbContext.TrackLists.FindAsync(userId, tickerId);
     }
 }

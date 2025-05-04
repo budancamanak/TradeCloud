@@ -17,7 +17,7 @@ public class PluginOutputRepository(BackendDbContext dbContext, IValidator<Plugi
     public async Task<PluginOutput> GetByIdAsync(int id)
     {
         Guard.Against.NegativeOrZero(id);
-        var item = await dbContext.PluginOutputs.FirstOrDefaultAsync(f => f.Id == id);
+        var item = await dbContext.PluginOutputs.FindAsync(id);
         Guard.Against.Null(item);
         return item;
     }
@@ -64,7 +64,7 @@ public class PluginOutputRepository(BackendDbContext dbContext, IValidator<Plugi
     public async Task<List<PluginOutput>> GetPluginOutputsOfSignalType(int pluginId, SignalType signalType)
     {
         Guard.Against.NegativeOrZero(pluginId);
-        Guard.Against.EnumOutOfRange<SignalType>(signalType);
+        Guard.Against.EnumOutOfRange(signalType);
         return await dbContext.PluginOutputs.Where(f => f.PluginId == pluginId && f.PluginSignal == signalType)
             .ToListAsync();
     }
