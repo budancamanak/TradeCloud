@@ -1,4 +1,5 @@
 ﻿using Common.Core.Models;
+using Common.Logging.Events.Security;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -21,7 +22,10 @@ public class RoleCheckRequestHandler(
             return MethodResponse.Error(string.Join(" && ", validated.Errors));
         }
 
-        logger.LogWarning("Controlling token for role check. IP: {ClientIp}", request.ClientIp);
+        logger.LogWarning(SecurityChecksLogEvents.RoleCheck,
+            "Controlling token[{Token}] for Roles[{Role}] check. IP: {ClientIp}", request.Token,
+            string.Join(",", request.Roles), request.ClientIp);
+
         var valid = await tokenService.ValidateToken(request.Token, request.ClientIp);
         if (!valid.IsValid) return MethodResponse.Error("Token is invalid");
         var userRoles = await userService.GetUserRoles(valid.UserId);

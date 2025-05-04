@@ -1,5 +1,6 @@
 ﻿using Common.Core.Models;
 using Common.Grpc;
+using Common.Logging.Events.Security;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -21,7 +22,9 @@ public class PermissionCheckRequestHandler(
             return MethodResponse.Error(string.Join(" && ", validated.Errors));
         }
 
-        logger.LogWarning("Controlling token for role check. IP: {ClientIp}", request.ClientIp);
+        logger.LogWarning(SecurityChecksLogEvents.PermissionCheck,
+            "Controlling token[{Token}] for permission[{Permission}] check. IP: {ClientIp}", request.Token,
+            string.Join(",", request.Permissions), request.ClientIp);
 
         var valid = await tokenService.ValidateToken(request.Token, request.ClientIp);
         if (!valid.IsValid) return MethodResponse.Error("Token is invalid");

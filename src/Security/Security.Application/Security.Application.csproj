@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Common\Common.Application\Common.Application.csproj" />
+      <ProjectReference Include="..\..\Common\Common.Logging\Common.Logging.csproj" />
       <ProjectReference Include="..\Security.Domain\Security.Domain.csproj" />
     </ItemGroup>
 

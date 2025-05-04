@@ -1,4 +1,5 @@
 ﻿using Common.Grpc;
+using Common.Logging.Events.Security;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -25,7 +26,8 @@ public class TokenCheckRequestHandler(
             };
         }
 
-        logger.LogWarning("Controlling token for role check. IP: {ClientIp}", request.ClientIp);
+        logger.LogWarning(SecurityChecksLogEvents.TokenCheck,
+            "Validating token[{Token}]. IP: {ClientIp}", request.Token, request.ClientIp);
         return await tokenService.ValidateToken(request.Token, request.ClientIp);
     }
 }
