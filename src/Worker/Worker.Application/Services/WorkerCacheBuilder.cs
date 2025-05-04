@@ -1,5 +1,6 @@
 ﻿using Common.Application.Repositories;
 using Common.Application.Services;
+using Common.Logging.Events.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Worker.Application.Abstraction;
@@ -22,7 +23,7 @@ public class AvailablePluginsCacheBuilder(
 {
     public async Task BuildCacheAsync()
     {
-        logger.LogInformation("Building Available Plugins cache...");
+        logger.LogInformation(WorkerLogEvents.WorkerCache, "Building Available Plugins cache...");
         var plugins = pluginHost.Plugins();
 
         await CacheAction();
@@ -32,12 +33,15 @@ public class AvailablePluginsCacheBuilder(
         {
             foreach (var item in plugins)
             {
-                logger.LogInformation("Adding plugin{} to cache", item.GetPluginInfo());
+                logger.LogInformation(WorkerLogEvents.WorkerCache, "Adding plugin[{PluginInfo}] to cache",
+                    item.GetPluginInfo());
 
-                await cache.SetAsync(CacheKeyGenerator.AvailablePluginKey(item.GetPluginInfo().Identifier), item, TimeSpan.MaxValue);
+                await cache.SetAsync(CacheKeyGenerator.AvailablePluginKey(item.GetPluginInfo().Identifier), item,
+                    TimeSpan.MaxValue);
             }
 
-            await cache.SetAsync("AvailablePlugins", plugins.Select(s=>s.GetPluginInfo()).ToList(), TimeSpan.MaxValue);
+            await cache.SetAsync("AvailablePlugins", plugins.Select(s => s.GetPluginInfo()).ToList(),
+                TimeSpan.MaxValue);
         }
     }
 }

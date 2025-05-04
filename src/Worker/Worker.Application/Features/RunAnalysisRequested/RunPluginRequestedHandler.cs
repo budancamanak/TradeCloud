@@ -2,6 +2,7 @@
 using Common.Core.Enums;
 using Common.Core.Models;
 using Common.Grpc;
+using Common.Logging.Events.Worker;
 using Common.Messaging.Abstraction;
 using Common.Messaging.Events.PluginExecution;
 using Common.Plugin.Abstraction;
@@ -23,7 +24,9 @@ public class RunAnalysisRequestedHandler(
 {
     public async Task<MethodResponse> Handle(RunAnalysisRequest request, CancellationToken cancellationToken)
     {
-        logger.LogWarning("RunAnalysisRequestedHandler called. Getting price info");
+        logger.LogInformation(WorkerLogEvents.RunAnalysis,
+            "Handling RunAnalysisRequest[{AnalysisExecution}]. Getting price info for request [{Request}]",
+            request.ExecutionId, request);
         var prices = await client.GetPricesForPluginAsync(new GrpcGetPricesRequest
         {
             Ticker = request.Ticker,
@@ -34,38 +37,40 @@ public class RunAnalysisRequestedHandler(
         });
         if (prices?.Prices is not { Count: > 0 })
         {
-            // todo send pluginupdated event over rabbitmq. change plugin state to waiting data
+            logger.LogWarning(WorkerLogEvents.RunAnalysis,
+                "Not enough price info for RunAnalysisRequest[{AnalysisExecution}]. Waiting price info for request [{Request}]",
+                request.ExecutionId, request);
             await eventBus.PublishAsync(new PluginStatusEvent(request.ExecutionId, PluginStatus.WaitingData));
             pluginHost.AddAnalysisToQueue(request);
             return MethodResponse.Error(request.ExecutionId, "Plugin is in waiting queue now. Waiting for data");
         }
 
-        // todo trigger hangfire !!
-        // todo send pluginupdated event over rabbitmq. change plugin state to running
         pluginHost.AddAnalysisToQueue(request);
         var info = await pluginHost.GetPluginToRun(request.ExecutionId);
         pluginHost.RemovePluginFromQueue(request.ExecutionId);
-        logger.LogDebug("Starting background job to to run plugin[{}]", request);
+        logger.LogInformation("Starting background jobs to to run analysis[{AnalysisExecution}]", request.ExecutionId);
 
-        string parent = "";
+        string parent = "", current = "";
         foreach (var infoItem in info)
         {
             if (string.IsNullOrWhiteSpace(parent))
             {
-                parent = jobClient.Enqueue(() =>
+                current = jobClient.Enqueue(() =>
                     infoItem.Plugin.Run(request.ExecutionId, infoItem.PluginExecutionId, infoItem.PriceCacheKey,
                         infoItem.TickerCacheKey));
             }
             else
             {
-                parent = jobClient.ContinueJobWith(parent,
+                current = jobClient.ContinueJobWith(parent,
                     () => infoItem.Plugin.Run(request.ExecutionId, infoItem.PluginExecutionId, infoItem.PriceCacheKey,
                         infoItem.TickerCacheKey));
             }
-            
+
             await eventBus.PublishAsync(new PluginStatusEvent(infoItem.PluginExecutionId, PluginStatus.Queued));
             pluginStateManager.OnPluginStarted(infoItem.PluginExecutionId);
-            logger.LogDebug("Started background job to to run plugin[{}] : {}", request, parent);
+            logger.LogDebug("Started background job[{PluginIdentifier}] to to run plugin[{PluginId}] after {ParentJob}",
+                current, infoItem.PluginExecutionId, parent);
+            parent = current;
         }
 
         // await eventBus.PublishAsync(new PluginStatusEvent(request.ExecutionId, PluginStatus.Queued));

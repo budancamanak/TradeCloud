@@ -17,6 +17,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\Common\Common.Application\Common.Application.csproj" />
       <ProjectReference Include="..\..\Common\Common.Grpc\Common.Grpc.csproj" />
+      <ProjectReference Include="..\..\Common\Common.Logging\Common.Logging.csproj" />
       <ProjectReference Include="..\..\Common\Common.Messaging\Common.Messaging.csproj" />
       <ProjectReference Include="..\..\Common\Common.Plugin\Common.Plugin.csproj" />
     </ItemGroup>
