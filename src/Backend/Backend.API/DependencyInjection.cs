@@ -1,10 +1,6 @@
 ﻿using System.Reflection;
-using AutoMapper;
-using Backend.API.Mappers;
 using Common.Grpc;
-using Common.Grpc.Interceptors;
-using Common.Web;
-using FluentValidation;
+using Common.Security.Interceptors;
 
 namespace Backend.API;
 

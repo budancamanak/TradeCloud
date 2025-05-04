@@ -16,6 +16,10 @@ public static class DependencyInjection
         {
             cfg.Address = new Uri(configuration["Market:GrpcHost"]);
         }).EnableCallContextPropagation();;
+        services.AddGrpcClient<GrpcAuthService.GrpcAuthServiceClient>(cfg =>
+        {
+            cfg.Address = new Uri(configuration["Security:GrpcHost"]);
+        }).EnableCallContextPropagation();;
     }
 
     public static void AddGrpcControllers(this WebApplication app)

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Ardalis.GuardClauses;
+using AutoMapper;
 using Common.Application.Repositories;
 using Common.Grpc;
 using Common.Logging.Events.Worker;
@@ -44,6 +45,7 @@ public class GrpcWorkerController(IPluginHost pluginHost, ICacheService cache, I
         GrpcGetAvailablePluginWithIdentifierRequest request, ServerCallContext context)
     {
         var item = pluginHost.Plugins().FirstOrDefault(f => f.GetPluginInfo().Identifier == request.Identifier);
+        if (item == null) throw new NotFoundException(request.Identifier, "Plugin not found");
         return await Task.FromResult(new GrpcAvailablePluginInfoResponse
         {
             Identifier = item.GetPluginInfo().Identifier,

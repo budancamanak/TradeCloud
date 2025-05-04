@@ -1,5 +1,8 @@
 using Common.Application.Services;
 using Common.Logging;
+using Common.Security.Abstraction;
+using Common.Security.Interceptors;
+using Common.Security.Services;
 using Hangfire;
 using Worker.API;
 using Worker.API.Models;
@@ -23,10 +26,11 @@ builder.Services.AddWorkerApplicationServices();
 builder.Services.AddGrpc(options =>
 {
     options.EnableDetailedErrors = true;
-    // options.Interceptors.Add(new InterceptorRegistration());
+    // options.Interceptors.Add<ServerAuthInterceptor>();
 });
 builder.Services.AddGrpcHealthChecks()
     .AddCheck("Worker.HealthCheck", () => HealthCheckResult.Healthy("Worker.GRPC Service is UP"));
+builder.Services.AddScoped<ISecurityGrpcClient, SecurityGrpcClient>(); // your implementation
 /***
  * todo layout below !!
  * 1. Request C# files to build -> must not need extra packages. or need to make nuget call

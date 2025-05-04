@@ -3,7 +3,7 @@ using Grpc.Core;
 using Grpc.Core.Interceptors;
 using Microsoft.AspNetCore.Http;
 
-namespace Common.Grpc.Interceptors;
+namespace Common.Security.Interceptors;
 
 public class AuthHeadersInterceptor(IHttpContextAccessor httpContextAccessor) : Interceptor
 {
@@ -11,12 +11,12 @@ public class AuthHeadersInterceptor(IHttpContextAccessor httpContextAccessor) : 
         ClientInterceptorContext<TRequest, TResponse> context,
         AsyncUnaryCallContinuation<TRequest, TResponse> continuation)
     {
+        var ip = httpContextAccessor.GetClientIp();
         var metadata = new Metadata
         {
-            { "HttpHeaderNames.AuthorizationXX", $"Bearer <JWT_TOKEN>" }
+            { "Token", $"Bearer " + httpContextAccessor.HttpContext?.Request.Headers["Authentication"] },
+            { "ClientIP", ip }
         };
-        var ip = httpContextAccessor.GetClientIp();
-        metadata.Add("ClientIP", ip);
         var userIdentity = httpContextAccessor.HttpContext?.User.Identity;
         if (userIdentity != null && userIdentity.IsAuthenticated)
         {
