@@ -38,13 +38,15 @@ public class NoopPlugin : PluginBase<NoopPluginParams>
 
     protected override void Execute()
     {
-        Logger.LogWarning("Plugin {} is running on {} with params: {}", GetPluginInfo(), TickerDto,
+        Logger.LogWarning(LogEventId, "Plugin {PluginInfo} is running on {Ticker} with params: {Params}",
+            GetPluginInfo(), TickerDto,
             Params.GetStringRepresentation());
         var timeout = TimeSpan.FromSeconds(3);
         while (true)
         {
             StateManager.ThrowIfCancelRequested(ExecutionId);
-            Logger.LogInformation("Plugin[{}] {} is running on {}", ExecutionId, GetPluginInfo(), TickerDto);
+            Logger.LogInformation(LogEventId, "Plugin[{PluginInfo}] {ExecutionId} is running on {Ticker}", ExecutionId,
+                GetPluginInfo(), TickerDto);
             Thread.Sleep(timeout);
         }
     }

@@ -15,6 +15,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Common.Application\Common.Application.csproj" />
       <ProjectReference Include="..\Common.Core\Common.Core.csproj" />
+      <ProjectReference Include="..\Common.Logging\Common.Logging.csproj" />
     </ItemGroup>
 
 </Project>
