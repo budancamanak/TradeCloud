@@ -40,12 +40,6 @@ public static class LogHelper
 
             loggerConfiguration.MinimumLevel.Override(kvp.Key.Replace("Logging:LogLevel:", ""), kvp.Value.ToLogLevel());
         }
-
-        if (context.HostingEnvironment.IsDevelopment())
-        {
-            loggerConfiguration.MinimumLevel.Override("Backend.API", LogEventLevel.Debug);
-            loggerConfiguration.MinimumLevel.Override("Market.API", LogEventLevel.Debug);
-        }
         
         var elasticUrl = context.Configuration.GetValue<string>("Elastic:Host");
         if (!string.IsNullOrEmpty(elasticUrl))
