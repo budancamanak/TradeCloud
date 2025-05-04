@@ -15,11 +15,12 @@ public static class DependencyInjection
         services.AddGrpcClient<GrpcPriceService.GrpcPriceServiceClient>(cfg =>
         {
             cfg.Address = new Uri(configuration["Market:GrpcHost"]);
-        });
+        }).EnableCallContextPropagation();;
     }
 
     public static void AddGrpcControllers(this WebApplication app)
     {
         app.MapGrpcService<GrpcWorkerController>();
+        app.MapGrpcHealthChecksService().AllowAnonymous();;
     }
 }

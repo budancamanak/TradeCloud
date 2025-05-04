@@ -13,15 +13,12 @@ public static class DependencyInjection
         // services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
-        // services.AddGrpcClient<GrpcAuthController.GrpcAuthControllerClient>(cfg =>
-        // {
-        //     cfg.Address = new Uri(configuration["Market:GrpcHost"]);
-        // });
     }
 
     public static void AddGrpcControllers(this WebApplication app)
     {
         app.MapGrpcService<GrpcSecurityController>();
         app.MapGrpcService<GrpcUserController>();
+        app.MapGrpcHealthChecksService().AllowAnonymous();;
     }
 }

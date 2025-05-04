@@ -6,6 +6,7 @@ using Worker.API.Models;
 using Worker.Application;
 using Worker.Infrastructure;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +25,8 @@ builder.Services.AddGrpc(options =>
     options.EnableDetailedErrors = true;
     // options.Interceptors.Add(new InterceptorRegistration());
 });
+builder.Services.AddGrpcHealthChecks()
+    .AddCheck("Worker.HealthCheck", () => HealthCheckResult.Healthy("Worker.GRPC Service is UP"));
 /***
  * todo layout below !!
  * 1. Request C# files to build -> must not need extra packages. or need to make nuget call

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Serilog;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,6 +88,8 @@ builder.Services.AddGrpc(options =>
     options.EnableDetailedErrors = true;
     // options.Interceptors.Add(new InterceptorRegistration());
 });
+builder.Services.AddGrpcHealthChecks()
+    .AddCheck("Market.HealthCheck", () => HealthCheckResult.Healthy("Market.GRPC Service is UP"));
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5238,

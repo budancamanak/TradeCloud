@@ -2,6 +2,7 @@ using Common.Logging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Security.API;
 using Security.Application;
 using Security.Infrastructure;
@@ -46,6 +47,8 @@ builder.Services.AddGrpc(options =>
     options.EnableDetailedErrors = true;
     // options.Interceptors.Add(new InterceptorRegistration());
 });
+builder.Services.AddGrpcHealthChecks()
+    .AddCheck("Security.HealthCheck", () => HealthCheckResult.Healthy("Security.GRPC Service is UP"));
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSecurityAuthentication(builder.Configuration);
 builder.WebHost.ConfigureKestrel(options =>

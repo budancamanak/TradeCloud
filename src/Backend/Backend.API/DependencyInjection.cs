@@ -27,19 +27,19 @@ public static class DependencyInjection
         services.AddGrpcClient<GrpcTickerService.GrpcTickerServiceClient>(cfg =>
         {
             cfg.Address = new Uri(configuration["Market:GrpcHost"]);
-        });
+        }).EnableCallContextPropagation();;
         services.AddGrpcClient<GrpcAvailablePluginsService.GrpcAvailablePluginsServiceClient>(cfg =>
         {
             cfg.Address = new Uri(configuration["Worker:GrpcHost"]);
-        });
+        }).EnableCallContextPropagation();;
         services.AddTransient<AuthHeadersInterceptor>();
         services.AddGrpcClient<GrpcAuthService.GrpcAuthServiceClient>(cfg =>
         {
             cfg.Address = new Uri(configuration["Security:GrpcHost"]);
-        }).AddInterceptor<AuthHeadersInterceptor>();
+        }).AddInterceptor<AuthHeadersInterceptor>().EnableCallContextPropagation();;
         services.AddGrpcClient<GrpcUserService.GrpcUserServiceClient>(cfg =>
         {
             cfg.Address = new Uri(configuration["Security:GrpcHost"]);
-        }).AddInterceptor<AuthHeadersInterceptor>();
+        }).AddInterceptor<AuthHeadersInterceptor>().EnableCallContextPropagation();;
     }
 }

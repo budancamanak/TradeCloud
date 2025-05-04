@@ -17,5 +17,6 @@ public static class DependencyInjection
     {
         app.MapGrpcService<GrpcPriceController>();
         app.MapGrpcService<GrpcTickerController>();
+        app.MapGrpcHealthChecksService().AllowAnonymous();;
     }
 }
