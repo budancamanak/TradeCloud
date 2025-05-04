@@ -4,7 +4,6 @@ using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Worker.Application.Abstraction;
-using Worker.Application.Features.RunPluginRequested;
 
 namespace Worker.Infrastructure.Messaging.Consumers;
 

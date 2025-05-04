@@ -37,7 +37,6 @@ public static class DependencyInjection
             configure: (context, config) =>
             {
                 config.Publish<IntegrationEvent>(f => f.Exclude = true);
-                config.Message<RunPluginRequestedEvent>(f => f.SetEntityName("plugin.executions.exchange.run"));
                 config.Message<RunAnalysisRequestedEvent>(f => f.SetEntityName("analysis.executions.exchange.run"));
                 config.Message<StopAnalysisEvent>(f => f.SetEntityName("analysis.executions.exchange.stop"));
                 config.ReceiveEndpoint("plugin.executions.queue.status", ep =>
@@ -78,7 +77,6 @@ public static class DependencyInjection
         services.AddScoped<IPluginService, PluginService>();
         services.AddScoped<ITickerService, TickerService>();
         services.AddScoped<IPluginExecutionEngine, PluginExecutionEngine>();
-
 
 
         //

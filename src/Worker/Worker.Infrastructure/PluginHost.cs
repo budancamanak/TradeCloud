@@ -1,13 +1,9 @@
 ﻿using System.Collections.Concurrent;
-using System.Reflection;
-using System.Runtime.Loader;
 using Ardalis.GuardClauses;
 using Common.Application.Repositories;
 using Common.Application.Services;
-using Common.Core.DTOs;
 using Common.Core.Enums;
 using Common.Core.Models;
-using Common.Messaging.Events.AnalysisExecution;
 using Common.Plugin.Abstraction;
 using Common.Plugin.Models;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Worker.Application.Abstraction;
 using Worker.Application.Features.RunAnalysisRequested;
-using Worker.Application.Features.RunPluginRequested;
+
 
 namespace Worker.Infrastructure;
 
@@ -56,12 +52,6 @@ public class PluginHost : IPluginHost
     }
 
     public IList<IPlugin> Plugins() => _pluginLoader.Plugins();
-
-    public bool AddPluginToQueue(RunPluginRequest request)
-    {
-        // return _waitingPluginRequests.TryAdd(request.ExecutionId, request);
-        return false;
-    }
 
     public bool AddAnalysisToQueue(RunAnalysisRequest request)
     {
