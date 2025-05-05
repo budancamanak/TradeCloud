@@ -74,6 +74,18 @@ builder.Services.AddAuthentication(options =>
         o.MapInboundClaims = false;
     });
 builder.Services.AddAuthorization();
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(8081,
+        listenOptions => { listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2; });
+
+    options.ListenAnyIP(8080, listenOptions =>
+    {
+        listenOptions.Protocols =
+            Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols
+                .Http1AndHttp2;
+    });
+});
 builder.Services.AddHttpLogging(options =>
 {
     options.LoggingFields = HttpLoggingFields.Duration | HttpLoggingFields.RequestMethod |
