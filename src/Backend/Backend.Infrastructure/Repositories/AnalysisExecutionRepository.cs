@@ -36,7 +36,7 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
         existing = dbContext.AnalysisExecutions.FirstOrDefault(f =>
             f.PluginIdentifier == item.PluginIdentifier && f.Timeframe == item.Timeframe &&
             f.StartDate == item.StartDate && f.EndDate == item.EndDate &&
-            f.ParamSet == item.ParamSet && f.Progress < 1.0);
+            f.ParamSet == item.ParamSet);
         Guard.Against.NonNull(existing, $"Plugin already registered: {existing?.Id}", AlreadySavedException.Creator);
         await dbContext.AnalysisExecutions.AddAsync(item);
         var result = await dbContext.SaveChangesAsync();
