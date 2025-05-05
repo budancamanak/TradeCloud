@@ -15,7 +15,6 @@ public class RedisCacheService(IConnectionMultiplexer mux) : ICacheService
     {
         // todo need retry policy to prevent recurrent price fetches.
         var serialized = JsonSerialization.ToJson(value);
-
         await _cache.StringSetAsync(key, serialized, expiration);
     }
 
@@ -30,13 +29,13 @@ public class RedisCacheService(IConnectionMultiplexer mux) : ICacheService
         await _cache.KeyDeleteAsync(key);
     }
 
-    public async Task<double> Increment(string key)
+    public async Task<double> Increment(string key, double value)
     {
-        return await _cache.StringIncrementAsync(key);
+        return await _cache.StringIncrementAsync(key, value);
     }
 
-    public async Task<double> Decrement(string key)
+    public async Task<double> Decrement(string key, double value)
     {
-        return await _cache.StringDecrementAsync(key);
+        return await _cache.StringDecrementAsync(key, value);
     }
 }

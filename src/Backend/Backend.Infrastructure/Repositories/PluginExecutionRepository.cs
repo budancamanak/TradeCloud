@@ -151,7 +151,7 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
     {
         Guard.Against.NegativeOrZero(id);
         var existing = dbContext.PluginExecutions.FirstOrDefault(f => f.Id == id);
-        Guard.Against.Null(existing);
+        Guard.Against.Null(existing, message: $"Failed to find plugin with {id}. Was updating status to :{status}");
         if (status > existing.Status)
             existing.Status = status;
         switch (status)

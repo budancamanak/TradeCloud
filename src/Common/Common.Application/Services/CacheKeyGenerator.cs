@@ -30,4 +30,7 @@ public static class CacheKeyGenerator
     public static string UserPermissionsKey(string userId) => $"UserPermissionsKey:UI{userId}";
 
     public static string UserTokenInfoKey(string token) => $"UserTokenInfoKey:UTI{token}";
+
+    public static string PluginProgressEventConsumer(int pluginId) => $"PluginProgressConsumer:PId:{pluginId}";
+    public static string AnalysisProgressEventConsumer(int analysisId) => $"AnalysisProgressConsumer:AId:{analysisId}";
 }

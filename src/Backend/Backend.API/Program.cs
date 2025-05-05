@@ -76,10 +76,10 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenAnyIP(8081,
+    options.ListenAnyIP(5251,
         listenOptions => { listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2; });
 
-    options.ListenAnyIP(8080, listenOptions =>
+    options.ListenAnyIP(5250, listenOptions =>
     {
         listenOptions.Protocols =
             Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols

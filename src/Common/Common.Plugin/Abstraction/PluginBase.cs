@@ -77,7 +77,7 @@ public abstract class PluginBase<T> : IPlugin where T : IParameters
         {
             Execute();
             MessageBroker.OnPluginSucceeded(this, pluginExecutionId);
-            Logger.LogInformation("Plugin[{}] finished", GetPluginInfo());
+            Logger.LogInformation("Plugin[{PluginInfo}] finished", GetPluginInfo());
         }
         catch (Exception ex)
         {

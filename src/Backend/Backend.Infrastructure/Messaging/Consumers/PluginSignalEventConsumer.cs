@@ -13,8 +13,6 @@ public class PluginSignalEventConsumer(
 {
     public async Task Consume(ConsumeContext<PluginSignalEvent> context)
     {
-        logger.LogInformation("Consuming PluginSignalEvent> Saving signal for {}: {}", context.Message.PluginId,
-            context.Message.Signal);
         var plugin = await pluginExecutionRepository.GetByIdAsync(context.Message.PluginId);
         if (plugin == null) return;
         var mr = await pluginOutputRepository.AddAsync(new PluginOutput
@@ -24,7 +22,7 @@ public class PluginSignalEventConsumer(
             CreatedDate = context.Message.CreatedDate,
             SignalDate = context.Message.Signal.SignalDate
         });
-        logger.LogInformation("Consumed PluginSignalEvent> Saving signal result for {}: {} - {}",
+        logger.LogInformation("Consumed PluginSignalEvent> Saving signal result for {PluginId}: {Signal} - Response: {Result}",
             context.Message.PluginId,
             context.Message.Signal, mr);
     }

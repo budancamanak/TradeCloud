@@ -38,12 +38,13 @@ public class PriceService(
         var cachedPrices = await cache.GetAsync<List<PriceDto>>(cacheKey);
         if (cachedPrices is { Count: > 0 })
         {
-            logger.LogWarning("Returning from cache for {} Price count: {}", pluginId, cachedPrices.Count);
+            logger.LogInformation("Returning from cache for {PluginId} Price count: {Count}", pluginId,
+                cachedPrices.Count);
             return cachedPrices;
         }
 
         var dbResults = await repository.GetTickerPricesAsync(tickerId, timeframe, start, end);
-        logger.LogDebug("Get prices from repository: count:{}", dbResults.Count);
+        logger.LogDebug("Get prices from repository for {PluginId}: count:{Count}", pluginId, dbResults.Count);
         var output = mapper.Map<List<PriceDto>>(dbResults);
         return output;
     }
@@ -51,9 +52,10 @@ public class PriceService(
     public async Task<MethodResponse> SaveMissingPricesAsync(IList<Price> priceInfo, string? pluginIdToCache)
     {
         // todo need retry policy to prevent recurrent price fetches.
-        logger.LogInformation("Saving prices for {}, priceCount:{}", pluginIdToCache, priceInfo?.Count);
+        logger.LogInformation("Saving prices for {PluginIdCache}, priceCount:{Count}", pluginIdToCache,
+            priceInfo?.Count);
         var mr = await repository.SavePricesAsync(priceInfo);
-        logger.LogInformation("Price save result:{}", mr);
+        logger.LogInformation("Price save for {PluginIdCache}, result:{Response}", pluginIdToCache, mr);
         if (!mr.IsSuccess) return mr;
         if (!string.IsNullOrWhiteSpace(pluginIdToCache))
             await _SetCacheAsync(priceInfo, pluginIdToCache);
@@ -80,7 +82,7 @@ public class PriceService(
         // var alreadyCached = await cache.GetAsync<List<PriceDto>>(pluginId) ?? new List<PriceDto>();
         // alreadyCached.AddRange(output);
         // alreadyCached = alreadyCached.DistinctBy(f => f.Timestamp).ToList();
-        logger.LogWarning("Last Cache Operation ::: {} Price count: {}", cacheKey, priceInfo.Count);
+        logger.LogWarning("Last Cache Operation ::: {CacheKey} Price count: {Count}", cacheKey, priceInfo.Count);
         await cache.SetAsync(cacheKey, priceInfo, TimeSpan.FromDays(1));
     }
 }

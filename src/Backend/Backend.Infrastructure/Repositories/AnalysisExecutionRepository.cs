@@ -99,7 +99,7 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
     public async Task<MethodResponse> SetAnalysisExecutionProgress(int id, int increment, int total)
     {
         Guard.Against.NegativeOrZero(id);
-        var existing = dbContext.AnalysisExecutions.FirstOrDefault(f => f.Id == id);
+        var existing =await dbContext.AnalysisExecutions.FindAsync(id);
         Guard.Against.Null(existing);
         if (existing.ProgressTotal == 0)
         {

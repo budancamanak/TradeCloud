@@ -29,6 +29,7 @@ public static class DependencyInjection
             cfg.Address = new Uri(configuration["Worker:GrpcHost"]);
         });//.EnableCallContextPropagation();;
         services.AddTransient<AuthHeadersInterceptor>();
+        Console.WriteLine("Connecting to security:"+configuration["Security:GrpcHost"]);
         services.AddGrpcClient<GrpcAuthService.GrpcAuthServiceClient>(cfg =>
         {
             cfg.Address = new Uri(configuration["Security:GrpcHost"]);

@@ -11,17 +11,17 @@ public class PluginStatusEventConsumer(IPluginExecutionRepository repository, IL
 {
     public async Task Consume(ConsumeContext<PluginStatusEvent> context)
     {
-        logger.LogInformation("Consuming PluginStatusEvent > Setting plugin[{}] status to {} ",
+        logger.LogInformation("Consuming PluginStatusEvent > Setting plugin[{PluginId}] status to {Status} ",
             context.Message.PluginId, context.Message.Status);
         var mr = await repository.SetPluginStatus(context.Message.PluginId, context.Message.Status);
         if (context.Message.Status == PluginStatus.Success)
         {
-            logger.LogInformation("PluginStatusEvent > Setting plugin[{}] progress to {}",
+            logger.LogInformation("PluginStatusEvent > Setting plugin[{PluginId}] progress to {Status}",
                 context.Message.PluginId, 1.0d);
             mr = await repository.SetPluginProgress(context.Message.PluginId, 1.0d);
         }
 
-        logger.LogInformation("Consumed PluginStatusEvent > Setting plugin[{}] status to {} : {}",
+        logger.LogInformation("Consumed PluginStatusEvent > Setting plugin[{PluginId}] status to {Status} : {Result}",
             context.Message.PluginId, context.Message.Status, mr);
     }
 }
