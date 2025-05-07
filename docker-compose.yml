@@ -1,4 +1,5 @@
-﻿services:
+﻿version: '3.5'
+services:
   market.api:
     image: market.api
     container_name: Market.API
@@ -54,6 +55,12 @@
     build:
       context: .
       dockerfile: src/Security/Security.API/Dockerfile
+  nginx:
+    build: ./infrastructure/nginx
+    ports:
+      - "80:80"
+    networks:
+      - trade-cloud-network
 
   backend.api:
     image: backend.api

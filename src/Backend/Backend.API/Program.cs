@@ -20,6 +20,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+// Configure forwarded headers to trust Nginx's forwarded IP headers
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+// Clearing KnownNetworks and KnownProxies to ensure headers are trusted from specific proxies only
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
