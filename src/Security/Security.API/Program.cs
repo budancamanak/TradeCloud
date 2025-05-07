@@ -56,12 +56,8 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ListenAnyIP(5501,
         listenOptions => { listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2; });
 
-    options.ListenAnyIP(5500, listenOptions =>
-    {
-        listenOptions.Protocols =
-            Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols
-                .Http1AndHttp2;
-    });
+    options.ListenAnyIP(5500,
+        listenOptions => { listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1; });
 });
 builder.Host.UseSerilog((context, configuration) =>
     LogHelper.ConfigureLogger("security-api", builder.Configuration, context, configuration), true);

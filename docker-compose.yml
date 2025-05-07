@@ -1,12 +1,85 @@
 ﻿services:
   market.api:
     image: market.api
+    container_name: Market.API
+    restart: always
+    environment:
+      - Worker__GrpcHost=http://worker.api:5163
+      - Security__GrpcHost=http://security.api:5501
+    ports:
+      - '5237:5237'
+      - '5238:5238'
+    networks:
+      - trade-cloud-network
+    #    depends_on:
+    #      - worker.api
+    #    healthcheck:
+    #      test: /health
     build:
       context: .
       dockerfile: src/Market/Market.API/Dockerfile
 
   worker.api:
     image: worker.api
+    container_name: Worker.API
+    restart: always
+    environment:
+      - Market__GrpcHost=http://market.api:5238
+      - Security__GrpcHost=http://security.api:5501
+    ports:
+      - '5162:5162'
+      - '5163:5163'
+    networks:
+      - trade-cloud-network
+    #    healthcheck:
+    #      test: /health
     build:
       context: .
       dockerfile: src/Worker/Worker.API/Dockerfile
+      
+  
+  security.api:
+    image: security.api
+    container_name: Security.API
+    restart: always
+    environment:
+      - Market__GrpcHost=http://market.api:5238
+    ports:
+      - '5500:5500'
+      - '5501:5501'
+    networks:
+      - trade-cloud-network
+    #    healthcheck:
+    #      test: /health
+    build:
+      context: .
+      dockerfile: src/Security/Security.API/Dockerfile
+
+  backend.api:
+    image: backend.api
+    container_name: Backend.API
+    restart: always
+    environment:
+      - Market__GrpcHost=http://market.api:5238
+      - Security__GrpcHost=http://Security.API:5501
+      - Worker__GrpcHost=http://worker.api:5163
+    ports:
+      - '5250:5250'
+      - '5251:5251'
+    depends_on:
+      - security.api
+      - market.api
+      - worker.api
+    networks:
+      - trade-cloud-network
+    #    healthcheck:
+    #      test: /health
+    build:
+      context: .
+      dockerfile: src/Backend/Backend.API/Dockerfile
+
+networks:
+  trade-cloud-network:
+    driver: bridge
+    external: false
+    

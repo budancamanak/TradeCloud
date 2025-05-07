@@ -16,15 +16,12 @@ public static class HttpContextExtensions
         var remoteIpAddress =
             contextAccessor.GetClientIpFromHeaders() ?? contextAccessor.HttpContext?.Connection.RemoteIpAddress;
         var result = "";
-        if (remoteIpAddress == null) return result;
-        if (remoteIpAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+        if (remoteIpAddress == null)
         {
-            remoteIpAddress = Dns.GetHostEntry(remoteIpAddress).AddressList
-                .First(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+            return result;
         }
 
         result = remoteIpAddress.ToString();
-
         return result;
     }
 
@@ -35,7 +32,6 @@ public static class HttpContextExtensions
         {
             var ip = GetHeaderValueAs<string>(contextAccessor, "X-Forwarded-For")?.SplitCsv().FirstOrDefault();
 
-            // RemoteIpAddress is always null in DNX RC1 Update1 (bug).
             if (string.IsNullOrWhiteSpace(ip) && contextAccessor.HttpContext?.Connection.RemoteIpAddress != null)
                 ip = contextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
 
@@ -44,7 +40,7 @@ public static class HttpContextExtensions
 
             if (string.IsNullOrWhiteSpace(ip))
                 throw new Exception("Unable to determine caller's IP.");
-            return IPAddress.Parse(ip);
+            return IPAddress.Parse(ip).MapToIPv4();
         }
         catch (Exception e)
         {

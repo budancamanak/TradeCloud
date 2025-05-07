@@ -69,12 +69,8 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ListenAnyIP(5163,
         listenOptions => { listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2; });
 
-    options.ListenAnyIP(5162, listenOptions =>
-    {
-        listenOptions.Protocols =
-            Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols
-                .Http1AndHttp2;
-    });
+    options.ListenAnyIP(5162,
+        listenOptions => { listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1; });
 });
 builder.Services.AddHttpLogging(options =>
 {

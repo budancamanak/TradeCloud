@@ -20,23 +20,23 @@ public static class DependencyInjection
 
     public static void AddGrpcClients(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddSingleton<AuthHeadersInterceptor>();
         services.AddGrpcClient<GrpcTickerService.GrpcTickerServiceClient>(cfg =>
         {
             cfg.Address = new Uri(configuration["Market:GrpcHost"]);
-        });//.EnableCallContextPropagation();;
+        });
         services.AddGrpcClient<GrpcAvailablePluginsService.GrpcAvailablePluginsServiceClient>(cfg =>
         {
             cfg.Address = new Uri(configuration["Worker:GrpcHost"]);
-        });//.EnableCallContextPropagation();;
-        services.AddTransient<AuthHeadersInterceptor>();
-        Console.WriteLine("Connecting to security:"+configuration["Security:GrpcHost"]);
+        });
+        Console.WriteLine("Connecting to security:" + configuration["Security:GrpcHost"]);
         services.AddGrpcClient<GrpcAuthService.GrpcAuthServiceClient>(cfg =>
         {
             cfg.Address = new Uri(configuration["Security:GrpcHost"]);
-        }).AddInterceptor<AuthHeadersInterceptor>();//.EnableCallContextPropagation();;
+        }).AddInterceptor<AuthHeadersInterceptor>();
         services.AddGrpcClient<GrpcUserService.GrpcUserServiceClient>(cfg =>
         {
             cfg.Address = new Uri(configuration["Security:GrpcHost"]);
-        }).AddInterceptor<AuthHeadersInterceptor>();//.EnableCallContextPropagation();;
+        }).AddInterceptor<AuthHeadersInterceptor>();
     }
 }

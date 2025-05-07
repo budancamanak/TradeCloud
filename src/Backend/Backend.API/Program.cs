@@ -114,15 +114,15 @@ app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogHelper.En
 app.UseHttpLogging();
 app.UseHttpsRedirection();
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                       ForwardedHeaders.XForwardedProto
+});
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseExceptionHandler();
 
 app.MapControllers();
 app.MapHealthChecks("/health");
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor |
-                       ForwardedHeaders.XForwardedProto
-});
 app.Run();
