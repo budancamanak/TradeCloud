@@ -30,6 +30,15 @@ public static class HttpContextExtensions
     {
         try
         {
+            var x = GetHeaderValueAs<string>(contextAccessor, "X-Forwarded-For")?.SplitCsv();
+            if (x != null)
+            {
+                foreach (var _ip in x)
+                {
+                    Console.WriteLine("ip>>" + _ip);
+                }
+            }
+
             var ip = GetHeaderValueAs<string>(contextAccessor, "X-Forwarded-For")?.SplitCsv().FirstOrDefault();
 
             if (string.IsNullOrWhiteSpace(ip) && contextAccessor.HttpContext?.Connection.RemoteIpAddress != null)

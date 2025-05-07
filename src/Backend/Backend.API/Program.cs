@@ -110,6 +110,7 @@ builder.Host.UseSerilog((context, configuration) =>
     LogHelper.ConfigureLogger("backend-api", builder.Configuration, context, configuration), true);
 
 var app = builder.Build();
+app.UseForwardedHeaders();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -122,11 +123,6 @@ app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogHelper.En
 app.UseHttpLogging();
 app.UseHttpsRedirection();
 
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor |
-                       ForwardedHeaders.XForwardedProto
-});
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseExceptionHandler();
