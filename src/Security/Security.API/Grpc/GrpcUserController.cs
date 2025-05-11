@@ -2,9 +2,6 @@
 using Common.Grpc;
 using Grpc.Core;
 using MediatR;
-using Security.Application.Features.Checks;
-using Security.Application.Features.Checks.PermissionCheck;
-using Security.Application.Features.Checks.RoleCheck;
 using Security.Application.Features.User.AddPermissionToRole;
 using Security.Application.Features.User.AddRoleToUser;
 using Security.Application.Features.User.LoginUser;
@@ -16,7 +13,8 @@ namespace Security.API.Grpc;
 
 public class GrpcUserController(IMapper mapper, IMediator mediator) : GrpcUserService.GrpcUserServiceBase
 {
-    public override async Task<GrpcUserLoginResponse> LoginUser(GrpcUserLoginRequest grpcRequest, ServerCallContext context)
+    public override async Task<GrpcUserLoginResponse> LoginUser(GrpcUserLoginRequest grpcRequest,
+        ServerCallContext context)
     {
         var request = mapper.Map<LoginUserRequest>(grpcRequest,
             opts => { opts.Items["ClientIP"] = (context.RequestHeaders.GetValue("ClientIP") ?? ""); });
@@ -25,7 +23,7 @@ public class GrpcUserController(IMapper mapper, IMediator mediator) : GrpcUserSe
         {
             Message = mr.Message,
             Success = mr.IsSuccess,
-            Token = mr.Data?.ToString()
+            Token = mr.Data?.ToString() ?? "Empty"
         };
     }
 

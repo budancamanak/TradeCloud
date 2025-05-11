@@ -2,7 +2,6 @@
 using Common.Application.Repositories;
 using Common.Application.Services;
 using Common.Core.Models;
-using Common.Core.Serialization;
 using Common.Logging.Events.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -46,7 +45,7 @@ public class UserService(
         try
         {
             var user = await repository.FindUserByEmail(email);
-            Guard.Against.Null(user);
+            Guard.Against.Null(user, message: "Failed to find user with email");
             var passMatch = BCrypt.Net.BCrypt.Verify(password, user.Password);
             if (!passMatch) return MethodResponse.Error("Password mismatch");
             // todo generate jwt token

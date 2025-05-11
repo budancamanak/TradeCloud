@@ -16,7 +16,16 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        b =>
+        {
+            b.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -110,7 +119,12 @@ builder.Host.UseSerilog((context, configuration) =>
     LogHelper.ConfigureLogger("backend-api", builder.Configuration, context, configuration), true);
 
 var app = builder.Build();
-app.UseForwardedHeaders();
+app.UseCors("AllowAll");
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+    ForwardLimit = 50
+});
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

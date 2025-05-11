@@ -1,11 +1,8 @@
-using System.Security.Claims;
-using Common.Grpc;
 using Common.Security.Abstraction;
 using Common.Security.Attributes;
-using Common.Web.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Http;
 
 namespace Common.Security.Filters;
 
@@ -26,6 +23,13 @@ public class PermissionAuthorizationFilter(
         if (string.IsNullOrWhiteSpace(token) && anonEnabled)
         {
             context.HttpContext.Items.Add("CurrentUser", "-1");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            Console.WriteLine("Token is null");
+            context.Result = new ForbidResult();
             return;
         }
 
