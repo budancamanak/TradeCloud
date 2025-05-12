@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import AuthService from "../services/Auth.Service";
 
 function Sidebar() {
@@ -28,19 +29,16 @@ function Sidebar() {
             </a>
             <ul className="nav nav-treeview">
               <li className="nav-item">
-                <a href="pages/layout/top-nav.html" className="nav-link">
+                <Link to="/symbols" className="nav-link">
                   <i className="far fa-circle nav-icon"></i>
                   <p>Symbol List</p>
-                </a>
+                </Link>
               </li>
               <li className="nav-item">
-                <a
-                  href="pages/layout/top-nav-sidebar.html"
-                  className="nav-link"
-                >
+                <Link to="/tracklist" className="nav-link">
                   <i className="far fa-circle nav-icon"></i>
                   <p>Track List</p>
-                </a>
+                </Link>
               </li>
             </ul>
           </li>

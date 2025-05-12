@@ -3,6 +3,7 @@ import Navbar from "./Navbar.jsx";
 import Sidebar from "./Sidebar.jsx";
 import AppLogo from "../assets/img/AdminLTELogo.png";
 import UserLogo from "../assets/img/user3-128x128.jpg";
+import { Outlet } from "react-router-dom";
 
 function BaseLayout() {
   return (
@@ -87,6 +88,7 @@ function BaseLayout() {
         <section className="content">
           <div className="container-fluid">
             <div className="row">
+              <Outlet></Outlet>
             </div>
           </div>
         </section>
