@@ -17,15 +17,10 @@ function Login() {
   }, []);
 
   const loginAttempt = async (e) => {
-    console.log("attempting login", email, password, rememberMe);
     e.preventDefault();
     var mr = await authService.login_user(email, password);
     if (mr.isSuccess) ToastUtility.login(mr.message);
     else ToastUtility.error(mr.message);
-    console.log(mr);
-
-    // mr = await fetcher.get("AvailableTickers");
-    // console.log(mr);
   };
 
   return (
