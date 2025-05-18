@@ -87,10 +87,10 @@ function Sidebar() {
                 </a>
                 <ul className="nav nav-treeview">
                   <li className="nav-item">
-                    <a href="#" className="nav-link">
-                      <i className="far fa-dot-circle nav-icon"></i>
+                    <Link to="/execution/history" className="nav-link">
+                      <i className="far fa-circle nav-icon"></i>
                       <p>My History</p>
-                    </a>
+                    </Link>
                   </li>
                   <li className="nav-item">
                     <a href="#" className="nav-link">

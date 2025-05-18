@@ -4,6 +4,7 @@ import BaseLayout from "../layouts/BaseLayout";
 import Login from "../features/auth/login/Login";
 import SymbolList from "../features/symbols/SymbolList";
 import TrackList from "../features/symbols/TrackList";
+import ExecutionHistory from "../features/executions/history";
 
 function AppRouter() {
   const logged_in = !!localStorage.getItem("access_token");
@@ -19,6 +20,10 @@ function AppRouter() {
             <Route
               path="/tracklist"
               element={logged_in ? <TrackList /> : <Login />}
+            />
+            <Route
+              path="/execution/history"
+              element={logged_in ? <ExecutionHistory /> : <Login />}
             />
           </Route>
           <Route

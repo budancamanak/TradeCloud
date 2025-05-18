@@ -70,3 +70,15 @@ button:focus-visible {
 /* .content-header .breadcrumb {
   text-transform: capitalize;
 } */
+
+.Failure{
+  color: red;
+}
+
+.Init{
+  color: gray;
+}
+
+.Success{
+  color: green;
+}
