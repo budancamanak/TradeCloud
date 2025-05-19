@@ -1,7 +1,7 @@
 function RangeParameter({ param }) {
   return (
     <>
-      <label>Default Value:</label>
+      {/* <label>Default Value:</label>
       <div className="form-group">
         <input
           type="number"
@@ -9,7 +9,7 @@ function RangeParameter({ param }) {
           placeholder="Default Value"
           defaultValue={param.Value.Default}
         />
-      </div>
+      </div> */}
 
       <label>Minimum Value:</label>
       <div className="form-group">
