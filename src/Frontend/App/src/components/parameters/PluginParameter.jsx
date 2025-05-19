@@ -9,6 +9,7 @@ import RangeParameter from "./RangeParameter";
 import ListParameter from "./ListParameter";
 
 function ParameterInstance({ param, selected_type }) {
+  if(!selected_type) return null;
   console.log("param instance");
   switch (selected_type) {
     case 0:
@@ -23,7 +24,8 @@ function ParameterInstance({ param, selected_type }) {
 }
 
 function PluginParameter({ param }) {
-  const [parameterRange, setParameterRange] = useState(param.type);
+  console.log("plugin parameter>",param);
+  const [parameterRange, setParameterRange] = useState(param.Range);
   return (
     <>
       <div className="card card-default" style={{ minWidth: "300px" }}>
