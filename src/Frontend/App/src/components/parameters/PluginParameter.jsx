@@ -1,8 +1,29 @@
 import { useState, useEffect } from "react";
 import Select from "react-select";
-import { getPluginParameterRange, getPluginParameterValueType } from "../../utils/helpers";
+import {
+  getPluginParameterRange,
+  getPluginParameterValueType,
+} from "../../utils/helpers";
+import SingleParameter from "./SingleParameter";
+import RangeParameter from "./RangeParameter";
+import ListParameter from "./ListParameter";
+
+function ParameterInstance({ param, selected_type }) {
+  console.log("param instance");
+  switch (selected_type) {
+    case 0:
+      return <SingleParameter param={param} />;
+    case 1:
+      return <RangeParameter param={param} />;
+    case 2:
+      return <ListParameter />;
+    default:
+      return <div>Unknown</div>;
+  }
+}
 
 function PluginParameter({ param }) {
+  const [parameterRange, setParameterRange] = useState(param.type);
   return (
     <>
       <div className="card card-default" style={{ minWidth: "300px" }}>
@@ -41,17 +62,13 @@ function PluginParameter({ param }) {
                   defaultValue={param.Range}
                   // value={param.Range}
                   // inputValue={getPluginParameterRange()[param.Range].name}
+                  onChange={(e) => {
+                    console.log(e);
+                    setParameterRange(e.type);
+                  }}
                   options={getPluginParameterRange()}
                 />
               </div>
-
-              <div className="form-group">
-                <label>Symbol to run</label>
-
-              </div>
-            </div>
-
-            <div className="col-md-6">
               <div className="form-group">
                 <label>Value Type:</label>
 
@@ -67,22 +84,14 @@ function PluginParameter({ param }) {
                   options={getPluginParameterValueType()}
                 />
               </div>
+            </div>
+
+            <div className="col-md-6">
               <div className="form-group">
-                <label>Timeframe</label>
-                <select
-                  className="form-control select2bs4"
-                  style={{ width: "100%" }}
-                >
-                  <option value={"5m"}>5m</option>
-                  <option value={"15m"}>15m</option>
-                  <option value={"30m"}>30m</option>
-                  <option value={"60m"}>1H</option>
-                  <option value={"120m"}>2H</option>
-                  <option value={"240m"}>4H</option>
-                  <option value={"480m"}>8H</option>
-                  <option value={"720m"}>12H</option>
-                  <option value={"1440m"}>1D</option>
-                </select>
+                <ParameterInstance
+                  param={param}
+                  selected_type={parameterRange}
+                />
               </div>
             </div>
           </div>

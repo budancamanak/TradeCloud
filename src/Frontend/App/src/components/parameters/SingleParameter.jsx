@@ -1,10 +1,17 @@
-
-function SingleParameter({def_value}){
+function SingleParameter({ param }) {
   return (
     <>
-    <input type="text" value={def_value}/>
+      <label>Parameter Value:</label>
+      <div className="form-group">
+        <input
+          type="number"
+          className="form-control"
+          placeholder="Value"
+          defaultValue={param.Value}
+        />
+      </div>
     </>
-  )
+  );
 }
 
 export default SingleParameter;
