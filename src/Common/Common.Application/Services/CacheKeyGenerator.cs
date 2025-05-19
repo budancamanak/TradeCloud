@@ -20,6 +20,7 @@ public static class CacheKeyGenerator
     public static string ActivePluginKey(int pluginId) => $"ActivePlugins:P{pluginId}";
     public static string ActiveAnalysisKey(int analysisId) => $"ActiveAnalysis:A{analysisId}";
     public static string ActivePluginParamsKey(int pluginId) => $"ActivePluginParams:P{pluginId}";
+    public static string AvailablePluginParamsKey(string identifier) => $"AvailablePluginParams:P{identifier}";
     public static string ActivePluginCountKey() => "ActivePluginCount";
 
     // backend

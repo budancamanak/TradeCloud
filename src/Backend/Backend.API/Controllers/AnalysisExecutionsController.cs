@@ -7,6 +7,8 @@ using Backend.Application.Features.Execution.ListAvailablePlugins;
 using Backend.Application.Features.Execution.RunAnalysisExecution;
 using Backend.Application.Features.Execution.StopAnalysisExecution;
 using Backend.Application.Features.Execution.UserAnalysisExecutionList;
+using Common.Application.Repositories;
+using Common.Application.Services;
 using Common.Core.DTOs.Backend;
 using Common.Core.Enums;
 using Common.Core.Models;
@@ -29,6 +31,7 @@ namespace Backend.API.Controllers;
 public class AnalysisExecutionsController(
     ILogger<AnalysisExecutionsController> logger,
     IHttpContextAccessor contextAccessor,
+    ICacheService cache,
     IMediator mediator,
     IMapper mapper)
 {
@@ -41,6 +44,19 @@ public class AnalysisExecutionsController(
         var request = new ListAvailablePluginsRequest();
         var result = await mediator.Send(request);
         return result;
+    }
+
+    [HttpGet("/AvailablePluginParameters")]
+    [HasPermission(Permissions.Enum.RunAnalysis, Permissions.Enum.ManageScripts)]
+    [HasRole(Roles.Enum.Admin, Roles.Enum.Analyst, Roles.Enum.ScriptDeveloper)]
+    public async Task<string> GetAvailablePluginPluginParameters(string identifier)
+    {
+        var currentUser = contextAccessor.CurrentUser();
+        // var request = new ListAvailablePluginsRequest();
+        // var result = await mediator.Send(request);
+        // return result;
+        var values = await cache.GetAsync<string>(CacheKeyGenerator.AvailablePluginParamsKey(identifier));
+        return values;
     }
 
 

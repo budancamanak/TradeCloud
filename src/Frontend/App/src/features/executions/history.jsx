@@ -31,6 +31,22 @@ function ExecutionHistory() {
             <h3 className="card-title">
               Symbols that are registered within the system
             </h3>
+            <div className="card-tools">
+              <button
+                type="button"
+                className="btn btn-tool"
+                data-card-widget="collapse"
+              >
+                <i className="fas fa-minus"></i>
+              </button>
+              <button
+                type="button"
+                className="btn btn-tool"
+                data-card-widget="remove"
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
           </div>
           <div className="card-body">
             <table id="example1" className="table table-bordered table-striped">
@@ -58,7 +74,7 @@ function ExecutionHistory() {
                       {item.timeframe}
                     </td>
                     <td className={`${item.status}`}>{item.status}</td>
-                    <td>%{item.progress*100}</td>
+                    <td>%{item.progress * 100}</td>
                     <td>{item.startDate}</td>
                     <td>{item.endDate}</td>
                     <td>{item.pluginExecutions?.length}</td>

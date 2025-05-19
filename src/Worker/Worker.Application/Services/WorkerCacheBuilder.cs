@@ -38,6 +38,8 @@ public class AvailablePluginsCacheBuilder(
 
                 await cache.SetAsync(CacheKeyGenerator.AvailablePluginKey(item.GetPluginInfo().Identifier), item,
                     TimeSpan.MaxValue);
+                await cache.SetAsync(CacheKeyGenerator.AvailablePluginParamsKey(item.GetPluginInfo().Identifier), item.GetDefaultParamSet().GetParamSet().ToJson(),
+                    TimeSpan.MaxValue);
             }
 
             await cache.SetAsync("AvailablePlugins", plugins.Select(s => s.GetPluginInfo()).ToList(),
