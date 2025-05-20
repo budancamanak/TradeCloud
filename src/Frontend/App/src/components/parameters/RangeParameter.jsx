@@ -1,4 +1,16 @@
-function RangeParameter({ param }) {
+import { useState } from "react";
+
+function RangeParameter({ ...props }) {
+  const [min, setMin] = useState(props.param.Value.Min);
+  const [max, setMax] = useState(props.param.Value.Max);
+  const setMinimum = (value) => {
+    props.param.Value.Min = parseInt(value);
+    setMin(value);
+  };
+  const setMaximum = (value) => {
+    props.param.Value.Max = parseInt(value);
+    setMax(value);
+  };
   return (
     <>
       {/* <label>Default Value:</label>
@@ -17,7 +29,9 @@ function RangeParameter({ param }) {
           type="number"
           className="form-control"
           placeholder="Minimum Value"
-          defaultValue={param.Value.Min}
+          value={min}
+          onChange={(e) => setMinimum(e.target.value)}
+          defaultValue={props.param.Value.Min}
         />
       </div>
 
@@ -27,7 +41,9 @@ function RangeParameter({ param }) {
           type="number"
           className="form-control"
           placeholder="Maximum Value"
-          defaultValue={param.Value.Max}
+          value={max}
+          onChange={(e) => setMaximum(e.target.value)}
+          defaultValue={props.param.Value.Max}
         />
       </div>
 
@@ -37,7 +53,7 @@ function RangeParameter({ param }) {
           type="number"
           className="form-control"
           placeholder="Increment"
-          defaultValue={param.Value.Increment}
+          defaultValue={props.param.Value.Increment}
         />
       </div>
     </>
