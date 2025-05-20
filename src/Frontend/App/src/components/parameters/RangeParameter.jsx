@@ -4,10 +4,14 @@ function RangeParameter({ ...props }) {
   const [min, setMin] = useState(props.param.Value.Min);
   const [max, setMax] = useState(props.param.Value.Max);
   const setMinimum = (value) => {
+    if (!props.param.Value.Min)
+      props.param.Value = { ...props.param.Value, ...{ Min: 0 } };
     props.param.Value.Min = parseInt(value);
     setMin(value);
   };
   const setMaximum = (value) => {
+    if (!props.param.Value.Max)
+      props.param.Value = { ...props.param.Value, ...{ Max: 0 } };
     props.param.Value.Max = parseInt(value);
     setMax(value);
   };

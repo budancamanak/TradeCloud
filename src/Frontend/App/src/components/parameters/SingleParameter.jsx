@@ -1,7 +1,11 @@
 import { useState } from "react";
 
-function SingleParameter({ param }) {
-  const [value, setValue] = useState(param.Value);
+function SingleParameter({ ...props }) {
+  const [value, setValue] = useState(props.param.Value);
+  const setCurrentValue = (value) => {
+    props.param.Value = parseInt(value);
+    setValue(value);
+  };
   return (
     <>
       <label>Parameter Value:</label>
@@ -11,7 +15,8 @@ function SingleParameter({ param }) {
           className="form-control"
           placeholder="Value"
           value={value}
-          defaultValue={param.Value}
+          onChange={(e) => setCurrentValue(e.target.value)}
+          defaultValue={props.param.Value}
         />
       </div>
     </>

@@ -9,7 +9,7 @@ import RangeParameter from "./RangeParameter";
 import ListParameter from "./ListParameter";
 
 function ParameterInstance({ ...props }) {
-  if (!props.selected_type) return null;
+  // if (!props.selected_type) return null;
   console.log("param instance");
   switch (props.selected_type) {
     case 0:

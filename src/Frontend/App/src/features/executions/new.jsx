@@ -43,6 +43,7 @@ function NewExecution() {
   const saveAnalysisExecution = () => {
     console.log("saveAnalysisExecution", pluginParameters);
     ToastUtility.success("Will save analysis execution");
+    console.log(JSON.stringify(pluginParameters));
   };
 
   const resetExecutionParamsConfirmation = () => {
