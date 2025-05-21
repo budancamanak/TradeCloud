@@ -70,13 +70,6 @@ function NewExecution() {
               >
                 <i className="fas fa-minus"></i>
               </button>
-              <button
-                type="button"
-                className="btn btn-tool"
-                data-card-widget="remove"
-              >
-                <i className="fas fa-times"></i>
-              </button>
             </div>
           </div>
 
@@ -156,13 +149,6 @@ function NewExecution() {
                 data-card-widget="collapse"
               >
                 <i className="fas fa-minus"></i>
-              </button>
-              <button
-                type="button"
-                className="btn btn-tool"
-                data-card-widget="remove"
-              >
-                <i className="fas fa-times"></i>
               </button>
             </div>
           </div>

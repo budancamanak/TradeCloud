@@ -39,13 +39,6 @@ function ExecutionHistory() {
               >
                 <i className="fas fa-minus"></i>
               </button>
-              <button
-                type="button"
-                className="btn btn-tool"
-                data-card-widget="remove"
-              >
-                <i className="fas fa-times"></i>
-              </button>
             </div>
           </div>
           <div className="card-body">
