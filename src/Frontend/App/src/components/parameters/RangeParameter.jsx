@@ -43,7 +43,6 @@ function RangeParameter({ ...props }) {
           placeholder="Minimum Value"
           value={min}
           onChange={(e) => changeMinimum(e.target.value)}
-          defaultValue={props.param.Value.Min}
         />
       </div>
 
@@ -55,7 +54,6 @@ function RangeParameter({ ...props }) {
           placeholder="Maximum Value"
           value={max}
           onChange={(e) => changeMaximum(e.target.value)}
-          defaultValue={props.param.Value.Max}
         />
       </div>
 
@@ -67,7 +65,6 @@ function RangeParameter({ ...props }) {
           placeholder="Increment"
           value={increment}
           onChange={(e) => changeIncrement(e.target.value)}
-          defaultValue={props.param.Value.Increment}
         />
       </div>
     </>

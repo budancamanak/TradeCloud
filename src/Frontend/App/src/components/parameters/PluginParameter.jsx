@@ -17,7 +17,7 @@ function ParameterInstance({ ...props }) {
     case 1:
       return <RangeParameter param={props.param} />;
     case 2:
-      return <ListParameter />;
+      return <ListParameter param={props.param} />;
     default:
       return <div>Unknown</div>;
   }

@@ -16,7 +16,6 @@ function SingleParameter({ ...props }) {
           placeholder="Value"
           value={value}
           onChange={(e) => setCurrentValue(e.target.value)}
-          defaultValue={props.param.Value}
         />
       </div>
     </>

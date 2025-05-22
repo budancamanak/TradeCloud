@@ -3,7 +3,7 @@ import React, { KeyboardEventHandler } from "react";
 
 import CreatableSelect from "react-select/creatable";
 
-function ListParameter({ param }) {
+function ListParameter({ ...props }) {
   const components = {
     DropdownIndicator: null,
   };
@@ -13,12 +13,25 @@ function ListParameter({ param }) {
   });
   const [inputValue, setInputValue] = useState("");
   const [value, setValue] = React.useState([]);
+
+  const setListValues = (new_value) => {
+    setValue((prev) => [...prev, createOption(new_value)]);
+    if (!Array.isArray(props.param.Value)) props.param.Value = [];
+    props.param.Value = [...props.param.Value, new_value];
+    console.log(props.param.Value);
+  };
+  const xOnChange = (values) => {
+    console.log(values);
+    setValue(values);
+    if (!Array.isArray(props.param.Value)) props.param.Value = [];
+    props.param.Value = values.map((f) => f.value);
+  };
   const handleKeyDown = (event) => {
     if (!inputValue) return;
     switch (event.key) {
       case "Enter":
       case "Tab":
-        setValue((prev) => [...prev, createOption(inputValue)]);
+        setListValues(inputValue);
         setInputValue("");
         event.preventDefault();
     }
@@ -37,7 +50,7 @@ function ListParameter({ param }) {
             isClearable
             isMulti
             menuIsOpen={false}
-            onChange={(newValue) => setValue(newValue)}
+            onChange={(newValue) => xOnChange(newValue)}
             onInputChange={(newValue) => setInputValue(newValue)}
             onKeyDown={handleKeyDown}
             placeholder="Type something and press enter..."
