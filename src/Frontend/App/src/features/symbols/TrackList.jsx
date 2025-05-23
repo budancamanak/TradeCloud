@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import $ from "jquery";
 import AuthService from "../../services/Auth.Service";
 import { ToastUtility } from "../../utils/toast-utility";
 

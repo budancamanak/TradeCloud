@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Select from "react-select";
 import {
   getPluginParameterRange,
@@ -10,7 +10,6 @@ import ListParameter from "./ListParameter";
 
 function ParameterInstance({ ...props }) {
   // if (!props.selected_type) return null;
-  console.log("param instance");
   switch (props.selected_type) {
     case 0:
       return <SingleParameter param={props.param} />;
@@ -103,4 +102,5 @@ function PluginParameter({ ...props }) {
     </>
   );
 }
-export default PluginParameter;
+const MemoizedPluginParameter = React.memo(PluginParameter);
+export { PluginParameter, MemoizedPluginParameter };

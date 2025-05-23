@@ -17,6 +17,20 @@ export const getPluginParameterValueType = () => {
   ];
 };
 
+export const getTimeFrames = () => {
+  return [
+    { value: "5m", name: "5m" },
+    { value: "15m", name: "15m" },
+    { value: "30m", name: "30m" },
+    { value: "1h", name: "1H" },
+    { value: "2h", name: "2H" },
+    { value: "4h", name: "4H" },
+    // { value: "8h", name: "8H" },
+    { value: "12h", name: "12H" },
+    { value: "1D", name: "1D" },
+  ];
+};
+
 // export default async function fetcher(url, options) {
 //   return (await fetch(url, updateOptions(options))).json();
 // }

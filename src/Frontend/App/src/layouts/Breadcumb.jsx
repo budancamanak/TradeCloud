@@ -32,7 +32,7 @@ function Breadcumb() {
             ) : (
               <li className="breadcrumb-item" key={breadcrumbPath}>
                 {" "}
-                / <Link to={breadcrumbPath}>{name}</Link>
+                 <Link to={breadcrumbPath}>{name}</Link>
               </li>
             );
           })}

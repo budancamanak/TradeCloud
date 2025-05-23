@@ -1,23 +1,31 @@
-import { useState, useEffect, useRef, createRef } from "react";
-import AuthService from "../../services/Auth.Service";
+// import $ from 'jquery';
+import { useState, useEffect } from "react";
+// import DateRangePicker from "react-bootstrap-daterangepicker";
 import { ToastUtility } from "../../utils/toast-utility";
 import Fetcher from "../../utils/network";
 import Select from "react-select";
-import PluginParameter from "../../components/parameters/PluginParameter";
+import { MemoizedPluginParameter } from "../../components/parameters/PluginParameter";
+import { getTimeFrames } from "../../utils/helpers";
 
 function NewExecution() {
   const [tickers, setTickers] = useState([]);
   const [plugins, setPlugins] = useState([]);
   const [pluginParameters, setPluginParameters] = useState([]);
   const fetcher = new Fetcher();
+  const [model, setModel] = useState({
+    pluginIdentifier: "",
+    symbol: "",
+    startDate: "",
+    endDate: "",
+    timeframe: "",
+    paramSet: "",
+    tradingParams: "",
+  });
 
   useEffect(() => {
     fetcher.get("AvailableTickers").then((result) => {
-      console.log("setting tickers");
       setTickers(result);
     });
-  }, []);
-  useEffect(() => {
     fetcher.get("AvailablePlugins").then((result) => {
       console.log("setting plugins");
       setPlugins(result);
@@ -25,25 +33,51 @@ function NewExecution() {
   }, []);
   useEffect(() => {
     $("#executionDateRange").daterangepicker();
-  }, []);
+    $("#executionDateRange").on("apply.daterangepicker", function (ev, picker) {
+      const start = picker.startDate.toISOString();
+      const end = picker.endDate.toISOString();
+      console.log(model);
+      setModel({ ...model, startDate: start, endDate: end });
+    });
+  }, [model]);
 
-  const getPluginDefaultParamset = (plugin) => {
-    fetcher
-      .get(`AvailablePluginParameters?identifier=${plugin.identifier}`)
-      .then(function (result) {
-        let params = Object.entries(result).flatMap((x) => [x[1]]);
-        console.log(params);
-        setPluginParameters(params);
-      });
+  const getPluginDefaultParamset = async (plugin) => {
+    const mr = await fetcher.get(
+      `AvailablePluginParameters?identifier=${plugin.identifier}`
+    );
+    let params = Object.entries(mr).flatMap((x) => [x[1]]);
+    console.log(model);
+    setPluginParameters(params);
+    setModel({
+      ...model,
+      pluginIdentifier: plugin.identifier,
+      // paramSet: params,
+    });
   };
+
+  const setSelectedTimeFrame = (tf) => {
+    console.log(model);
+    setModel({ ...model, timeframe: tf.value });
+  };
+
+  const setSelectedSymbol = (tf) => {
+    console.log(model);
+    setModel({ ...model, symbol: tf.symbol });
+  };
+
   const saveAnalysisExecutionConfirmation = () => {
+    console.log(model);
+    setModel({ ...model, paramSet: JSON.stringify(pluginParameters) });
     $("#saveConfirmationModal").modal("show");
   };
 
-  const saveAnalysisExecution = () => {
+  const saveAnalysisExecution = async () => {
     console.log("saveAnalysisExecution", pluginParameters);
-    ToastUtility.success("Will save analysis execution");
-    console.log(JSON.stringify(pluginParameters));
+    ToastUtility.info("Saving analysis execution...");
+    // const data = JSON.stringify(model);
+    const mr = await fetcher.post("AnalysisExecutions", model);
+    console.log(mr);
+    ToastUtility.success(`Result: ${mr.message}`);
   };
 
   const resetExecutionParamsConfirmation = () => {
@@ -60,7 +94,7 @@ function NewExecution() {
       <div className="col-md-12">
         <div className="card card-default">
           <div className="card-header">
-            <h3 className="card-title">Base Information</h3>
+            <h3 className="card-title">Plugin Information</h3>
 
             <div className="card-tools">
               <button
@@ -91,6 +125,7 @@ function NewExecution() {
                 <div className="form-group">
                   <label>Symbol to run</label>
                   <Select
+                    onChange={setSelectedSymbol}
                     getOptionLabel={(option) =>
                       `${option.name} (${option.exchangeName})`
                     }
@@ -119,20 +154,12 @@ function NewExecution() {
                 </div>
                 <div className="form-group">
                   <label>Timeframe</label>
-                  <select
-                    className="form-control select2bs4"
-                    style={{ width: "100%" }}
-                  >
-                    <option value={"5m"}>5m</option>
-                    <option value={"15m"}>15m</option>
-                    <option value={"30m"}>30m</option>
-                    <option value={"60m"}>1H</option>
-                    <option value={"120m"}>2H</option>
-                    <option value={"240m"}>4H</option>
-                    <option value={"480m"}>8H</option>
-                    <option value={"720m"}>12H</option>
-                    <option value={"1440m"}>1D</option>
-                  </select>
+                  <Select
+                    onChange={setSelectedTimeFrame}
+                    getOptionLabel={(option) => `${option.name}`}
+                    getOptionValue={(option) => `${option.value}`}
+                    options={getTimeFrames()}
+                  />
                 </div>
               </div>
             </div>
@@ -156,10 +183,7 @@ function NewExecution() {
           <div className="card-body">
             <div className="row" style={{ gap: "15px" }}>
               {pluginParameters.map((param) => (
-                <PluginParameter
-                  key={param.Name}
-                  param={param}
-                />
+                <MemoizedPluginParameter key={param.Name} param={param} />
               ))}
             </div>
           </div>
