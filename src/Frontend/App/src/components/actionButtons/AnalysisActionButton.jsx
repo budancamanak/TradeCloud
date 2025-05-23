@@ -8,16 +8,10 @@ function AnalysisActionButton({ ...props }) {
   return (
     <>
       <div class="btn-group">
-        <button type="button" class="btn btn-default">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
           {props.title || "Action"}
         </button>
-        <button
-          type="button"
-          class="btn btn-default dropdown-toggle dropdown-icon"
-          data-toggle="dropdown"
-        >
-          <span class="sr-only">Toggle Dropdown</span>
-        </button>
+
         <div class="dropdown-menu" role="menu">
           <a class="dropdown-item" href="#" onClick={() => onAction("Details")}>
             Details
@@ -46,14 +40,15 @@ function AnalysisActionButton({ ...props }) {
               Cancel
             </a>
           )}
-
-          <a
-            class="dropdown-item"
-            href="#"
-            onClick={() => onAction("ViewInChart")}
-          >
-            View in Chart
-          </a>
+          {props.execution.status === "Success" && (
+            <a
+              class="dropdown-item"
+              href="#"
+              onClick={() => onAction("ViewInChart")}
+            >
+              View in Chart
+            </a>
+          )}
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="#" onClick={() => onAction("Delete")}>
             Delete
