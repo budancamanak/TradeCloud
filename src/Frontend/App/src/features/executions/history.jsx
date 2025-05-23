@@ -1,13 +1,8 @@
 import { useState, useEffect } from "react";
-// import $ from "jquery";
-import AuthService from "../../services/Auth.Service";
 import { ToastUtility } from "../../utils/toast-utility";
 import Fetcher from "../../utils/network";
 import DataTable from "datatables.net-bs4";
 import AnalysisActionButton from "../../components/actionButtons/AnalysisActionButton";
-// import "../../lib/plugins/jquery/jquery.min";
-// import "../../lib/plugins/jquery-ui/jquery-ui.min";
-// import "../../lib/plugins/datatables/jquery.dataTables.min";
 
 function ExecutionHistory() {
   const [tickers, setTickers] = useState([]);
@@ -19,10 +14,15 @@ function ExecutionHistory() {
       setTickers(result);
     });
   }, []);
+
   useEffect(() => {
     console.log("init dtable");
     if (tickers && tickers.length > 0) new DataTable("#example1");
   }, [tickers]);
+
+  const executeAction = (type, execution) => {
+    console.log(type, execution);
+  };
 
   return (
     <>
@@ -76,35 +76,8 @@ function ExecutionHistory() {
                       <AnalysisActionButton
                         title={"Actions"}
                         execution={item}
-                        onAction={(type, item) => console.log(type, item)}
+                        onAction={executeAction}
                       />
-                      {/* <div class="btn-group">
-                        <button type="button" class="btn btn-default">
-                          Action
-                        </button>
-                        <button
-                          type="button"
-                          class="btn btn-default dropdown-toggle dropdown-icon"
-                          data-toggle="dropdown"
-                        >
-                          <span class="sr-only">Toggle Dropdown</span>
-                        </button>
-                        <div class="dropdown-menu" role="menu">
-                          <a class="dropdown-item" href="#">
-                            Details
-                          </a>
-                          <a class="dropdown-item" href="#">
-                            Restart
-                          </a>
-                          <a class="dropdown-item" href="#">
-                            View in Chart
-                          </a>
-                          <div class="dropdown-divider"></div>
-                          <a class="dropdown-item" href="#">
-                            Delete
-                          </a>
-                        </div>
-                      </div> */}
                     </td>
                   </tr>
                 ))}
