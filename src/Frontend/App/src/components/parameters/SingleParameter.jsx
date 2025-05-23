@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function SingleParameter({ ...props }) {
   const [value, setValue] = useState(props.param.Value);
+  useEffect(() => {
+    props.param.Range = 0;
+  }, []);
   const setCurrentValue = (value) => {
     props.param.Value = parseInt(value);
     setValue(value);

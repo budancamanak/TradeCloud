@@ -1,5 +1,4 @@
-import { useState } from "react";
-import React, { KeyboardEventHandler } from "react";
+import { useState, useEffect } from "react";
 
 import CreatableSelect from "react-select/creatable";
 
@@ -12,7 +11,11 @@ function ListParameter({ ...props }) {
     value: label,
   });
   const [inputValue, setInputValue] = useState("");
-  const [value, setValue] = React.useState([]);
+  const [value, setValue] = useState([]);
+
+  useEffect(() => {
+    props.param.Range = 2;
+  }, []);
 
   const setListValues = (new_value) => {
     setValue((prev) => [...prev, createOption(new_value)]);

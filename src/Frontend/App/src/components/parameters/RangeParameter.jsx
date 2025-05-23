@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function RangeParameter({ ...props }) {
   const [min, setMin] = useState(props.param.Value.Min);
   const [max, setMax] = useState(props.param.Value.Max);
   const [increment, setIncrement] = useState(props.param.Value.Increment);
+
+  useEffect(() => {
+    props.param.Range = 1;
+  }, []);
 
   const changeMinimum = (value) => {
     if (!props.param.Value.Min)
