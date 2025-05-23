@@ -4,6 +4,7 @@ import AuthService from "../../services/Auth.Service";
 import { ToastUtility } from "../../utils/toast-utility";
 import Fetcher from "../../utils/network";
 import DataTable from "datatables.net-bs4";
+import AnalysisActionButton from "../../components/actionButtons/AnalysisActionButton";
 // import "../../lib/plugins/jquery/jquery.min";
 // import "../../lib/plugins/jquery-ui/jquery-ui.min";
 // import "../../lib/plugins/datatables/jquery.dataTables.min";
@@ -72,7 +73,12 @@ function ExecutionHistory() {
                     <td>{item.endDate}</td>
                     <td>{item.pluginExecutions?.length}</td>
                     <td>
-                      <div class="btn-group">
+                      <AnalysisActionButton
+                        title={"Actions"}
+                        execution={item}
+                        onAction={(type, item) => console.log(type, item)}
+                      />
+                      {/* <div class="btn-group">
                         <button type="button" class="btn btn-default">
                           Action
                         </button>
@@ -98,7 +104,7 @@ function ExecutionHistory() {
                             Delete
                           </a>
                         </div>
-                      </div>
+                      </div> */}
                     </td>
                   </tr>
                 ))}
