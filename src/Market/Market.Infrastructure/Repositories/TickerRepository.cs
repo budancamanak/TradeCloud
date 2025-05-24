@@ -28,7 +28,7 @@ public class TickerRepository(MarketDbContext dbContext, IValidator<Ticker> vali
         Guard.Against.NegativeOrZero(exchangeId);
         var exchange = await dbContext.Exchanges.FirstOrDefaultAsync(f => f.Id == exchangeId);
         Guard.Against.Null(exchange);
-        var items = await dbContext.Tickers.Where(f => f.ExchangeId == exchangeId).ToListAsync();
+        var items = await dbContext.Tickers.Where(f => f.ExchangeId == exchangeId).OrderByDescending(f => f.Id).ToListAsync();
         return items;
     }
 
@@ -44,7 +44,7 @@ public class TickerRepository(MarketDbContext dbContext, IValidator<Ticker> vali
 
     public async Task<List<Ticker>> GetAllAsync()
     {
-        var items = await dbContext.Tickers.Include(f => f.Exchange).ToListAsync();
+        var items = await dbContext.Tickers.Include(f => f.Exchange).OrderByDescending(f => f.Id).ToListAsync();
         return items;
     }
 

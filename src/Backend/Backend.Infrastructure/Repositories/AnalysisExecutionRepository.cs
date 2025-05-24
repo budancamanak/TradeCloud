@@ -24,7 +24,7 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
 
     public async Task<List<AnalysisExecution>> GetAllAsync()
     {
-        return await dbContext.AnalysisExecutions.ToListAsync();
+        return await dbContext.AnalysisExecutions.OrderByDescending(f => f.Id).ToListAsync();
     }
 
     public async Task<MethodResponse> AddAsync(AnalysisExecution item)
@@ -83,7 +83,8 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
     public async Task<List<AnalysisExecution>> GetUserAnalysisExecutions(int userId)
     {
         Guard.Against.NegativeOrZero(userId);
-        var items = await dbContext.AnalysisExecutions.Where(f => f.UserId == userId).ToListAsync();
+        var items = await dbContext.AnalysisExecutions.Where(f => f.UserId == userId).OrderByDescending(f => f.Id)
+            .ToListAsync();
         return items;
     }
 
@@ -92,14 +93,14 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
         Guard.Against.NegativeOrZero(userId);
         Guard.Against.EnumOutOfRange(status);
         var items = await dbContext.AnalysisExecutions.Where(f => f.UserId == userId && f.Status == status)
-            .ToListAsync();
+            .OrderByDescending(f => f.Id).ToListAsync();
         return items;
     }
 
     public async Task<MethodResponse> SetAnalysisExecutionProgress(int id, int increment, int total)
     {
         Guard.Against.NegativeOrZero(id);
-        var existing =await dbContext.AnalysisExecutions.FindAsync(id);
+        var existing = await dbContext.AnalysisExecutions.FindAsync(id);
         Guard.Against.Null(existing);
         if (existing.ProgressTotal == 0)
         {

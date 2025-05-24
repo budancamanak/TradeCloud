@@ -24,7 +24,7 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
 
     public async Task<List<PluginExecution>> GetAllAsync()
     {
-        return await dbContext.PluginExecutions.ToListAsync();
+        return await dbContext.PluginExecutions.OrderByDescending(f => f.Id).ToListAsync();
     }
 
     public async Task<MethodResponse> AddAsync(PluginExecution item)
@@ -83,6 +83,7 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
     {
         var items = await dbContext.PluginExecutions
             // .Where(f => f.Status == PluginStatus.Init || f.Status == PluginStatus.Queued)
+            .OrderByDescending(f => f.Id)
             .ToListAsync();
         return items;
     }
@@ -93,28 +94,30 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
             .Where(f => f.AnalysisExecutionId == analysisId &&
                         f.Status != PluginStatus.Failure &&
                         f.Status != PluginStatus.Success &&
-                        f.Status != PluginStatus.Init).ToListAsync();
+                        f.Status != PluginStatus.Init).OrderByDescending(f => f.Id).ToListAsync();
         return items;
     }
 
     public async Task<List<PluginExecution>> GetPluginExecutionsWithStatus(PluginStatus status)
     {
         var items = await dbContext.PluginExecutions
-            .Where(f => f.Status == status).ToListAsync();
+            .Where(f => f.Status == status).OrderByDescending(f => f.Id).ToListAsync();
         return items;
     }
 
     public async Task<List<PluginExecution>> GetPluginExecutionsWithStatus(int analysisId, params PluginStatus[] status)
     {
         var items = await dbContext.PluginExecutions
-            .Where(f => f.AnalysisExecutionId == analysisId && status.Contains(f.Status)).ToListAsync();
+            .Where(f => f.AnalysisExecutionId == analysisId && status.Contains(f.Status)).OrderByDescending(f => f.Id)
+            .ToListAsync();
         return items;
     }
 
     public async Task<List<PluginExecution>> GetPluginOfAnalysis(int analysisId)
     {
         Guard.Against.NegativeOrZero(analysisId);
-        var items = await dbContext.PluginExecutions.Where(f => f.AnalysisExecutionId == analysisId).ToListAsync();
+        var items = await dbContext.PluginExecutions.Where(f => f.AnalysisExecutionId == analysisId)
+            .OrderByDescending(f => f.Id).ToListAsync();
         return items;
     }
 

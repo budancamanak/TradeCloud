@@ -27,7 +27,7 @@ public class ExchangeRepository(
 
     public async Task<List<Exchange>> GetAllAsync()
     {
-        var items = await dbContext.Exchanges.ToListAsync();
+        var items = await dbContext.Exchanges.OrderByDescending(f => f.Id).ToListAsync();
         return items;
     }
 
