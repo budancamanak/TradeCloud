@@ -8,7 +8,11 @@ function AnalysisActionButton({ ...props }) {
   return (
     <>
       <div class="btn-group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+        <button
+          type="button"
+          class="btn btn-default dropdown-toggle"
+          data-toggle="dropdown"
+        >
           {props.title || "Action"}
         </button>
 
@@ -16,6 +20,11 @@ function AnalysisActionButton({ ...props }) {
           <a class="dropdown-item" href="#" onClick={() => onAction("Details")}>
             Details
           </a>
+          {props.execution.status !== "Running" && (
+            <a class="dropdown-item" href="#" onClick={() => onAction("Edit")}>
+              Edit
+            </a>
+          )}
           {props.execution.status === "Init" && (
             <a class="dropdown-item" href="#" onClick={() => onAction("Start")}>
               Start

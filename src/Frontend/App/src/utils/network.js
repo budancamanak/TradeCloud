@@ -41,6 +41,16 @@ class Fetcher {
     ).json();
   };
 
+  send = async (url, method, data) => {
+    const finalUrl = this.BASE_URL + url;
+    return (
+      await fetch(
+        finalUrl,
+        this.updateOptions(this.createOptions(method, data))
+      )
+    ).json();
+  };
+
   get = async (url) => {
     const finalUrl = this.BASE_URL + url;
     return (

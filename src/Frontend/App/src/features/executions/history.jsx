@@ -6,22 +6,37 @@ import AnalysisActionButton from "../../components/actionButtons/AnalysisActionB
 
 function ExecutionHistory() {
   const [tickers, setTickers] = useState([]);
+  const [update, setUpdate] = useState(false);
   const fetcher = new Fetcher();
 
   useEffect(() => {
+    setUpdate(false);
     fetcher.get("AnalysisExecutions/User/1/Info").then((result) => {
       console.log("setting tickers");
       setTickers(result);
+      setUpdate(true);
     });
   }, []);
 
   useEffect(() => {
     console.log("init dtable");
     if (tickers && tickers.length > 0) new DataTable("#example1");
-  }, [tickers]);
+  }, [tickers, update]);
+
+  const startExecution = async (execution) => {
+    const mr = await fetcher.send("AnalysisExecutions", "PATCH", {
+      executionId: execution.id,
+    });
+    if (mr.isSuccess) ToastUtility.success(mr.message);
+    else ToastUtility.error(mr.message);
+  };
 
   const executeAction = (type, execution) => {
     console.log(type, execution);
+    if ("Start" === type || "Restart" === type) {
+      startExecution(execution);
+      return;
+    }
   };
 
   return (
@@ -68,7 +83,7 @@ function ExecutionHistory() {
                       {item.timeframe}
                     </td>
                     <td className={`${item.status}`}>{item.status}</td>
-                    <td>%{item.progress * 100}</td>
+                    <td>%{(item.progress * 100).toFixed(2)}</td>
                     <td>{item.startDate}</td>
                     <td>{item.endDate}</td>
                     <td>{item.pluginExecutions?.length}</td>
