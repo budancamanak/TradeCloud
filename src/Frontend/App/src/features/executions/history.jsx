@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { ToastUtility } from "../../utils/toast-utility";
 import Fetcher from "../../utils/network";
 import DataTable from "datatables.net-bs4";
 import AnalysisActionButton from "../../components/actionButtons/AnalysisActionButton";
 
 function ExecutionHistory() {
+  const navigate = useNavigate();
   const [tickers, setTickers] = useState([]);
   const [update, setUpdate] = useState(false);
   const fetcher = new Fetcher();
@@ -35,6 +38,10 @@ function ExecutionHistory() {
     console.log(type, execution);
     if ("Start" === type || "Restart" === type) {
       startExecution(execution);
+      return;
+    }
+    if ("ViewInChart" === type) {
+      navigate(`/execution/${execution.id}/chart`);
       return;
     }
   };

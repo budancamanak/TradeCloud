@@ -6,12 +6,20 @@ import "customTypes.proto";
 
 service GrpcPriceService {
   rpc GetPricesForPlugin(GrpcGetPricesRequest) returns (GrpcGetPricesResponse);
+  rpc GetTickerPrices(GrpcGetTickerPricesRequest) returns (GrpcGetPricesResponse);
 }
 
 service GrpcTickerService{
   rpc GetTickerWithId(GrpcGetTickerWithIdRequest) returns (GrpcTickerResponse);
   rpc GetTickerWithSymbol(GrpcGetTickerWithSymbolRequest) returns (GrpcTickerResponse);
   rpc GetAvailableTickers(GrpcGetAvailableTickersRequest) returns (GrpcAvailableTickersResponse);
+}
+
+message GrpcGetTickerPricesRequest{
+  int32 ticker=1;
+  string timeframe = 3;
+  google.protobuf.Timestamp startDate = 4;
+  google.protobuf.Timestamp endDate = 5;
 }
 
 message GrpcGetPricesRequest {

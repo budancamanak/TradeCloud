@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
 using Common.Core.DTOs;
-using Common.Core.Enums;
 using Common.Grpc;
 using Google.Protobuf.Collections;
 using Google.Protobuf.WellKnownTypes;
-using Market.Application.Features.GetPricesForPlugin.Request;
-using Market.Application.Features.GetTickerPrices;
 
-namespace Market.API.Mappers;
+namespace Backend.API.Mappers;
 
 public class GrpcPriceMappingProfile : Profile
 {
@@ -19,19 +16,12 @@ public class GrpcPriceMappingProfile : Profile
             .ForMember(f => f.High, opt => opt.MapFrom((src, _) => src.High))
             .ForMember(f => f.Low, opt => opt.MapFrom((src, _) => src.Low))
             .ForMember(f => f.Open, opt => opt.MapFrom((src, _) => src.Open));
-
-
-        CreateMap<GrpcGetPricesRequest, GetPricesForPluginQuery>()
-            .ForMember(f => f.PluginId, opt => opt.MapFrom((src, _) => src.PluginId))
-            .ForMember(f => f.TickerId, opt => opt.MapFrom((src, _) => src.Ticker))
-            .ForMember(f => f.StartDate, opt => opt.MapFrom((src, _) => src.StartDate.ToDateTime()))
-            .ForMember(f => f.EndDate, opt => opt.MapFrom((src, _) => src.EndDate.ToDateTime()))
-            .ForMember(f => f.Timeframe, opt => opt.MapFrom((src, _) => src.Timeframe.TimeFrameFromString()));
-        CreateMap<GrpcGetTickerPricesRequest, GetTickerPricesRequest>()
-            .ForMember(f => f.TickerId, opt => opt.MapFrom((src, _) => src.Ticker))
-            .ForMember(f => f.StartDate, opt => opt.MapFrom((src, _) => src.StartDate.ToDateTime()))
-            .ForMember(f => f.EndDate, opt => opt.MapFrom((src, _) => src.EndDate.ToDateTime()))
-            .ForMember(f => f.Timeframe, opt => opt.MapFrom((src, _) => src.Timeframe.TimeFrameFromString()));
+        CreateMap<GrpcPrice, PriceDto>()
+            .ForMember(f => f.Timestamp, opt => opt.MapFrom((src, _) => src.Timestamp.ToDateTime()))
+            .ForMember(f => f.Close, opt => opt.MapFrom((src, _) => src.Close))
+            .ForMember(f => f.High, opt => opt.MapFrom((src, _) => src.High))
+            .ForMember(f => f.Low, opt => opt.MapFrom((src, _) => src.Low))
+            .ForMember(f => f.Open, opt => opt.MapFrom((src, _) => src.Open));
 
         CreateMap<List<PriceDto>, GrpcGetPricesResponse>()
             .ForMember(dest => dest.Prices, opt => opt.MapFrom(src => ConvertToRepeatedField(src)));
@@ -55,7 +45,6 @@ public class GrpcPriceMappingProfile : Profile
                 High = s.High,
                 Low = s.Low,
                 Open = s.Open,
-                Volume = s.Volume,
                 Timestamp = s.Timestamp.ToTimestamp()
             });
         }

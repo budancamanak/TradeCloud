@@ -1,4 +1,3 @@
-import { Component } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import BaseLayout from "../layouts/BaseLayout";
 import Login from "../features/auth/login/Login";
@@ -6,6 +5,7 @@ import SymbolList from "../features/symbols/SymbolList";
 import TrackList from "../features/symbols/TrackList";
 import ExecutionHistory from "../features/executions/history";
 import NewExecution from "../features/executions/new";
+import ExecutionChart from "../features/chart/execution";
 
 function AppRouter() {
   const logged_in = !!localStorage.getItem("access_token");
@@ -27,8 +27,17 @@ function AppRouter() {
               element={logged_in ? <ExecutionHistory /> : <Login />}
             />
             <Route
+              path="/execution/"
+              element={logged_in ? <ExecutionHistory /> : <Login />}
+            />
+            <Route
               path="/execution/new"
               element={logged_in ? <NewExecution /> : <Login />}
+            />
+            <Route
+              exact
+              path="/execution/:executionId/chart"
+              element={logged_in ? <ExecutionChart /> : <Login />}
             />
           </Route>
           <Route

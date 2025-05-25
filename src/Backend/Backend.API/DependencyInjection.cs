@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using AutoMapper;
+using Backend.API.Mappers;
 using Common.Grpc;
 using Common.Security.Interceptors;
 
@@ -9,10 +11,10 @@ public static class DependencyInjection
     public static void AddApiServices(this IServiceCollection services)
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
-        // services.AddScoped(provider => new MapperConfiguration(cfg =>
-        // {
-        //     cfg.AddProfile(new AnalysisModelsMappingProfile());
-        // }).CreateMapper());
+        services.AddScoped(provider => new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile(new GrpcPriceMappingProfile());
+        }).CreateMapper());
         // services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         // services.AddExceptionHandler<GlobalExceptionHandler>();
         // services.AddProblemDetails();
@@ -25,6 +27,10 @@ public static class DependencyInjection
         {
             cfg.Address = new Uri(configuration["Market:GrpcHost"]);
         });
+        services.AddGrpcClient<GrpcPriceService.GrpcPriceServiceClient>(cfg =>
+        {
+            cfg.Address = new Uri(configuration["Market:GrpcHost"]);
+        }); //.EnableCallContextPropagation();;
         services.AddGrpcClient<GrpcAvailablePluginsService.GrpcAvailablePluginsServiceClient>(cfg =>
         {
             cfg.Address = new Uri(configuration["Worker:GrpcHost"]);
