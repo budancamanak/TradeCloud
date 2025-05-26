@@ -11,10 +11,11 @@ public static class DependencyInjection
     public static void AddApiServices(this IServiceCollection services)
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
-        services.AddScoped(provider => new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile(new GrpcPriceMappingProfile());
-        }).CreateMapper());
+        // services.AddScoped(provider => new MapperConfiguration(cfg =>
+        // {
+        //     cfg.AddProfile(new GrpcPriceMappingProfile());
+        //     cfg.AddProfile(new AnalysisModelsMappingProfile());
+        // }).CreateMapper());
         // services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         // services.AddExceptionHandler<GlobalExceptionHandler>();
         // services.AddProblemDetails();
