@@ -17,6 +17,7 @@
     "bootstrap": "^4.6.0",
     "datatables.net-bs4": "^2.3.1",
     "datatables.net-react": "^1.0.1",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.5.0",
     "echarts-for-react": "^3.0.2",
     "moment": "^2.30.1",
