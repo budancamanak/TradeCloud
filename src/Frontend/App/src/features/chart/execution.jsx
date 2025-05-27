@@ -145,11 +145,11 @@ function ExecutionChart() {
       const date = dayjs(signal.signalDate).format("DD/MM/YYYY HH:mm");
       let value = prices[date].high;
       let rotate = 180;
-      let symbolOffset = [0, "5%"];
+      let symbolOffset = [0, "-15"];
       if ("Open Long" == signal.signalType) {
         value = prices[date].low;
         rotate = 0;
-        symbolOffset = [0, "-5%"];
+        symbolOffset = [0, "15"];
       }
       newOption.series[0].markPoint.data.push({
         symbol: "triangle",
