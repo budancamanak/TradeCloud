@@ -5,10 +5,10 @@ import Fetcher from "../../utils/network";
 import dayjs from "dayjs";
 import { cloneDeep } from "lodash";
 
-const upColor = "#ec0000";
-const upBorderColor = "#8A0000";
-const downColor = "#00da3c";
-const downBorderColor = "#008F28";
+const downColor = "#ec0000";
+const downBorderColor = "#8A0000";
+const upColor = "#00da3c";
+const upBorderColor = "#008F28";
 function ExecutionChart() {
   const default_option = {
     tooltip: {
@@ -38,28 +38,20 @@ function ExecutionChart() {
         show: true,
       },
     },
-  dataZoom: [
-    {
-      textStyle: {
-        color: '#8392A5'
+    dataZoom: [
+      {
+        type: "inside",
+        start: 95,
+        end: 100,
       },
-      handleIcon:
-        'path://M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-      dataBackground: {
-        areaStyle: {
-          color: '#8392A5'
-        },
-        lineStyle: {
-          opacity: 0.8,
-          color: '#8392A5'
-        }
+      {
+        show: true,
+        type: "slider",
+        top: "90%",
+        start: 50,
+        end: 100,
       },
-      brushSelect: true
-    },
-    {
-      type: 'inside'
-    }
-  ],
+    ],
     series: [
       {
         name: "ExecutionChart",
@@ -74,13 +66,17 @@ function ExecutionChart() {
         markPoint: {
           label: {
             formatter: function (param) {
-              return param != null ? Math.round(param.value) + "" : "";
+              return param != null ? `${param.data.label}` : "";
             },
           },
           data: [],
           tooltip: {
             formatter: function (param) {
-              return param.name + "<br>" + (param.data.coord || "");
+              return (
+                param.name +
+                "<br>" +
+                `${param.data.label}@${param.data.coord[1]}`
+              );
             },
           },
         },
@@ -89,9 +85,8 @@ function ExecutionChart() {
   };
   const [option, setOption] = useState(default_option);
   const { executionId } = useParams();
-  const [prices, setPrices] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [values, setValues] = useState([]);
+  // const [prices, setPrices] = useState({});
+  const [prices, setPrices] = useState({});
   const [longCount, setLongCount] = useState(0);
   const [shortCount, setShortCount] = useState(0);
   const [analysis, setAnalysis] = useState(null);
@@ -100,7 +95,12 @@ function ExecutionChart() {
 
   useEffect(() => {
     fetcher.get("Chart/Execution/" + executionId + "/Prices").then((result) => {
-      setPrices(result);
+      const map = {};
+      result.forEach((item) => {
+        map[dayjs(item.timestamp).format("DD/MM/YYYY HH:mm")] = item;
+      });
+      setPrices(map);
+      // setPrices(result);
     });
     fetcher.get(`AnalysisExecutions/${executionId}/Details`).then((result) => {
       console.log("setting AnalysisExecutions", result);
@@ -134,43 +134,52 @@ function ExecutionChart() {
     )
       return;
     const newOption = cloneDeep(option);
+    let counter = 0;
     // analysis.pluginExecutions.forEach((exec) => {
     analysis.pluginExecutions[0].outputs.forEach((signal) => {
+      if (
+        "Open Long" !== signal.signalType &&
+        "Open Short" !== signal.signalType
+      )
+        return;
+      const date = dayjs(signal.signalDate).format("DD/MM/YYYY HH:mm");
+      let value = prices[date].high;
+      let rotate = 180;
+      let symbolOffset = [0, "5%"];
+      if ("Open Long" == signal.signalType) {
+        value = prices[date].low;
+        rotate = 0;
+        symbolOffset = [0, "-5%"];
+      }
       newOption.series[0].markPoint.data.push({
-        name: "Mark",
-        coord: [dayjs(signal.signalDate).format("DD/MM/YYYY HH:mm"), 88300],
-        value: 8,
+        symbol: "triangle",
+        symbolSize: 25,
+        symbolRotate: rotate,
+        symbolOffset: symbolOffset,
+        name: `Output${++counter}`,
+        coord: [date, value],
+        // value: value,
+        label: signal.signalType,
         // valueDim: "lowest",
         itemStyle: {
           color: "rgb(41,60,85)",
         },
       });
     });
-    // });
-    // newOption.series[0].markPoint.data.push({
-    //   name: "lowest value",
-    //   type: "min",
-    //   valueDim: "lowest",
-    // });
-
+    console.log("Setting new options with annotations");
     setOption(newOption);
   }, [analysis]);
 
   useEffect(() => {
     const categoryData = [];
     const values = [];
-    for (var i = 0; i < prices.length; i++) {
+    const keys = Object.keys(prices);
+    for (var i = 0; i < keys.length; i++) {
+      const item = prices[keys[i]];
       // open，close，lowest，highest
-      categoryData.push(dayjs(prices[i].timestamp).format("DD/MM/YYYY HH:mm"));
-      values.push([
-        prices[i].open,
-        prices[i].close,
-        prices[i].low,
-        prices[i].high,
-      ]);
+      categoryData.push(dayjs(item.timestamp).format("DD/MM/YYYY HH:mm"));
+      values.push([item.open, item.close, item.low, item.high]);
     }
-    setCategories(categoryData);
-    setValues(values);
     const newOption = cloneDeep(option);
     newOption.series[0].data = values;
     newOption.xAxis.data = categoryData;
@@ -252,7 +261,7 @@ function ExecutionChart() {
                 className="btn btn-tool"
                 // data-card-widget="collapse"
               >
-                <i class="fas fa-expand"></i>
+                <i className="fas fa-expand"></i>
               </button>
               <button
                 type="button"
