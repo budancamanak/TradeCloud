@@ -4,6 +4,7 @@ import ReactECharts from "echarts-for-react";
 import Fetcher from "../../utils/network";
 import dayjs from "dayjs";
 import { cloneDeep } from "lodash";
+import PluginExecutionPaginator from "../../components/actionButtons/PluginExecutionPaginator";
 
 const downColor = "#ec0000";
 const downBorderColor = "#8A0000";
@@ -41,7 +42,7 @@ function ExecutionChart() {
     dataZoom: [
       {
         type: "inside",
-        start: 95,
+        start: 50,
         end: 100,
       },
       {
@@ -83,13 +84,21 @@ function ExecutionChart() {
       },
     ],
   };
+  const default_zoom = {
+    start: 50,
+    startValue: 50,
+    end: 100,
+    endValue: 100,
+  };
   const [option, setOption] = useState(default_option);
   const { executionId } = useParams();
-  // const [prices, setPrices] = useState({});
   const [prices, setPrices] = useState({});
   const [longCount, setLongCount] = useState(0);
   const [shortCount, setShortCount] = useState(0);
   const [analysis, setAnalysis] = useState(null);
+  const [selectedPluginExecution, setSelectedPluginExecution] = useState(null);
+  const chartRef = useRef(null);
+  const [currentZoom, setCurrentZoom] = useState(default_zoom);
 
   const fetcher = new Fetcher();
 
@@ -105,6 +114,7 @@ function ExecutionChart() {
     fetcher.get(`AnalysisExecutions/${executionId}/Details`).then((result) => {
       console.log("setting AnalysisExecutions", result);
       setAnalysis(result);
+      setSelectedPluginExecution(result.pluginExecutions[0]);
       if (
         result == null ||
         result.pluginExecutions == null ||
@@ -126,6 +136,7 @@ function ExecutionChart() {
       setShortCount(sc);
     });
   }, [executionId]);
+
   useEffect(() => {
     if (
       !analysis ||
@@ -135,8 +146,7 @@ function ExecutionChart() {
       return;
     const newOption = cloneDeep(option);
     let counter = 0;
-    // analysis.pluginExecutions.forEach((exec) => {
-    analysis.pluginExecutions[0].outputs.forEach((signal) => {
+    selectedPluginExecution.outputs.forEach((signal) => {
       if (
         "Open Long" !== signal.signalType &&
         "Open Short" !== signal.signalType
@@ -166,9 +176,16 @@ function ExecutionChart() {
         },
       });
     });
-    console.log("Setting new options with annotations");
-    setOption(newOption);
-  }, [analysis]);
+
+    chartRef.current.getEchartsInstance().setOption(newOption, true);
+    chartRef.current.getEchartsInstance().dispatchAction({
+      type: "dataZoom",
+      start: currentZoom.start,
+      startValue: currentZoom.startValue,
+      end: currentZoom.end,
+      endValue: currentZoom.endValue,
+    });
+  }, [selectedPluginExecution]);
 
   useEffect(() => {
     const categoryData = [];
@@ -184,78 +201,60 @@ function ExecutionChart() {
     newOption.series[0].data = values;
     newOption.xAxis.data = categoryData;
     setOption(newOption);
+    // chartRef.current.getEchartsInstance().setOption(newOption);
   }, [prices]);
 
+  const onDataZoom = (params) => {
+    if (params.batch) {
+      currentZoom.start = params.batch[0].start;
+      currentZoom.end = params.batch[0].end;
+    } else {
+      currentZoom.startValue = params.startValue;
+      currentZoom.endValue = params.endValue;
+    }
+    setCurrentZoom(currentZoom);
+  };
+
+  const onEvents = {
+    datazoom: onDataZoom,
+  };
   return (
     <>
       <div className="col-12">
         <div className="card">
           <div className="card-header">
-            <h3 className="card-title">Execution Info #{executionId}</h3>
+            <h3 className="card-title">
+              <span className={analysis?.status} style={{ marginRight: "5px" }}>
+                {analysis?.status === "Success" && (
+                  <i class="fas fa-check-circle"></i>
+                )}
+                {analysis?.status === "Failure" && (
+                  <i class="fas fa-exclamation-circle"></i>
+                )}
+              </span>
+              <span className="font-weight-bold" style={{ marginRight: "5px" }}>
+                {analysis?.pluginInfo?.name}
+              </span>
+              <span style={{ marginRight: "5px" }}>[Ticker] @</span>
+              <span className="font-weight-bold" style={{ marginRight: "5px" }}>
+                {dayjs(analysis?.startDate).format("DD/MMM/YYYY")} -
+              </span>
+              <span className="font-weight-bold" style={{ marginRight: "5px" }}>
+                {dayjs(analysis?.endDate).format("DD/MMM/YYYY")}
+              </span>
+            </h3>
             <div className="card-tools">
+              <PluginExecutionPaginator
+                executions={analysis?.pluginExecutions}
+                onAction={(item) => setSelectedPluginExecution(item)}
+              />
               <button
                 type="button"
                 className="btn btn-tool"
-                data-card-widget="collapse"
+                // data-card-widget="collapse"
               >
-                <i className="fas fa-minus"></i>
+                <i className="fas fa-info"></i>
               </button>
-            </div>
-          </div>
-          <div className="card-body">
-            <div className="row">
-              <div className="col-md-4">
-                <ul>
-                  <li>
-                    Plugin Name:{" "}
-                    <span className="font-weight-bold">
-                      {analysis?.pluginInfo?.name}
-                    </span>
-                  </li>
-                  <li>Ticker</li>
-                  <li>
-                    Start Date:{" "}
-                    <span className="font-weight-bold">
-                      {dayjs(analysis?.startDate).format("DD/MMM/YYYY")}
-                    </span>
-                  </li>
-                  <li>
-                    End Date:{" "}
-                    <span className="font-weight-bold">
-                      {dayjs(analysis?.endDate).format("DD/MMM/YYYY")}
-                    </span>
-                  </li>
-                </ul>
-              </div>
-              <div className="col-md-4">
-                <ul>
-                  <li>
-                    Execution status:{" "}
-                    <span className={analysis?.status}>{analysis?.status}</span>
-                  </li>
-                  <li>
-                    Output Count:{" "}
-                    <span className="font-weight-bold">
-                      {longCount + shortCount}
-                    </span>
-                  </li>
-                  <li>
-                    Long Count:
-                    <span className="font-weight-bold">{longCount}</span>
-                  </li>
-                  <li>
-                    Short Count:{" "}
-                    <span className="font-weight-bold">{shortCount}</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="card-header">
-            <h3 className="card-title">Chart of Execution #{executionId}</h3>
-            <div className="card-tools">
               <button
                 type="button"
                 className="btn btn-tool"
@@ -273,7 +272,12 @@ function ExecutionChart() {
             </div>
           </div>
           <div className="card-body">
-            <ReactECharts option={option} style={{ height: "600px" }} />
+            <ReactECharts
+              option={option}
+              ref={chartRef}
+              style={{ height: "600px" }}
+              onEvents={onEvents}
+            />
           </div>
         </div>
       </div>
