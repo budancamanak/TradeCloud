@@ -15,14 +15,12 @@ function ExecutionHistory() {
   useEffect(() => {
     setUpdate(false);
     fetcher.get("AnalysisExecutions/User/1/Info").then((result) => {
-      console.log("setting tickers");
       setTickers(result);
       setUpdate(true);
     });
   }, []);
 
   useEffect(() => {
-    console.log("init dtable");
     if (tickers && tickers.length > 0) new DataTable("#example1");
   }, [tickers, update]);
 
@@ -35,7 +33,6 @@ function ExecutionHistory() {
   };
 
   const executeAction = (type, execution) => {
-    console.log(type, execution);
     if ("Start" === type || "Restart" === type) {
       startExecution(execution);
       return;

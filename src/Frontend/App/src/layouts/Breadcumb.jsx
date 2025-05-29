@@ -22,7 +22,6 @@ function Breadcumb() {
           {pathnames.map((name, index) => {
             breadcrumbPath += `/${name}`;
             const isLast = index === pathnames.length - 1;
-            console.log(pathnames, breadcrumbPath);
 
             return isLast ? (
               <li className="breadcrumb-item active" key={breadcrumbPath}>
@@ -32,7 +31,7 @@ function Breadcumb() {
             ) : (
               <li className="breadcrumb-item" key={breadcrumbPath}>
                 {" "}
-                 <Link to={breadcrumbPath}>{name}</Link>
+                <Link to={breadcrumbPath}>{name}</Link>
               </li>
             );
           })}

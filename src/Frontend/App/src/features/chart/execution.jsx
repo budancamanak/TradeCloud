@@ -5,6 +5,8 @@ import Fetcher from "../../utils/network";
 import dayjs from "dayjs";
 import { cloneDeep } from "lodash";
 import PluginExecutionPaginator from "../../components/actionButtons/PluginExecutionPaginator";
+import Popover from "react-bootstrap/Popover";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 
 const downColor = "#ec0000";
 const downBorderColor = "#8A0000";
@@ -93,10 +95,12 @@ function ExecutionChart() {
   const [option, setOption] = useState(default_option);
   const { executionId } = useParams();
   const [prices, setPrices] = useState({});
-  const [longCount, setLongCount] = useState(0);
-  const [shortCount, setShortCount] = useState(0);
   const [analysis, setAnalysis] = useState(null);
+  const [showPopover, setShowPopover] = useState(false);
   const [selectedPluginExecution, setSelectedPluginExecution] = useState(null);
+
+  const [selectedPluginExecutionIndex, setSelectedPluginExecutionIndex] =
+    useState(0);
   const chartRef = useRef(null);
   const [currentZoom, setCurrentZoom] = useState(default_zoom);
 
@@ -109,31 +113,16 @@ function ExecutionChart() {
         map[dayjs(item.timestamp).format("DD/MM/YYYY HH:mm")] = item;
       });
       setPrices(map);
-      // setPrices(result);
     });
     fetcher.get(`AnalysisExecutions/${executionId}/Details`).then((result) => {
-      console.log("setting AnalysisExecutions", result);
-      setAnalysis(result);
-      setSelectedPluginExecution(result.pluginExecutions[0]);
-      if (
-        result == null ||
-        result.pluginExecutions == null ||
-        result.pluginExecutions.length == 0
-      ) {
-        setLongCount(0);
-        setShortCount(0);
-        return;
-      }
-      let lc = 0;
-      let sc = 0;
-      result.pluginExecutions.forEach((pluginItem) => {
-        pluginItem.outputs.forEach((output) => {
-          if ("Open Long" === output.signalType) lc++;
-          if ("Open Short" === output.signalType) sc++;
-        });
+      result.pluginExecutions.forEach((item) => {
+        const parsed = JSON.parse(item.paramSet);
+        item.parameters = parsed;
+        delete item.paramSet;
       });
-      setLongCount(lc);
-      setShortCount(sc);
+      setAnalysis(result);
+      if (result.pluginExecutions.length > 0)
+        setSelectedPluginExecution(result.pluginExecutions[0]);
     });
   }, [executionId]);
 
@@ -218,6 +207,80 @@ function ExecutionChart() {
   const onEvents = {
     datazoom: onDataZoom,
   };
+
+  const hidePopover = () => {
+    setShowPopover(false);
+  };
+
+  const formatDate = (date) => {
+    return dayjs(date).format("DD/MM/YYYY HH:mm");
+  };
+
+  const longCountOfSelectedExecution = (signalType) => {
+    if (!selectedPluginExecution) return 0;
+    let count = 0;
+    selectedPluginExecution.outputs.forEach((output) => {
+      if (!signalType) {
+        if (!output.signalType.includes("Close")) count++;
+      } else if (signalType === output.signalType) count++;
+    });
+    return count;
+  };
+
+  const parametersOfSelectedExecution = (
+    <>
+      {selectedPluginExecution?.parameters && (
+        <>
+          {Object.keys(selectedPluginExecution.parameters).map((key) => (
+            <div key={key}>
+              <span>
+                <strong>{key}: </strong>
+              </span>
+              <span>{selectedPluginExecution.parameters[key]}</span>
+            </div>
+          ))}
+        </>
+      )}
+    </>
+  );
+
+  const pluginExecutionDetails = (
+    <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+      {selectedPluginExecution && (
+        <>
+          <span>
+            <strong>Queued date: </strong>
+            {formatDate(selectedPluginExecution.queuedDate)}
+          </span>
+          <span>
+            <strong>Start date: </strong>
+            {formatDate(selectedPluginExecution.runStartDate)}
+          </span>
+          <span>
+            <strong>End date: </strong>
+            {formatDate(selectedPluginExecution.finishDate)}
+          </span>
+          <span>
+            <strong>Total Signal #: </strong>
+            {longCountOfSelectedExecution("")}
+          </span>
+          <span>
+            <strong>Long Signal #: </strong>
+            {longCountOfSelectedExecution("Open Long")}
+          </span>
+          <span>
+            <strong>Short Signal #: </strong>
+            {longCountOfSelectedExecution("Open Short")}
+          </span>
+          <span style={{ textDecoration: "underline" }}>
+            <strong>Parameters: </strong>
+          </span>
+          {parametersOfSelectedExecution}
+        </>
+      )}
+    </div>
+  );
+
   return (
     <>
       <div className="col-12">
@@ -226,10 +289,10 @@ function ExecutionChart() {
             <h3 className="card-title">
               <span className={analysis?.status} style={{ marginRight: "5px" }}>
                 {analysis?.status === "Success" && (
-                  <i class="fas fa-check-circle"></i>
+                  <i className="fas fa-check-circle"></i>
                 )}
                 {analysis?.status === "Failure" && (
-                  <i class="fas fa-exclamation-circle"></i>
+                  <i className="fas fa-exclamation-circle"></i>
                 )}
               </span>
               <span className="font-weight-bold" style={{ marginRight: "5px" }}>
@@ -246,15 +309,41 @@ function ExecutionChart() {
             <div className="card-tools">
               <PluginExecutionPaginator
                 executions={analysis?.pluginExecutions}
-                onAction={(item) => setSelectedPluginExecution(item)}
+                onAction={(index, item) => {
+                  setSelectedPluginExecution(item);
+                  setSelectedPluginExecutionIndex(index);
+                }}
               />
-              <button
-                type="button"
-                className="btn btn-tool"
-                // data-card-widget="collapse"
+              <OverlayTrigger
+                trigger="click"
+                key={"bottom"}
+                show={showPopover}
+                onToggle={(next) => setShowPopover(next)}
+                placement={"bottom"}
+                overlay={
+                  <Popover id={`popover-positioned-${"bottom"}`}>
+                    <Popover.Header as="h3">
+                      {
+                        <>
+                          Details of execution #
+                          {selectedPluginExecutionIndex + 1}
+                          <i
+                            className="fas fa-times float-right"
+                            style={{ cursor: "pointer" }}
+                            onClick={hidePopover}
+                          ></i>
+                        </>
+                      }
+                    </Popover.Header>
+                    <Popover.Body>{pluginExecutionDetails}</Popover.Body>
+                  </Popover>
+                }
               >
-                <i className="fas fa-info"></i>
-              </button>
+                <button type="button" className="btn btn-tool">
+                  <i className="fas fa-info"></i>
+                </button>
+              </OverlayTrigger>
+
               <button
                 type="button"
                 className="btn btn-tool"

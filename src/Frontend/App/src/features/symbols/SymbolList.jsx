@@ -14,12 +14,10 @@ function SymbolList() {
 
   useEffect(() => {
     fetcher.get("AvailableTickers").then((result) => {
-      console.log("setting tickers");
       setTickers(result);
     });
   }, []);
   useEffect(() => {
-    console.log("init dtable");
     if (tickers && tickers.length > 0) new DataTable("#example1");
   }, [tickers]);
 

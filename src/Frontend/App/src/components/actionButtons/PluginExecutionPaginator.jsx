@@ -14,7 +14,7 @@ function PluginExecutionPaginator({ ...props }) {
     setRightDisabled(next == props.executions.length - 1);
     if (next == current) return;
     setCurrent(next);
-    props.onAction(props.executions[next]);
+    props.onAction(next, props.executions[next]);
   };
   return (
     <>
