@@ -1,15 +1,15 @@
 import { useState } from "react";
 
 function PluginExecutionPaginator({ ...props }) {
-  const [current, setCurrent] = useState(1);
+  const [current, setCurrent] = useState(0);
   const [leftDisabled, setLeftDisabled] = useState(true);
   const [rightDisabled, setRightDisabled] = useState(false);
   const onAction = (increment) => {
     if (!props.onAction) return;
     if (!props.executions) return;
     let next = current + increment;
-    if (next < 1) next = 1;
-    setLeftDisabled(next == 1);
+    if (next <= 0) next = 0;
+    setLeftDisabled(next == 0);
     if (next >= props.executions.length) next = props.executions.length - 1;
     setRightDisabled(next == props.executions.length - 1);
     if (next == current) return;
@@ -29,7 +29,7 @@ function PluginExecutionPaginator({ ...props }) {
         <i className="fas fa-arrow-left"></i>
       </button>
       <span>
-        {current} / {props.executions?.length}
+        {current + 1} / {props.executions?.length}
       </span>
       <button
         type="button"
