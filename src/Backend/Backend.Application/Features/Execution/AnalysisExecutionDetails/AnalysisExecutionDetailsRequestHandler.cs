@@ -16,6 +16,7 @@ public class AnalysisExecutionDetailsRequestHandler(
     IAnalysisExecutionRepository analysisExecutionRepository,
     IPluginExecutionRepository pluginExecutionRepository,
     IPluginOutputRepository pluginOutputRepository,
+    ITickerService tickerService,
     IMapper mapper,
     ILogger<AnalysisExecutionDetailsRequestHandler> logger,
     IPluginService pluginService)
@@ -31,7 +32,8 @@ public class AnalysisExecutionDetailsRequestHandler(
         Guard.Against.Null(analysis, message: $"Failed to find analysis with {request.AnalysisExecutionId}");
         var pluginInfo = await pluginService.GetPluginInfo(analysis.PluginIdentifier);
         Guard.Against.Null(pluginInfo, message: $"Failed to find plugin with {analysis.PluginIdentifier}");
-
+        var ticker = await tickerService.GetTickerWithId(analysis.TickerId);
+        Guard.Against.Null(ticker, message: $"Failed to find ticker with {analysis.TickerId}");
         var result = new AnalysisExecutionDto
         {
             Id = analysis.Id,
@@ -39,7 +41,9 @@ public class AnalysisExecutionDetailsRequestHandler(
             Status = analysis.Status.GetStringRepresentation(),
             EndDate = analysis.EndDate,
             StartDate = analysis.StartDate,
-            Progress = analysis.Progress
+            Progress = analysis.Progress,
+            Ticker = ticker.Name,
+            Timeframe = analysis.Timeframe.GetStringRepresentation()
         };
         if (!request.RequestMinimalInfo)
         {
