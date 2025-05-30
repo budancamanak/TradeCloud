@@ -96,9 +96,7 @@ function ExecutionChart() {
   const { executionId } = useParams();
   const [prices, setPrices] = useState({});
   const [analysis, setAnalysis] = useState(null);
-  const [showPopover, setShowPopover] = useState(false);
   const [selectedPluginExecution, setSelectedPluginExecution] = useState(null);
-
   const [selectedPluginExecutionIndex, setSelectedPluginExecutionIndex] =
     useState(0);
   const chartRef = useRef(null);
@@ -208,10 +206,6 @@ function ExecutionChart() {
     datazoom: onDataZoom,
   };
 
-  const hidePopover = () => {
-    setShowPopover(false);
-  };
-
   const formatDate = (date) => {
     return dayjs(date).format("DD/MM/YYYY HH:mm");
   };
@@ -255,12 +249,12 @@ function ExecutionChart() {
             <strong>Status: </strong>
             {selectedPluginExecution?.status === "Success" && (
               <>
-              <i className="fas fa-check-circle"></i>
+                <i className="fas fa-check-circle"></i>
               </>
             )}
             {selectedPluginExecution?.status === "Failure" && (
               <>
-              <i className="fas fa-exclamation-circle"></i>
+                <i className="fas fa-exclamation-circle"></i>
               </>
             )}
             {selectedPluginExecution?.status}
@@ -336,8 +330,6 @@ function ExecutionChart() {
               <OverlayTrigger
                 trigger="click"
                 key={"bottom"}
-                show={showPopover}
-                onToggle={(next) => setShowPopover(next)}
                 placement={"bottom"}
                 overlay={
                   <Popover id={`popover-positioned-${"bottom"}`}>
@@ -346,11 +338,6 @@ function ExecutionChart() {
                         <>
                           Details of execution #
                           {selectedPluginExecutionIndex + 1}
-                          <i
-                            className="fas fa-times float-right"
-                            style={{ cursor: "pointer" }}
-                            onClick={hidePopover}
-                          ></i>
                         </>
                       }
                     </Popover.Header>
