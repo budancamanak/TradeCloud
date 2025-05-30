@@ -16,6 +16,7 @@
   "dependencies": {
     "bootstrap": "^4.6.0",
     "datatables.net-bs4": "^2.3.1",
+    "datatables.net-plugins": "^2.3.0",
     "datatables.net-react": "^1.0.1",
     "dayjs": "^1.11.13",
     "dotenv": "^16.5.0",

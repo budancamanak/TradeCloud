@@ -5,6 +5,7 @@ import { ToastUtility } from "../../utils/toast-utility";
 import Fetcher from "../../utils/network";
 import DataTable from "datatables.net-bs4";
 import AnalysisActionButton from "../../components/actionButtons/AnalysisActionButton";
+import "datatables.net-plugins/dataRender/datetime.mjs";
 
 function ExecutionHistory() {
   const navigate = useNavigate();
@@ -21,7 +22,20 @@ function ExecutionHistory() {
   }, []);
 
   useEffect(() => {
-    if (tickers && tickers.length > 0) new DataTable("#example1");
+    if (tickers && tickers.length > 0)
+      new DataTable("#example1", {
+        order: [[0, "desc"]],
+        columnDefs: [
+          {
+            targets: 7,
+            render: DataTable.render.datetime("Do MMM YYYY"),
+          },
+          {
+            targets: 6,
+            render: DataTable.render.datetime("Do MMM YYYY"),
+          },
+        ],
+      });
   }, [tickers, update]);
 
   const startExecution = async (execution) => {
