@@ -248,6 +248,23 @@ function ExecutionChart() {
     <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
       {selectedPluginExecution && (
         <>
+          <span
+            className={selectedPluginExecution?.status}
+            style={{ marginRight: "5px" }}
+          >
+            <strong>Status: </strong>
+            {selectedPluginExecution?.status === "Success" && (
+              <>
+              <i className="fas fa-check-circle"></i>
+              </>
+            )}
+            {selectedPluginExecution?.status === "Failure" && (
+              <>
+              <i className="fas fa-exclamation-circle"></i>
+              </>
+            )}
+            {selectedPluginExecution?.status}
+          </span>
           <span>
             <strong>Queued date: </strong>
             {formatDate(selectedPluginExecution.queuedDate)}
@@ -298,7 +315,9 @@ function ExecutionChart() {
               <span className="font-weight-bold" style={{ marginRight: "5px" }}>
                 {analysis?.pluginInfo?.name}
               </span>
-              <span style={{ marginRight: "5px" }}>[Ticker] @</span>
+              <span style={{ marginRight: "5px" }}>
+                {analysis?.ticker}({analysis?.timeframe}) @
+              </span>
               <span className="font-weight-bold" style={{ marginRight: "5px" }}>
                 {dayjs(analysis?.startDate).format("DD/MMM/YYYY")} -
               </span>

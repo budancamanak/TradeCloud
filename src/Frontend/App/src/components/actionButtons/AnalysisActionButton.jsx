@@ -49,7 +49,8 @@ function AnalysisActionButton({ ...props }) {
               Cancel
             </a>
           )}
-          {props.execution.status === "Success" && (
+          {(props.execution.status === "Success" ||
+            props.execution.status === "Failure") && (
             <a
               className="dropdown-item"
               href="#"
