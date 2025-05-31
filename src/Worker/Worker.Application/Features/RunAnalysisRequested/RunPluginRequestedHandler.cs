@@ -40,7 +40,8 @@ public class RunAnalysisRequestedHandler(
             logger.LogWarning(WorkerLogEvents.RunAnalysis,
                 "Not enough price info for RunAnalysisRequest[{AnalysisExecution}]. Waiting price info for request [{Request}]",
                 request.ExecutionId, request);
-            await eventBus.PublishAsync(new PluginStatusEvent(request.ExecutionId, PluginStatus.WaitingData));
+            await eventBus.PublishAsync(new PluginStatusEvent(request.ExecutionId, request.ExecutionId,
+                PluginStatus.WaitingData));
             pluginHost.AddAnalysisToQueue(request);
             return MethodResponse.Error(request.ExecutionId, "Plugin is in waiting queue now. Waiting for data");
         }
@@ -66,7 +67,8 @@ public class RunAnalysisRequestedHandler(
                         infoItem.TickerCacheKey));
             }
 
-            await eventBus.PublishAsync(new PluginStatusEvent(infoItem.PluginExecutionId, PluginStatus.Queued));
+            await eventBus.PublishAsync(new PluginStatusEvent(infoItem.PluginExecutionId, request.ExecutionId,
+                PluginStatus.Queued));
             pluginStateManager.OnPluginStarted(infoItem.PluginExecutionId);
             logger.LogDebug("Started background job[{PluginIdentifier}] to to run plugin[{PluginId}] after {ParentJob}",
                 current, infoItem.PluginExecutionId, parent);

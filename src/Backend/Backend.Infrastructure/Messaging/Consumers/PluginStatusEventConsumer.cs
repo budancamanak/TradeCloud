@@ -6,7 +6,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Backend.Infrastructure.Messaging.Consumers;
 
-public class PluginStatusEventConsumer(IPluginExecutionRepository repository, ILogger<PluginStatusEventConsumer> logger)
+public class PluginStatusEventConsumer(
+    IPluginExecutionRepository repository,
+    IAnalysisExecutionRepository analysisRepository,
+    ILogger<PluginStatusEventConsumer> logger)
     : IConsumer<PluginStatusEvent>
 {
     public async Task Consume(ConsumeContext<PluginStatusEvent> context)
@@ -19,6 +22,7 @@ public class PluginStatusEventConsumer(IPluginExecutionRepository repository, IL
             logger.LogInformation("PluginStatusEvent > Setting plugin[{PluginId}] progress to {Status}",
                 context.Message.PluginId, 1.0d);
             mr = await repository.SetPluginProgress(context.Message.PluginId, 1.0d);
+            await analysisRepository.SetAnalysisExecutionProgress(context.Message.AnalysisId, 1, 0);
         }
 
         logger.LogInformation("Consumed PluginStatusEvent > Setting plugin[{PluginId}] status to {Status} : {Result}",

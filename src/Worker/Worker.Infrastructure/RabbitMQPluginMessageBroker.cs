@@ -11,24 +11,24 @@ namespace Worker.Infrastructure;
 public class RabbitMQPluginMessageBroker(IEventBus eventBus, ILogger<RabbitMQPluginMessageBroker> logger)
     : IPluginMessageBroker
 {
-    public async Task OnPluginStarted(IPlugin plugin, int executionId)
+    public async Task OnPluginStarted(IPlugin plugin, int executionId, int analysisExecution)
     {
         logger.LogWarning(WorkerLogEvents.PluginMessageBroker, "OnPluginStarted: {PluginInfo}", plugin.GetPluginInfo());
-        await eventBus.PublishAsync(new PluginStatusEvent(executionId, PluginStatus.Running));
+        await eventBus.PublishAsync(new PluginStatusEvent(executionId,analysisExecution, PluginStatus.Running));
     }
 
-    public async Task OnPluginSucceeded(IPlugin plugin, int executionId)
+    public async Task OnPluginSucceeded(IPlugin plugin, int executionId, int analysisExecution)
     {
         logger.LogWarning(WorkerLogEvents.PluginMessageBroker, "OnPluginSucceeded: {PluginInfo}",
             plugin.GetPluginInfo());
-        await eventBus.PublishAsync(new PluginStatusEvent(executionId, PluginStatus.Success));
+        await eventBus.PublishAsync(new PluginStatusEvent(executionId, analysisExecution, PluginStatus.Success));
     }
 
-    public async Task OnPluginFailed(IPlugin plugin, int executionId, Exception exception)
+    public async Task OnPluginFailed(IPlugin plugin, int executionId, int analysisExecution, Exception exception)
     {
         logger.LogWarning(WorkerLogEvents.PluginMessageBroker, "OnPluginFailed: {PluginInfo} - Reason:{Reason}",
             plugin.GetPluginInfo(), exception);
-        await eventBus.PublishAsync(new PluginStatusEvent(executionId, PluginStatus.Failure));
+        await eventBus.PublishAsync(new PluginStatusEvent(executionId, analysisExecution, PluginStatus.Failure));
     }
 
     public async Task OnPluginProgress(IPlugin plugin, int executionId, int current, int total)

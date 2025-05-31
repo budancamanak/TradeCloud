@@ -26,7 +26,7 @@ public class StopAnalysisExecutionHandler(
         await validator.ValidateAndThrowAsync(request, cancellationToken);
         logger.LogInformation(AnalysisExecutionLogEvents.StopAnalysisExecution,
             "Stopping analysis execution> Fetching plugins of {AnalysisExecution}", request.AnalysisExecutionId);
-        await analysisExecutionRepository.SetAnalysisExecutionProgress(request.AnalysisExecutionId, 100, 100);
+        await analysisExecutionRepository.SetAnalysisExecutionProgress(request.AnalysisExecutionId, -1, 0);
         var executions = await pluginRepository.GetPluginOfAnalysis(request.AnalysisExecutionId);
         var @event = new StopAnalysisEvent
         {

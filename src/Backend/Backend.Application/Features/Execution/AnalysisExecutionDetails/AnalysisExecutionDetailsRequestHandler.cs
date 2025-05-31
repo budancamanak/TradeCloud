@@ -2,6 +2,8 @@
 using AutoMapper;
 using Backend.Application.Abstraction.Repositories;
 using Backend.Application.Abstraction.Services;
+using Common.Application.Repositories;
+using Common.Application.Services;
 using Common.Core.DTOs.Backend;
 using Common.Core.Enums;
 using Common.Logging.Events.Backend;
@@ -16,6 +18,7 @@ public class AnalysisExecutionDetailsRequestHandler(
     IAnalysisExecutionRepository analysisExecutionRepository,
     IPluginExecutionRepository pluginExecutionRepository,
     IPluginOutputRepository pluginOutputRepository,
+    ICacheService cache,
     ITickerService tickerService,
     IMapper mapper,
     ILogger<AnalysisExecutionDetailsRequestHandler> logger,
@@ -50,6 +53,10 @@ public class AnalysisExecutionDetailsRequestHandler(
             result.PluginExecutions = mapper.Map<List<PluginExecutionsDto>>(analysis.PluginExecutions).ToArray();
             foreach (var item in result.PluginExecutions)
             {
+                var cachedProgress =
+                    await cache.GetAsync<double>(CacheKeyGenerator.PluginProgressEventConsumer(item.Id));
+                if (cachedProgress > 0)
+                    item.Progress = cachedProgress;
                 var outputs = await pluginOutputRepository.GetPluginOutputs(item.Id);
                 var outputDtos =
                     mapper.Map<List<PluginOutputDto>>(outputs, opts => { opts.Items["PluginName"] = pluginInfo.Name; });

@@ -84,7 +84,7 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
             var slowSma = slowResult?.Sma;
             var fastSma = fast.Find(PriceInfo[i].Timestamp)?.Sma;
             MessageBroker.OnPluginProgress(this, ExecutionId, i + 1, PriceInfo.Count);
-            MessageBroker.OnAnalysisProgress(this, AnalysisExecutionId, 1, PriceInfo.Count);
+            // MessageBroker.OnAnalysisProgress(this, AnalysisExecutionId, 1, PriceInfo.Count);
             if (!slowSma.HasValue || !fastSma.HasValue)
             {
                 Logger.LogDebug(LogEventId,

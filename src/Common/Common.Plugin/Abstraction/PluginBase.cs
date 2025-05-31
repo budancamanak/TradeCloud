@@ -72,16 +72,16 @@ public abstract class PluginBase<T> : IPlugin where T : IParameters
         LogEventId = new EventId(999, GetPluginType().AssemblyQualifiedName);
         SetPluginParameters(priceCacheKey, tickerCacheKey, analysisExecutionId, pluginExecutionId);
         Logger.LogInformation(LogEventId, "Plugin[{PluginInfo}] started to run", GetPluginInfo());
-        MessageBroker.OnPluginStarted(this, pluginExecutionId);
+        MessageBroker.OnPluginStarted(this, pluginExecutionId, analysisExecutionId);
         try
         {
             Execute();
-            MessageBroker.OnPluginSucceeded(this, pluginExecutionId);
+            MessageBroker.OnPluginSucceeded(this, pluginExecutionId, analysisExecutionId);
             Logger.LogInformation("Plugin[{PluginInfo}] finished", GetPluginInfo());
         }
         catch (Exception ex)
         {
-            MessageBroker.OnPluginFailed(this, pluginExecutionId, ex);
+            MessageBroker.OnPluginFailed(this, pluginExecutionId, analysisExecutionId, ex);
             Logger.LogCritical(LogEventId, "Plugin[{PluginInfo}] with failed: Exception:{Reason}",
                 GetPluginInfo(), ex);
         }

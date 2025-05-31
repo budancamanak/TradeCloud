@@ -19,10 +19,8 @@ public class RunAnalysisExecutionRequestHandler(
     IValidator<RunAnalysisExecutionRequest> validator,
     IPluginService pluginService,
     IEventBus messageBroker,
-    ICacheService cache,
     IMapper mapper,
     ILogger<RunAnalysisExecutionRequestHandler> logger,
-    IPluginExecutionEngine pluginExecutionEngine,
     IPluginExecutionRepository pluginRepository,
     IAnalysisExecutionRepository analysisRepository
 )
@@ -52,45 +50,8 @@ public class RunAnalysisExecutionRequestHandler(
         // todo use grpc to ask worker about plugin status or use cache to store plugin status and fetch from there
         if (plugin.Status >= PluginStatus.Queued)
             throw new IllegalStateException("Plugin is already triggered");
-        var executions = pluginExecutionEngine.GeneratePluginExecutions(plugin);
-        int savedCount = 0, failedCount = 0;
-        foreach (var item in executions)
-        {
-            try
-            {
-                mr = await pluginRepository.AddAsync(item);
-                if (!mr.IsSuccess)
-                {
-                    logger.LogCritical(AnalysisExecutionLogEvents.RunAnalysisExecution,
-                        "Failed to save plugin execution!! for : {PluginExecution}", item);
-                    failedCount++;
-                }
-                else
-                {
-                    savedCount++;
-                }
-            }
-            catch (AlreadySavedException e)
-            {
-                logger.LogDebug(AnalysisExecutionLogEvents.RunAnalysisExecution,
-                    "Plugin[{PluginExecution}] is already saved. Safe exception skip. {Exception}", item, e);
-                // pass.
-                savedCount++;
-            }
-        }
 
-        if (failedCount == executions.Count)
-        {
-            logger.LogCritical(AnalysisExecutionLogEvents.RunAnalysisExecution,
-                "Failed to create plugin executions for analysis[{AnalysisExecution}]", request.ExecutionId);
-            await analysisRepository.SetAnalysisExecutionProgress(request.ExecutionId, 1, 1);
-            var failEvent = new AnalysisFinishedEvent();
-            await messageBroker.PublishAsync(failEvent);
-            return MethodResponse.Error(
-                $"Failed to create plugin executions for analysis[{request.ExecutionId}]. Stopped execution");
-        }
-
-        executions = await pluginRepository.GetPluginExecutionsWithStatus(request.ExecutionId, PluginStatus.Init);
+        var executions = await pluginRepository.GetPluginExecutionsWithStatus(request.ExecutionId, PluginStatus.Init);
         var @event = mapper.Map<RunAnalysisRequestedEvent>(plugin,
             opts =>
             {

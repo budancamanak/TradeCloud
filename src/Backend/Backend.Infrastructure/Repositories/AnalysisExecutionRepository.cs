@@ -33,11 +33,11 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
         await validator.ValidateAndThrowAsync(item);
         var existing = await dbContext.AnalysisExecutions.FindAsync(item.Id);
         Guard.Against.NonNull(existing, "Plugin already registered", AlreadySavedException.Creator);
-        existing = dbContext.AnalysisExecutions.FirstOrDefault(f =>
-            f.PluginIdentifier == item.PluginIdentifier && f.Timeframe == item.Timeframe &&
-            f.StartDate == item.StartDate && f.EndDate == item.EndDate &&
-            f.ParamSet == item.ParamSet);
-        Guard.Against.NonNull(existing, $"Plugin already registered: {existing?.Id}", AlreadySavedException.Creator);
+        // existing = dbContext.AnalysisExecutions.FirstOrDefault(f =>
+        //     f.PluginIdentifier == item.PluginIdentifier && f.Timeframe == item.Timeframe &&
+        //     f.StartDate == item.StartDate && f.EndDate == item.EndDate &&
+        //     f.ParamSet == item.ParamSet);
+        // Guard.Against.NonNull(existing, $"Plugin already registered: {existing?.Id}", AlreadySavedException.Creator);
         await dbContext.AnalysisExecutions.AddAsync(item);
         var result = await dbContext.SaveChangesAsync();
         if (result == 0) return MethodResponse.Error("Failed to save analysis execution");
@@ -100,23 +100,15 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
     public async Task<MethodResponse> SetAnalysisExecutionProgress(int id, int increment, int total)
     {
         Guard.Against.NegativeOrZero(id);
+        Guard.Against.NegativeOrZero(increment);
         var existing = await dbContext.AnalysisExecutions.FindAsync(id);
         Guard.Against.Null(existing);
-        if (existing.ProgressTotal == 0)
-        {
-            existing.ProgressTotal = total * dbContext.PluginExecutions.Count(f => f.AnalysisExecutionId == id);
-        }
-
-        if (increment == total)
-        {
-            existing.ProgressCurrent = existing.ProgressTotal;
-        }
+        if (increment < 0)
+            existing.ProgressCurrent *= -1;
         else
-        {
             existing.ProgressCurrent += increment;
-            if (existing.ProgressCurrent >= existing.ProgressTotal)
-                existing.ProgressCurrent = existing.ProgressTotal;
-        }
+        if (total > 0 && existing.ProgressTotal == 0)
+            existing.ProgressTotal = total;
 
         var result = await dbContext.SaveChangesAsync();
         if (result > 0) return MethodResponse.Success(result, "AnalysisExecutions updated progress");

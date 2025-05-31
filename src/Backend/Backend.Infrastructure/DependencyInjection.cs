@@ -32,7 +32,7 @@ public static class DependencyInjection
                 config.AddConsumer<PluginStatusEventConsumer>();
                 config.AddConsumer<PluginSignalEventConsumer>();
                 config.AddConsumer<PluginProgressEventConsumer>(cfg => { cfg.ConcurrentMessageLimit = 4; });
-                config.AddConsumer<AnalysisExecutionProgressEventConsumer>(cfg => { cfg.ConcurrentMessageLimit = 4; });
+                // config.AddConsumer<AnalysisExecutionProgressEventConsumer>(cfg => { cfg.ConcurrentMessageLimit = 4; });
             },
             configure: (context, config) =>
             {
@@ -51,12 +51,12 @@ public static class DependencyInjection
                     ep.Bind("plugin.executions.exchange.progress");
                     ep.ConfigureConsumer<PluginProgressEventConsumer>(context);
                 });
-                config.ReceiveEndpoint("analysis.executions.queue.progress", ep =>
-                {
-                    ep.ConfigureConsumeTopology = false;
-                    ep.Bind("analysis.executions.exchange.progress");
-                    ep.ConfigureConsumer<AnalysisExecutionProgressEventConsumer>(context);
-                });
+                // config.ReceiveEndpoint("analysis.executions.queue.progress", ep =>
+                // {
+                //     ep.ConfigureConsumeTopology = false;
+                //     ep.Bind("analysis.executions.exchange.progress");
+                //     ep.ConfigureConsumer<AnalysisExecutionProgressEventConsumer>(context);
+                // });
                 config.ReceiveEndpoint("plugin.executions.queue.signal", ep =>
                 {
                     ep.ConfigureConsumeTopology = false;
