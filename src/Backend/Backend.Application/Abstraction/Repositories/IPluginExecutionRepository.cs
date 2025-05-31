@@ -18,5 +18,6 @@ public interface IPluginExecutionRepository : IAsyncRepository<PluginExecution>
     // Task<List<PluginExecution>> GetPluginExecutionsForTicker(int tickerId);
     // Task<List<PluginExecution>> GetPluginExecutionsWithIdentifier(string identifier);
     Task<MethodResponse> SetPluginProgress(int id, double progress);
+    Task<MethodResponse> SetPluginError(int id,string error);
     Task<MethodResponse> SetPluginStatus(int id, PluginStatus status);
 }

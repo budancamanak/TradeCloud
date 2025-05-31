@@ -38,6 +38,7 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
         //     f.StartDate == item.StartDate && f.EndDate == item.EndDate &&
         //     f.ParamSet == item.ParamSet);
         // Guard.Against.NonNull(existing, $"Plugin already registered: {existing?.Id}", AlreadySavedException.Creator);
+        item.ProgressTotal = item.PluginExecutions.Count;
         await dbContext.AnalysisExecutions.AddAsync(item);
         var result = await dbContext.SaveChangesAsync();
         if (result == 0) return MethodResponse.Error("Failed to save analysis execution");

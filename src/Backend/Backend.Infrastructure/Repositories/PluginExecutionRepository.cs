@@ -150,6 +150,19 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
         return MethodResponse.Error("Failed to update execution progress");
     }
 
+
+    public async Task<MethodResponse> SetPluginError(int id, string error)
+    {
+        Guard.Against.NegativeOrZero(id);
+        var existing = dbContext.PluginExecutions.FirstOrDefault(f => f.Id == id);
+        Guard.Against.Null(existing);
+        existing.Error = error;
+        var result = await dbContext.SaveChangesAsync();
+        if (result > 0) return MethodResponse.Success(result, "Execution updated progress");
+
+        return MethodResponse.Error("Failed to update execution progress");
+    }
+
     public async Task<MethodResponse> SetPluginStatus(int id, PluginStatus status)
     {
         Guard.Against.NegativeOrZero(id);

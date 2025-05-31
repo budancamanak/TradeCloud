@@ -27,22 +27,7 @@ public class AnalysisExecutionProgressEventConsumer(
         var cachedProgress =
             await cache.GetAsync<double>(
                 CacheKeyGenerator.AnalysisProgressEventConsumer(context.Message.AnalysisExecutionId));
-        // logger.LogInformation(
-        //     "Consuming AnalysisExecutionProgressEvent > Setting Analysis[{AnalysisId}] progress to {CachedProgress} ",
-        //     context.Message.AnalysisExecutionId, cachedProgress);
-        // if (cachedProgress % 10 == 0)
-        // {
-        //     logger.LogWarning(
-        //         "Setting AnalysisExecutionProgressEvent> Setting Analysis[{AnalysisId}] progress to {CachedProgress}, Total: {Total} ",
-        //         context.Message.AnalysisExecutionId, cachedProgress, context.Message.Total);
-        //     if (Math.Abs(cachedProgress - context.Message.Total) < 0.1)
-        //         await repository.SetAnalysisExecutionProgress(context.Message.AnalysisExecutionId,
-        //             context.Message.Total,
-        //             context.Message.Total);
-        //     else
-        //         await repository.SetAnalysisExecutionProgress(context.Message.AnalysisExecutionId, 10,
-        //             context.Message.Total);
-        // }
+
         logger.LogInformation(
             "Consuming AnalysisExecutionProgressEvent > Setting Analysis[{AnalysisId}] progress to {CachedProgress} ",
             context.Message.AnalysisExecutionId,cachedProgress);
