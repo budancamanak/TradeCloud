@@ -23,10 +23,10 @@ public class PluginStatusEventConsumer(
             logger.LogInformation("PluginStatusEvent > Setting plugin[{PluginId}] progress to {Status}",
                 context.Message.PluginId, 1.0d);
             mr = await repository.SetPluginProgress(context.Message.PluginId, 1.0d);
-            analysisRepository.SetAnalysisExecutionProgress(context.Message.AnalysisId, 1, 0);
+            await analysisRepository.SetAnalysisExecutionProgress(context.Message.AnalysisId, 1, 0);
             if (context.Message.Status == PluginStatus.Failure)
             {
-                repository.SetPluginError(context.Message.PluginId, context.Message.Error);
+                await repository.SetPluginError(context.Message.PluginId, context.Message.Error);
             }
         }
 

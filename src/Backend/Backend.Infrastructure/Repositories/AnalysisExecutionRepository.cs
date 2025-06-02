@@ -8,10 +8,14 @@ using Common.Core.Models;
 using Common.Web.Exceptions;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Backend.Infrastructure.Repositories;
 
-public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<AnalysisExecution> validator)
+public class AnalysisExecutionRepository(
+    BackendDbContext dbContext,
+    IValidator<AnalysisExecution> validator,
+    ILogger<AnalysisExecutionRepository> logger)
     : IAnalysisExecutionRepository
 {
     public async Task<AnalysisExecution> GetByIdAsync(int id)
@@ -110,6 +114,8 @@ public class AnalysisExecutionRepository(BackendDbContext dbContext, IValidator<
             existing.ProgressCurrent += increment;
         if (total > 0 && existing.ProgressTotal == 0)
             existing.ProgressTotal = total;
+        logger.LogInformation("Setting analysis execution progress to: {ProgressCurrent} / {ProgressTotal}",
+            existing.ProgressCurrent, existing.ProgressTotal);
 
         var result = await dbContext.SaveChangesAsync();
         if (result > 0) return MethodResponse.Success(result, "AnalysisExecutions updated progress");

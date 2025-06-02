@@ -22,7 +22,7 @@ public class PluginProgressEventConsumer(
             await cache.GetAsync<double>(CacheKeyGenerator.PluginProgressEventConsumer(context.Message.PluginId));
         if (cachedProgress % 10 == 0)
         {
-            var mr = await repository.SetPluginProgress(context.Message.PluginId, context.Message.Progress);
+            await repository.SetPluginProgress(context.Message.PluginId, context.Message.Progress);
         }
 
         // logger.LogInformation("Consumed PluginProgressEvent > Setting plugin[{}] progress to {} : {}",
