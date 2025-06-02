@@ -140,6 +140,10 @@ function ExecutionChart() {
       )
         return;
       const date = dayjs(signal.signalDate).format("DD/MM/YYYY HH:mm");
+      if(!prices[date]){
+        console.error(`Failed to find price of date:${date}`);
+        return;
+      }
       let value = prices[date].high;
       let rotate = 180;
       let symbolOffset = [0, "-15"];
@@ -207,7 +211,7 @@ function ExecutionChart() {
   };
 
   const formatDate = (date) => {
-    return dayjs(date).format("DD/MM/YYYY HH:mm");
+    return dayjs(date).format("DD/MM/YYYY HH:mm:ss");
   };
 
   const longCountOfSelectedExecution = (signalType) => {
