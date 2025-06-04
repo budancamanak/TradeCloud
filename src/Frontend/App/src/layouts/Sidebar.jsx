@@ -24,7 +24,6 @@ function Sidebar() {
               <p>
                 Symbols
                 <i className="fas fa-angle-left right"></i>
-                <span className="badge badge-info right">6</span>
               </p>
             </a>
             <ul className="nav nav-treeview">
