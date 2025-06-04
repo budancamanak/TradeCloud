@@ -95,12 +95,6 @@ function Sidebar() {
                   <li className="nav-item">
                     <a href="#" className="nav-link">
                       <i className="far fa-dot-circle nav-icon"></i>
-                      <p>Others' Executions</p>
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a href="#" className="nav-link">
-                      <i className="far fa-dot-circle nav-icon"></i>
                       <p>Logs</p>
                     </a>
                   </li>
@@ -131,47 +125,7 @@ function Sidebar() {
               </li>
             </ul>
           </li>
-          <li className="nav-item">
-            <a href="#" className="nav-link">
-              <i className="nav-icon fas fa-wallet"></i>
-              <p>
-                Trading
-                <i className="fas fa-angle-left right"></i>
-              </p>
-            </a>
-            <ul className="nav nav-treeview">
-              <li className="nav-item">
-                <a href="pages/UI/general.html" className="nav-link">
-                  <i className="far fa-circle nav-icon"></i>
-                  <p>Wallet</p>
-                </a>
-              </li>
-              <li className="nav-item">
-                <a href="pages/UI/general.html" className="nav-link">
-                  <i className="far fa-circle nav-icon"></i>
-                  <p>API Keys</p>
-                </a>
-              </li>
-              <li className="nav-item">
-                <a href="pages/UI/icons.html" className="nav-link">
-                  <i className="far fa-circle nav-icon"></i>
-                  <p>Settings</p>
-                </a>
-              </li>
-              <li className="nav-item">
-                <a href="pages/UI/buttons.html" className="nav-link">
-                  <i className="far fa-circle nav-icon"></i>
-                  <p>History</p>
-                </a>
-              </li>
-              <li className="nav-item">
-                <a href="pages/UI/buttons.html" className="nav-link">
-                  <i className="far fa-circle nav-icon"></i>
-                  <p>Logs</p>
-                </a>
-              </li>
-            </ul>
-          </li>
+
           <li className="nav-header"></li>
           <li className="nav-header"></li>
           <li className="nav-item">
