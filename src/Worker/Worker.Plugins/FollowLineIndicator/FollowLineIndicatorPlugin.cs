@@ -38,7 +38,7 @@ public class FollowLineIndicatorPlugin(
 
     public override PluginInfo GetPluginInfo()
     {
-        return new PluginInfo("GoldenCrossDeathCross", "d0d004cc-6bb0-4b84-89f9-3677aae18ff9", "1.0.0");
+        return new PluginInfo("Follow Line Indicator", "d0d004cc-6bb0-4b84-89f9-3677aae18ff9", "1.0.0");
     }
 
     public override FollowLineIndicatorPluginParams GetDefaultParamSet()
