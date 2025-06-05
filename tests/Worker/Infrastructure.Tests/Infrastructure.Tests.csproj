@@ -14,9 +14,10 @@
     <PackageReference Include="FluentAssertions" Version="8.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
-    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit" Version="4.3.2" />
     <PackageReference Include="NUnit.Analyzers" Version="3.9.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,6 +26,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\Worker\Worker.Plugins\Worker.Plugins.csproj"/>
+        <ProjectReference Include="..\..\Tests.Common\Tests.Common.csproj" />
     </ItemGroup>
 
 </Project>

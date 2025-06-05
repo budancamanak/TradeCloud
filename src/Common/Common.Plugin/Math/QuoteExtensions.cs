@@ -10,6 +10,11 @@ public static class QuoteExtensions
         return prices.Select(dto => dto.ToQuote()).ToList();
     }
 
+    public static double ToDouble(this decimal value)
+    {
+        return (double)value;
+    }
+
     public static Quote ToQuote(this PriceDto price)
     {
         return new Quote
