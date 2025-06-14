@@ -65,13 +65,14 @@ public class AnalysisExecutionsController(
         return result;
     }
 
-    [HttpGet("User/{userId:int}/Info")]
+    [HttpGet("User/Info")]
     [HasPermission(Permissions.Enum.ViewResults)]
     [HasRole(Roles.Enum.Admin, Roles.Enum.Analyst, Roles.Enum.ScriptDeveloper, Roles.Enum.QA)]
-    public async Task<List<UserAnalysisExecutionDto>> GetUserAnalysisExecutionInfos(int userId,
-        [FromQuery] PluginStatus? status = null)
+    public async Task<List<UserAnalysisExecutionDto>> GetUserAnalysisExecutionInfos([FromQuery] PluginStatus? status = null)
     {
-        var request = new UserAnalysisExecutionListRequest(userId, status);
+        var currentUserId = contextAccessor.CurrentUserId();
+        if (!currentUserId.HasValue) return null;
+        var request = new UserAnalysisExecutionListRequest(currentUserId.Value, status);
         var result = await mediator.Send(request);
         return result;
     }

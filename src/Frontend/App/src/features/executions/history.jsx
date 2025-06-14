@@ -15,7 +15,7 @@ function ExecutionHistory() {
 
   useEffect(() => {
     setUpdate(false);
-    fetcher.get("AnalysisExecutions/User/1/Info").then((result) => {
+    fetcher.get("AnalysisExecutions/User/Info").then((result) => {
       setTickers(result);
       setUpdate(true);
     });
