@@ -34,7 +34,7 @@ public sealed class TokenService(
             {
                 Subject = new ClaimsIdentity(
                 [
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.UserId),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email),
                     new Claim(JwtRegisteredClaimNames.Nickname, user.Username),
                     new Claim(JwtRegisteredClaimNames.Address, clientIp),

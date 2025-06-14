@@ -172,19 +172,19 @@ public class UserRepository(SecurityDbContext dbContext, IValidator<User> valida
         return MethodResponse.Success(userId, "Role assigned to user");
     }
 
-    public async Task<List<Role>> GetUserRoles(int userId)
+    public async Task<List<Role>> GetUserRoles(string userId)
     {
-        Guard.Against.NegativeOrZero(userId);
-        var item = await dbContext.Users.Include(user => user.UserRoles).FirstOrDefaultAsync(f => f.Id == userId);
+        Guard.Against.NullOrWhiteSpace(userId);
+        var item = await dbContext.Users.Include(user => user.UserRoles).FirstOrDefaultAsync(f => f.UserId == userId);
         Guard.Against.Null(item);
         return item.UserRoles.ToList();
     }
 
-    public async Task<List<Permission>> GetUserPermissions(int userId)
+    public async Task<List<Permission>> GetUserPermissions(string userId)
     {
-        Guard.Against.NegativeOrZero(userId);
+        Guard.Against.NullOrWhiteSpace(userId);
         var user = await dbContext.Users.Include(user => user.UserRoles).ThenInclude(f => f.Permissions)
-            .FirstOrDefaultAsync(f => f.Id == userId);
+            .FirstOrDefaultAsync(f => f.UserId == userId);
         Guard.Against.Null(user);
         var permissions = new List<Permission>();
         foreach (var userRole in user.UserRoles)

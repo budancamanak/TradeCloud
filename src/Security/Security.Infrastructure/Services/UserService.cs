@@ -63,7 +63,7 @@ public class UserService(
                 ClientIP = clientIp
             };
             var mr = await repository.AddUserLogin(user, loginInfo);
-            await cache.SetAsync(CacheKeyGenerator.UserRoleInfoKey(user.Id.ToString()),
+            await cache.SetAsync(CacheKeyGenerator.UserRoleInfoKey(user.UserId),
                 JsonConvert.SerializeObject(user.UserRoles),
                 TimeSpan.FromMinutes(15));
             await cache.SetAsync(CacheKeyGenerator.UserTokenInfoKey(token), loginInfo, TimeSpan.FromMinutes(15));
@@ -110,7 +110,7 @@ public class UserService(
         {
             var cached = await cache.GetAsync<List<Permission>>(CacheKeyGenerator.UserPermissionsKey(userId));
             if (cached is { Count: > 0 }) return cached;
-            cached = await repository.GetUserPermissions(int.Parse(userId));
+            cached = await repository.GetUserPermissions(userId);
             await cache.SetAsync(CacheKeyGenerator.UserPermissionsKey(userId), cached,
                 TimeSpan.FromMinutes(15));
             return cached;
@@ -129,7 +129,7 @@ public class UserService(
         {
             var cached = await cache.GetAsync<List<Role>>(CacheKeyGenerator.UserRoleInfoKey(userId));
             if (cached is { Count: > 0 }) return cached;
-            cached = await repository.GetUserRoles(int.Parse(userId));
+            cached = await repository.GetUserRoles(userId);
             await cache.SetAsync(CacheKeyGenerator.UserRoleInfoKey(userId), cached,
                 TimeSpan.FromMinutes(15));
             return cached;
