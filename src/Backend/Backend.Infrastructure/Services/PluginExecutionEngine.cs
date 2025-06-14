@@ -112,7 +112,11 @@ public class PluginExecutionEngine : IPluginExecutionEngine
                 param.Value = param.Value.ToString();
                 break;
             case ParameterRange.List:
-                param.Value = JsonConvert.DeserializeObject<StringListValue>(param.Value.ToString());
+                var arr = ((JArray)param.Value);
+                param.Value = new StringListValue
+                {
+                    Items = arr.Values<string>().ToArray()
+                };
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -130,7 +134,11 @@ public class PluginExecutionEngine : IPluginExecutionEngine
                 param.Value = JsonConvert.DeserializeObject<DoubleParamValue>(param.Value.ToString());
                 break;
             case ParameterRange.List:
-                param.Value = JsonConvert.DeserializeObject<DoubleListValue>(param.Value.ToString());
+                var arr = ((JArray)param.Value);
+                param.Value = new DoubleListValue()
+                {
+                    Items = arr.Values<double>().ToArray()
+                };
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -148,7 +156,11 @@ public class PluginExecutionEngine : IPluginExecutionEngine
                 param.Value = JsonConvert.DeserializeObject<IntParamValue>(param.Value.ToString());
                 break;
             case ParameterRange.List:
-                param.Value = JsonConvert.DeserializeObject<IntListValue>(param.Value.ToString());
+                var arr = ((JArray)param.Value);
+                param.Value = new IntListValue()
+                {
+                    Items = arr.Values<int>().ToArray()
+                };
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

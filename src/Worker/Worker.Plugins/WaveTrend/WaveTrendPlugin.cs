@@ -2,9 +2,7 @@
 using Common.Core.Models;
 using Common.Plugin.Abstraction;
 using Common.Plugin.Math;
-using Common.Plugin.Models;
 using Common.Plugin.Signals;
-using Microsoft.AspNetCore.Server.Kestrel.Transport.Quic;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Skender.Stock.Indicators;
@@ -44,7 +42,7 @@ public class WaveTrendPlugin(
     {
         return new WaveTrendPluginParams
         {
-            ApSrc = 1,
+            ApSrc = nameof(CandlePart.HLC3),
             AverageLength = 21,
             ChannelLength = 10,
             CiMultiple = 1,
@@ -62,10 +60,10 @@ public class WaveTrendPlugin(
     protected override void Execute()
     {
         var quotes = PriceInfo.ToQuotes();
-        var _apSrc = "HL3";
+        // var _apSrc = "HL3";
         var _maType = "EMA";
-        var esa = quotes.CalculateMa(_maType, _apSrc, Params.ChannelLength).ToList();
-        var src = quotes.Extract(_apSrc);
+        var esa = quotes.CalculateMa(_maType, Params.ApSrc, Params.ChannelLength).ToList();
+        var src = quotes.Extract(Params.ApSrc);
         var diff = TradeMathEx.Diff(src, esa, true).ToTuple();
         var d = diff.CalculateMa(Params.ChannelLength);
         var ciDiffUpper = TradeMathEx.Diff(src, esa, false);
@@ -74,7 +72,8 @@ public class WaveTrendPlugin(
         var wt1List = ci.CalculateMa(Params.AverageLength);
         var wt2List = wt1List.ToTuple().CalculateMa(Params.WaveTrend2Length);
 
-
+        var prevLong = false;
+        var prevShort = false;
         for (int i = 0; i < PriceInfo.Count; i++)
         {
             StateManager.ThrowIfCancelRequested(ExecutionId);
@@ -97,12 +96,12 @@ public class WaveTrendPlugin(
             }
 
             if (wt1.Ema.Value > wt2.Ema.Value && wt2.Ema.Value - wt1.Ema.Value < 0 &&
-                (wt2.Ema.Value + wt1.Ema.Value) / 2 >= Params.OverSoldLevel)
+                (wt2.Ema.Value + wt1.Ema.Value) / 2 <= Params.OverSoldLevel)
             {
                 goingUp = true;
             }
 
-            if (goingUp)
+            if (goingUp && !prevLong)
             {
                 // turned bullish
                 Logger.LogCritical(LogEventId, ">> We TURNED to bull. WT1: {wt1}, WT2:{wt2}, @ {Date}",
@@ -111,9 +110,11 @@ public class WaveTrendPlugin(
                     PluginSignal.CloseShort(TickerDto.Id, PriceInfo[i].Timestamp));
                 MessageBroker.OnPluginSignal(this, ExecutionId,
                     PluginSignal.OpenLong(TickerDto.Id, PriceInfo[i].Timestamp));
+                prevLong = true;
+                prevShort = false;
             }
 
-            if (goingDown)
+            if (goingDown && !prevShort)
             {
                 // turned bearish
                 Logger.LogCritical(LogEventId, ">> We TURNED to bear. WT1: {wt1}, WT2:{wt2}, @ {Date}",
@@ -122,6 +123,8 @@ public class WaveTrendPlugin(
                     PluginSignal.CloseLong(TickerDto.Id, PriceInfo[i].Timestamp));
                 MessageBroker.OnPluginSignal(this, ExecutionId,
                     PluginSignal.OpenShort(TickerDto.Id, PriceInfo[i].Timestamp));
+                prevShort = true;
+                prevLong = false;
             }
         }
     }
