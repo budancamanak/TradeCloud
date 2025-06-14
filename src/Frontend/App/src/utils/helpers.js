@@ -16,7 +16,13 @@ export const getPluginParameterValueType = () => {
     { type: 2, name: "String" },
   ];
 };
-
+export const getPluginParameterTypeParser = () => {
+  return [
+    (val) => parseInt(val),
+    (val) => parseFloat(val),
+    (val) => `${val}`,
+  ];
+};
 export const getTimeFrames = () => {
   return [
     { value: "5m", name: "5m" },

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getPluginParameterTypeParser } from "../../utils/helpers";
 
 function RangeParameter({ ...props }) {
   const [min, setMin] = useState(props.param.Value.Min);
@@ -12,19 +13,22 @@ function RangeParameter({ ...props }) {
   const changeMinimum = (value) => {
     if (!props.param.Value.Min)
       props.param.Value = { ...props.param.Value, ...{ Min: 0 } };
-    props.param.Value.Min = parseInt(value);
+    props.param.Value.Min =
+      getPluginParameterTypeParser()[props.param.Type](value);
     setMin(value);
   };
   const changeMaximum = (value) => {
     if (!props.param.Value.Max)
       props.param.Value = { ...props.param.Value, ...{ Max: 0 } };
-    props.param.Value.Max = parseInt(value);
+    props.param.Value.Max =
+      getPluginParameterTypeParser()[props.param.Type](value);
     setMax(value);
   };
   const changeIncrement = (value) => {
     if (!props.param.Value.Increment)
       props.param.Value = { ...props.param.Value, ...{ Increment: 0 } };
-    props.param.Value.Increment = parseInt(value);
+    props.param.Value.Increment =
+      getPluginParameterTypeParser()[props.param.Type](value);
     setIncrement(value);
   };
   return (
