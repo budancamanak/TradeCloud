@@ -21,7 +21,7 @@ public enum ParameterRange
 
 public abstract class ParamValue<T>
 {
-    public abstract List<T> Deflate();
+    public abstract List<T> Flatten();
 }
 
 public class IntParamValue : ParamValue<int>
@@ -31,7 +31,7 @@ public class IntParamValue : ParamValue<int>
     public int Increment { get; set; }
     public int Default { get; set; }
 
-    public override List<int> Deflate()
+    public override List<int> Flatten()
     {
         var list = new List<int>();
         for (int i = Min; i <= Max; i += Increment)
@@ -48,7 +48,7 @@ public class IntListValue : ParamValue<int>
     public int[] Items { get; set; }
     public int DefaultIndex { get; set; }
 
-    public override List<int> Deflate()
+    public override List<int> Flatten()
     {
         return Items.ToList();
     }
@@ -59,7 +59,7 @@ public class DoubleListValue : ParamValue<double>
     public double[] Items { get; set; }
     public int DefaultIndex { get; set; }
 
-    public override List<double> Deflate()
+    public override List<double> Flatten()
     {
         return Items.ToList();
     }
@@ -72,7 +72,7 @@ public class DoubleParamValue : ParamValue<double>
     public double Increment { get; set; }
     public double Default { get; set; }
 
-    public override List<double> Deflate()
+    public override List<double> Flatten()
     {
         var list = new List<double>();
         for (var i = Min; i < Max; i += Increment)
@@ -89,7 +89,7 @@ public class StringListValue : ParamValue<string>
     public string[] Items { get; set; }
     public int DefaultIndex { get; set; }
 
-    public override List<string> Deflate()
+    public override List<string> Flatten()
     {
         return Items.ToList();
     }
@@ -123,7 +123,7 @@ public class Param
                         break;
                     case ParameterRange.Range:
                         var v = Value as IntParamValue;
-                        var def = v.Deflate();
+                        var def = v.Flatten();
                         foreach (var item in def)
                         {
                             listOfParams.Add(new Param(Name, Type, ParameterRange.Single, item));
@@ -132,7 +132,7 @@ public class Param
                         break;
                     case ParameterRange.List:
                         var vl = Value as IntListValue;
-                        var defl = vl.Deflate();
+                        var defl = vl.Flatten();
                         foreach (var item in defl)
                         {
                             listOfParams.Add(new Param(Name, Type, ParameterRange.Single, item));
@@ -145,8 +145,53 @@ public class Param
 
                 break;
             case ParameterType.Double:
+                switch (Range)
+                {
+                    case ParameterRange.Single:
+                        listOfParams.Add(new Param(Name, Type, ParameterRange.Single, double.Parse(Value.ToString())));
+                        break;
+                    case ParameterRange.Range:
+                        var v = Value as DoubleParamValue;
+                        var def = v.Flatten();
+                        foreach (var item in def)
+                        {
+                            listOfParams.Add(new Param(Name, Type, ParameterRange.Single, item));
+                        }
+
+                        break;
+                    case ParameterRange.List:
+                        var vl = Value as DoubleListValue;
+                        var defl = vl.Flatten();
+                        foreach (var item in defl)
+                        {
+                            listOfParams.Add(new Param(Name, Type, ParameterRange.Single, item));
+                        }
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
                 break;
             case ParameterType.Str:
+                switch (Range)
+                {
+                    case ParameterRange.Single:
+                        listOfParams.Add(new Param(Name, Type, ParameterRange.Single, Value.ToString()));
+                        break;
+                    case ParameterRange.List:
+                        var vl = Value as StringListValue;
+                        var defl = vl.Flatten();
+                        foreach (var item in defl)
+                        {
+                            listOfParams.Add(new Param(Name, Type, ParameterRange.Single, item));
+                        }
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -222,6 +267,57 @@ public class Param
         {
             return new Param(name, ParameterType.Int, ParameterRange.List,
                 new IntListValue
+                {
+                    DefaultIndex = defIndex,
+                    Items = items
+                }
+            );
+        }
+    }
+
+    public static class Double
+    {
+        public static Param Single(string name, double value)
+        {
+            return new Param(name, ParameterType.Double, ParameterRange.Single, value);
+        }
+
+        public static Param Range(string name, double min, double max, double inc, double def)
+        {
+            return new Param(name, ParameterType.Double, ParameterRange.Range,
+                new DoubleParamValue
+                {
+                    Increment = inc,
+                    Default = def,
+                    Min = min,
+                    Max = max
+                }
+            );
+        }
+
+        public static Param List(string name, int defIndex, params double[] items)
+        {
+            return new Param(name, ParameterType.Double, ParameterRange.List,
+                new DoubleListValue
+                {
+                    DefaultIndex = defIndex,
+                    Items = items
+                }
+            );
+        }
+    }
+
+    public static class Str
+    {
+        public static Param Single(string name, string value)
+        {
+            return new Param(name, ParameterType.Str, ParameterRange.Single, value);
+        }
+
+        public static Param List(string name, int defIndex, params string[] items)
+        {
+            return new Param(name, ParameterType.Str, ParameterRange.List,
+                new StringListValue
                 {
                     DefaultIndex = defIndex,
                     Items = items
