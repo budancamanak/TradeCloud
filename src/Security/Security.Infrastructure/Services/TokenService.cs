@@ -161,7 +161,8 @@ public sealed class TokenService(
             return new GrpcValidateTokenResponse
             {
                 IsValid = true,
-                UserId = user
+                UserId = user,
+                Id = loginInfo.UserId
             };
         }
         catch (Exception ex)

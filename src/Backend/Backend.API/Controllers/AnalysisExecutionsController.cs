@@ -51,10 +51,6 @@ public class AnalysisExecutionsController(
     [HasRole(Roles.Enum.Admin, Roles.Enum.Analyst, Roles.Enum.ScriptDeveloper)]
     public async Task<string> GetAvailablePluginPluginParameters(string identifier)
     {
-        var currentUser = contextAccessor.CurrentUser();
-        // var request = new ListAvailablePluginsRequest();
-        // var result = await mediator.Send(request);
-        // return result;
         var values = await cache.GetAsync<string>(CacheKeyGenerator.AvailablePluginParamsKey(identifier));
         return values;
     }

@@ -11,7 +11,6 @@ public class PermissionAuthorizationFilter(
     IHttpContextAccessor contextAccessor)
     : IAsyncAuthorizationFilter
 {
-    // private readonly IHttpContextAccessor _contextAccessor = contextAccessor;
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
         var endpoint = context.HttpContext.GetEndpoint();
@@ -78,5 +77,6 @@ public class PermissionAuthorizationFilter(
         // }
 
         context.HttpContext.Items.Add("CurrentUser", tokenValidation.UserId);
+        context.HttpContext.Items.Add("CurrentUserId", tokenValidation.Id);
     }
 }

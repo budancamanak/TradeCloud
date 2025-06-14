@@ -11,6 +11,14 @@ public static class HttpContextExtensions
             .Value?.ToString();
     }
 
+    public static int? CurrentUserId(this IHttpContextAccessor contextAccessor)
+    {
+        var value = contextAccessor.HttpContext?.Items.FirstOrDefault(f => f.Key.ToString() == "CurrentUserId")
+            .Value?.ToString();
+        if (int.TryParse(value, out var userId)) return userId;
+        return null;
+    }
+
     public static string GetClientIp(this IHttpContextAccessor contextAccessor)
     {
         var remoteIpAddress =

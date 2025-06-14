@@ -9,8 +9,10 @@ using Common.Logging.Events.Backend;
 using Common.Messaging.Abstraction;
 using Common.Messaging.Events.AnalysisExecution;
 using Common.Web.Exceptions;
+using Common.Web.Http;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Backend.Application.Features.Execution.CreateAnalysisExecution;
@@ -19,6 +21,7 @@ public class CreateAnalysisExecutionRequestHandler(
     IValidator<CreateAnalysisExecutionRequest> validator,
     IMapper mapper,
     ITickerService tickerService,
+    IHttpContextAccessor contextAccessor,
     IEventBus messageBroker,
     IPluginService pluginService,
     IAnalysisExecutionRepository repository,
@@ -41,8 +44,7 @@ public class CreateAnalysisExecutionRequestHandler(
         var analysisExecution = mapper.Map<CreateAnalysisExecutionRequest, AnalysisExecution>(request,
             opts =>
             {
-                // todo use Logged User Id
-                opts.Items["CurrentUserId"] = 1;
+                opts.Items["CurrentUserId"] = contextAccessor.CurrentUserId();
                 opts.Items["TickerId"] = ticker.Id;
                 opts.Items["PluginName"] = plugin.Name;
             }

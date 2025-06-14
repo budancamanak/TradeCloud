@@ -25,10 +25,6 @@ public class UserController(
     [AllowAnon]
     public async Task<MethodResponse> LoginUser([FromBody] UserLoginModel request)
     {
-        // var currentUser = contextAccessor.CurrentUser();
-        // var request = new ListAvailablePluginsRequest();
-        // var result = await mediator.Send(request);
-        // return result;
         var mr = await userGrpcClient.LoginUserAsync(request.Email, request.Password);
         return mr;
     }
@@ -37,10 +33,6 @@ public class UserController(
     [AllowAnon]
     public async Task<MethodResponse> RegisterUser([FromBody] RegisterUserModel request)
     {
-        // var currentUser = contextAccessor.CurrentUser();
-        // var request = new ListAvailablePluginsRequest();
-        // var result = await mediator.Send(request);
-        // return result;
         var mr = await userGrpcClient.RegisterUserAsync(request.Username, request.Email, request.Password,
             request.PasswordConfirm);
         return mr;
@@ -51,10 +43,6 @@ public class UserController(
     [HasRole(Roles.Enum.Admin)]
     public async Task<MethodResponse> AddRoleToUser(int userId, int roleId)
     {
-        // var currentUser = contextAccessor.CurrentUser();
-        // var request = new ListAvailablePluginsRequest();
-        // var result = await mediator.Send(request);
-        // return result;
         var token = contextAccessor?.HttpContext?.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
         if (string.IsNullOrWhiteSpace(token))
             return MethodResponse.Error("Unauthorized");
@@ -67,10 +55,6 @@ public class UserController(
     [HasRole(Roles.Enum.Admin)]
     public async Task<MethodResponse> RemoveRoleFromUser(int userId, int roleId)
     {
-        // var currentUser = contextAccessor.CurrentUser();
-        // var request = new ListAvailablePluginsRequest();
-        // var result = await mediator.Send(request);
-        // return result;
         var token = contextAccessor?.HttpContext?.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
         if (string.IsNullOrWhiteSpace(token))
             return MethodResponse.Error("Unauthorized");
@@ -84,10 +68,6 @@ public class UserController(
     [HasRole(Roles.Enum.Admin)]
     public async Task<MethodResponse> AddPermissionToRole(int roleId, int permissionId)
     {
-        // var currentUser = contextAccessor.CurrentUser();
-        // var request = new ListAvailablePluginsRequest();
-        // var result = await mediator.Send(request);
-        // return result;
         var token = contextAccessor?.HttpContext?.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
         if (string.IsNullOrWhiteSpace(token))
             return MethodResponse.Error("Unauthorized");
@@ -101,9 +81,6 @@ public class UserController(
     public async Task<MethodResponse> RemovePermissionFromRole(int roleId, int permissionId)
     {
         // var currentUser = contextAccessor.CurrentUser();
-        // var request = new ListAvailablePluginsRequest();
-        // var result = await mediator.Send(request);
-        // return result;
         var token = contextAccessor?.HttpContext?.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
         if (string.IsNullOrWhiteSpace(token))
             return MethodResponse.Error("Unauthorized");

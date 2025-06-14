@@ -18,6 +18,7 @@ message GrpcValidateTokenRequest {
 message GrpcValidateTokenResponse {
   bool isValid = 1;
   string userId = 2;
+  int32 id=3;
 }
 
 message GrpcCheckRequest {
