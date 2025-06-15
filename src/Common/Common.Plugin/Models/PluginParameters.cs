@@ -75,7 +75,7 @@ public class DoubleParamValue : ParamValue<double>
     public override List<double> Flatten()
     {
         var list = new List<double>();
-        for (var i = Min; i < Max; i += Increment)
+        for (var i = Min; i <= Max; i += Increment)
         {
             list.Add(i);
         }
