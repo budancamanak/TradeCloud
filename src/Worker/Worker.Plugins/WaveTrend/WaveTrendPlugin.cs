@@ -62,11 +62,12 @@ public class WaveTrendPlugin(
         var quotes = PriceInfo.ToQuotes();
         // var _apSrc = "HL3";
         var _maType = "EMA";
-        var esa = quotes.CalculateMa(_maType, Params.ApSrc, Params.ChannelLength).ToList();
-        var src = quotes.Extract(Params.ApSrc);
-        var diff = TradeMathEx.Diff(src, esa, true).ToTuple();
+        // var esa = quotes.CalculateMa(_maType, Params.ApSrc, Params.ChannelLength).ToList();
+        var ap = quotes.Extract(Params.ApSrc);
+        var esa = ap.ToTuple().CalculateMa(Params.ChannelLength);
+        var diff = TradeMathEx.Diff(ap, esa, true).ToTuple();
         var d = diff.CalculateMa(Params.ChannelLength);
-        var ciDiffUpper = TradeMathEx.Diff(src, esa, false);
+        var ciDiffUpper = TradeMathEx.Diff(ap, esa, false);
         var ciDiffLower = TradeMathEx.Multiply(d, Params.CiMultiple);
         var ci = TradeMathEx.Divide(ciDiffUpper, ciDiffLower).ToTuple();
         var wt1List = ci.CalculateMa(Params.AverageLength);

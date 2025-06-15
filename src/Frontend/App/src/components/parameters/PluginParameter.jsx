@@ -9,8 +9,8 @@ import RangeParameter from "./RangeParameter";
 import ListParameter from "./ListParameter";
 
 function ParameterInstance({ ...props }) {
-  // if (!props.selected_type) return null;
-  switch (props.selected_type) {
+  props.param.Type = props.selected_type;
+  switch (props.selected_range) {
     case 0:
       return <SingleParameter param={props.param} />;
     case 1:
@@ -25,6 +25,7 @@ function ParameterInstance({ ...props }) {
 function PluginParameter({ ...props }) {
   console.log("plugin parameter>", props.param);
   const [parameterRange, setParameterRange] = useState(props.param.Range);
+  const [parameterType, setParameterType] = useState(props.param.Type);
 
   return (
     <>
@@ -81,8 +82,10 @@ function PluginParameter({ ...props }) {
                     getPluginParameterValueType()[props.param.Type].name
                   }
                   defaultValue={props.param.Type}
-                  // value={param.Range}
-                  // inputValue={getPluginParameterRange()[param.Range].name}
+                  onChange={(e) => {
+                    console.log(e);
+                    setParameterType(e.type);
+                  }}
                   options={getPluginParameterValueType()}
                 />
               </div>
@@ -92,7 +95,8 @@ function PluginParameter({ ...props }) {
               <div className="form-group">
                 <ParameterInstance
                   param={props.param}
-                  selected_type={parameterRange}
+                  selected_range={parameterRange}
+                  selected_type={parameterType}
                 />
               </div>
             </div>
