@@ -31,10 +31,6 @@ Will allow users to modify a plugin parameters or cancel.
 | `RabbitMQ`      | Will trigger Worker service to run a plugin. <br/> Will listen for plugin status for status update/next plugin run                                                                       |
 | `MediatR`       | Will be used to direct requests to internal handlers.                                                                                                                                    |
 | `Redis`         | Will use redis to get plugin & tickers.                                                                                                                                                  |
-| `API Gateway`   | `Ocelot` will be used.                                                                                                                                                                   |
-| `GraphQL`       | Not decided yet.                                                                                                                                                                         |
-| `Load Balancer` | Nginx will be used till Kubernetes is done.                                                                                                                                              |
-| `Kubernetes`    | Not decided yet.                                                                                                                                                                         |
 
 <br>
 
@@ -49,7 +45,6 @@ Will allow users to modify a plugin parameters or cancel.
 #### **RabbitMQ** *(Producers)*
 - **Next Plugin from Queue**: Will trigger event for next waiting plugin execution to `Worker Service`
 - **Ticker Update**: Will trigger event to update ticker database to `Market Service`
-- **System Settings Update**: Will trigger event to notify other services about new system settings *(eg: Concurrent plugin count)*
 - **Plugin Status Update**: Will trigger event to notify other services(`Notifier Service/`)
 
 #### **RabbitMQ** *(Consumers)*
@@ -118,58 +113,48 @@ Engine could listen for `RabbitMQ` to start the next plugin.
   - [ ] Design PluginService : *Retrieves available plugins. Uses `RedisCache` & `GRPC Client`*
   - [ ] Design TickerService:  *Retrieves available tickers. Uses `RedisCache` & `GRPC Client`*
 ###### Behaviours
-  - [ ] Design ValidationBehaviour: *Could be same of the one in `MarketService.Behaviours.ValidationBehaviour`
-  - [ ] Design LoggingBehaviour: *Could be same of the one in `MarketService.Behaviours.LoggingBehaviour`
+  - [x] Design ValidationBehaviour: *Could be same of the one in `MarketService.Behaviours.ValidationBehaviour`
+  - [x] Design LoggingBehaviour: *Could be same of the one in `MarketService.Behaviours.LoggingBehaviour`
 ###### Exceptions
   - [ ] Design Exceptions
 ###### Features
-  - [ ] List Available Plugins
-  - [ ] List Available Tickers
+  - [x] List Available Plugins
+  - [x] List Available Tickers
   - User Track List Operations
-    - [ ] Add Ticker to UserTrackList
-    - [ ] Remove Ticker from UserTrackList
-    - [ ] List UserTrackList
+    - [x] Add Ticker to UserTrackList
+    - [x] Remove Ticker from UserTrackList
+    - [x] List UserTrackList
   - Plugin Execution Operations
-    - [ ] Create Plugin Execution
-    - [ ] Cancel Plugin Execution
-    - [ ] Next Plugin Execution
-    - [ ] Update Plugin State
+    - [x] Create Plugin Execution
+    - [x] Cancel Plugin Execution
+    - [x] Next Plugin Execution
+    - [x] Update Plugin State
   - Plugin Execution Details
-    - [ ] List Plugin Execution History
-    - [ ] Get Plugin Execution Details
+    - [x] List Plugin Execution History
+    - [x] Get Plugin Execution Details
 ###### Mappers
-  - [ ] Design Model2DTO Mappers
-  - [ ] Design Request Mappers: *API Requests, GRPC Requests, ?RabbitMQ Events?*
+  - [x] Design Model2DTO Mappers
+  - [x] Design Request Mappers: *API Requests, GRPC Requests, RabbitMQ Events*
 ###### Services
-  - [ ] Implement Cache Builders
+  - [x] Implement Cache Builders
 ###### Validators
-  - [ ] Implement Model Validators
-  - [ ] Implement Request Validators
+  - [x] Implement Model Validators
+  - [x] Implement Request Validators
 ###### Dependency Injection
-  - [ ] Register Services
+  - [x] Register Services
 
 ### **Backend.Infrastructure**
 ###### Data
-- [ ] Design Data Model Configurations
-- [ ] Implement Database Context
+- [x] Design Data Model Configurations
+- [x] Implement Database Context
 ###### Migrations
-- [ ] Database Migrations
+- [x] Database Migrations
 ###### Messaging
-- [ ] Implement Consumers
+- [x] Implement Consumers
 ###### Repositories
-- [ ] Implement Repositories
+- [x] Implement Repositories
 ###### Services
-- [ ] Implement Services
+- [x] Implement Services
 ###### Dependency Injection
-- [ ] Register Services
+- [x] Register Services
  
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>

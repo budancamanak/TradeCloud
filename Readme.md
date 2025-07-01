@@ -8,37 +8,37 @@
 **TradeCloud** is a project that will allow users to run analysis on stock or cryptocurrencies prices.
 Features the project are as such:
 - `User TrackList`: So that users will have preferred tickers/symbols to track.
-- `Plugin Executions`: So that users can create plugin executions, run/cancel/stop them. 
-Each plugin might have output signals that can be drawn on a chart with price information. 
-- `Notifications`: So that we can inform users about events such as plugin finish, signal generations etc.
-Currently, websocket signals & email notifications are considered.
-- `Trading`: So that users might bind their exchange APIs to automate position openings and closing based on generated signals.
+- `Analysis Executions`: So that users can create analysis executions, run/cancel/stop them. 
+Each plugin might have output signals that can be drawn on a chart with price information.
+Have base classes to be used to develop own algorithms.
+Based on supplied parameter range sets, project will run each possible analysis combination in sequence.
 - `Market`: Project will fetch necessary prices before running the analysis.
 
 
 
-| Tech            | Reason                                                              |
-|:----------------|:--------------------------------------------------------------------|
-| `GRPC`          | Will be used for inter-service request-response style communication |
-| `RabbitMQ`      | Will be used for inter-service communication                        |
-| `MediatR`       | Will be used to direct requests to internal handlers.               |
-| `Redis`         | Will use redis to get plugin & tickers.                             |
-| `API Gateway`   | `Ocelot` will be used.                                              |
-| `GraphQL`       | Not decided yet.                                                    |
-| `Load Balancer` | Nginx will be used till Kubernetes is done.                         |
-| `Kubernetes`    | Not decided yet.                                                    |
+| Name       | Reason                                                      |
+|:-----------|:------------------------------------------------------------|
+| `GRPC`     | Used for inter-service request-response style communication |
+| `RabbitMQ` | Used for inter-service communication                        |
+| `MediatR`  | Used to direct requests to internal handlers.               |
+| `Redis`    | Used to get plugin & tickers.                               |
+| `Hangfire` | Used to schedule analysis.                                  |
 
 
 ### Development Roadmap
 - [ ] Backend
-  - [x] v1: ***Handle usertracklist, analysis & plugin execution/cancellation***
+  - [x] v1: Manage user track list, analysis & plugin execution/cancellation
 - [ ] Worker
-  - [x] v1: ***Handle analysis & plugin execution/cancellation***
-- [ ] Security
+  - [x] v1: Execute analysis, cached math
+- [x] Security
+  - [x] v1: Handle authentication/authorization and permission checks
 - [ ] Market
-  - [x] v1: ***Handle ticker ops, fetch price info.***
+  - [x] v1: Handle ticker ops, fetch price info.
 - [ ] Notifications
-- [ ] Web UI
+  - [ ] v1: Web sockets will be used for notifications
+- [x] Web UI - React web app
+  - [x] Ability to create analysis with parameter sets
+  - [x] Display analysis outputs on candlestick chart with labels.
 
 ### License
 MIT License has been chosen for the project at the moment. Feel free to contribute. 🚀
