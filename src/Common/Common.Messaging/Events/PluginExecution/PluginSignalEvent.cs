@@ -1,4 +1,5 @@
-﻿using Common.Plugin.Signals;
+﻿using Common.Core.Models;
+using Common.Plugin.Signals;
 
 namespace Common.Messaging.Events.PluginExecution;
 

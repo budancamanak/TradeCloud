@@ -3,7 +3,7 @@ using Common.Core.DTOs;
 using Common.Core.Enums;
 using Common.Core.Models;
 using Common.Messaging.Abstraction;
-using Common.Messaging.Events;
+using Common.Core.Models;
 using FluentAssertions;
 using FluentValidation;
 using Market.Application.Abstraction.Services;

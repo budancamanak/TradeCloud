@@ -1,4 +1,6 @@
-﻿namespace Common.Messaging.Events.PriceFetchEvents;
+﻿using Common.Core.Models;
+
+namespace Common.Messaging.Events.PriceFetchEvents;
 
 public class PriceFetchedIntegrationEvent(int pluginId) : IntegrationEvent
 {

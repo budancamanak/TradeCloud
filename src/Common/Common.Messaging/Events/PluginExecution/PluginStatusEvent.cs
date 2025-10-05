@@ -1,4 +1,5 @@
 ﻿using Common.Core.Enums;
+using Common.Core.Models;
 
 namespace Common.Messaging.Events.PluginExecution;
 

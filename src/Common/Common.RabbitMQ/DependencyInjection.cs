@@ -1,5 +1,5 @@
 ﻿using Common.Messaging.Abstraction;
-using Common.Messaging.Events;
+using Common.Core.Models;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Common.Application.Repositories;
 using Common.Application.Services;
-using Common.Messaging.Events;
+using Common.Core.Models;
 using Common.Messaging.Events.PluginExecution;
 using Common.Plugin.Abstraction;
 using Common.RabbitMQ;

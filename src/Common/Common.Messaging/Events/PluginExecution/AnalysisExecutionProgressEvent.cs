@@ -1,4 +1,6 @@
-﻿namespace Common.Messaging.Events.PluginExecution;
+﻿using Common.Core.Models;
+
+namespace Common.Messaging.Events.PluginExecution;
 
 public class AnalysisExecutionProgressEvent(int analysisExecutionId, int increment, int total) : IntegrationEvent
 {

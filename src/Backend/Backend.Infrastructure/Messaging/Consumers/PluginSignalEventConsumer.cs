@@ -1,5 +1,7 @@
 ﻿using Backend.Application.Abstraction.Repositories;
 using Backend.Domain.Entities;
+using Backend.Infrastructure.Services;
+using Common.Application.Queue;
 using Common.Messaging.Events.PluginExecution;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -7,23 +9,12 @@ using Microsoft.Extensions.Logging;
 namespace Backend.Infrastructure.Messaging.Consumers;
 
 public class PluginSignalEventConsumer(
-    IPluginOutputRepository pluginOutputRepository,
-    IPluginExecutionRepository pluginExecutionRepository,
+    IBackgroundTaskQueue taskQueue,
     ILogger<PluginSignalEventConsumer> logger) : IConsumer<PluginSignalEvent>
 {
     public async Task Consume(ConsumeContext<PluginSignalEvent> context)
     {
-        var plugin = await pluginExecutionRepository.GetByIdAsync(context.Message.PluginId);
-        if (plugin == null) return;
-        var mr = await pluginOutputRepository.AddAsync(new PluginOutput
-        {
-            PluginId = context.Message.PluginId,
-            PluginSignal = context.Message.Signal.SignalType,
-            CreatedDate = context.Message.CreatedDate,
-            SignalDate = context.Message.Signal.SignalDate
-        });
-        logger.LogInformation("Consumed PluginSignalEvent> Saving signal result for {PluginId}: {Signal} - Response: {Result}",
-            context.Message.PluginId,
-            context.Message.Signal, mr);
+        logger.LogInformation("PluginSignalEvent");
+        await taskQueue.QueueBackgroundWorkItemAsync(context.Message);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Common.Messaging.Events;
+﻿using Common.Core.Models;
 
 namespace Common.Messaging.Events.PluginExecution;
 

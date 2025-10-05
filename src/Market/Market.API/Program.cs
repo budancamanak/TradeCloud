@@ -1,6 +1,6 @@
 using Common.Application.Services;
 using Common.Logging;
-using Common.Messaging.Events;
+using Common.Core.Models;
 using Common.Messaging.Events.PriceFetchEvents;
 using Common.RabbitMQ;
 using Hangfire;

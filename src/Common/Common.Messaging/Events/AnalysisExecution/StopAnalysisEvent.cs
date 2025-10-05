@@ -1,4 +1,6 @@
-﻿namespace Common.Messaging.Events.AnalysisExecution;
+﻿using Common.Core.Models;
+
+namespace Common.Messaging.Events.AnalysisExecution;
 
 public class StopAnalysisEvent : IntegrationEvent
 {

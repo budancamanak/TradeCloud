@@ -1,4 +1,4 @@
-﻿namespace Common.Messaging.Events;
+﻿namespace Common.Core.Models;
 
 public abstract class IntegrationEvent
 {

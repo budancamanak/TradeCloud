@@ -7,9 +7,10 @@ using Backend.Domain.Entities;
 using Backend.Infrastructure.Messaging.Consumers;
 using Backend.Infrastructure.Repositories;
 using Backend.Infrastructure.Services;
+using Common.Application.Queue;
 using Common.Application.Repositories;
 using Common.Application.Services;
-using Common.Messaging.Events;
+using Common.Core.Models;
 using Common.Messaging.Events.AnalysisExecution;
 using Common.Messaging.Events.PluginExecution;
 using Common.RabbitMQ;
@@ -78,6 +79,14 @@ public static class DependencyInjection
         services.AddScoped<ITickerService, TickerService>();
         services.AddScoped<IPluginExecutionEngine, PluginExecutionEngine>();
 
+        services.AddHostedService<PluginSignalService>();
+        services.AddHostedService<PluginProgressService>();
+        services.AddSingleton<IBackgroundTaskQueue>(ctx =>
+        {
+            if (!int.TryParse(configurationManager["QueueCapacity"], out var queueCapacity))
+                queueCapacity = 100;
+            return new BackgroundTaskQueue(queueCapacity);
+        });
 
         //
         var multiplexer = ConnectionMultiplexer.Connect(configurationManager.GetConnectionString("Redis"));
