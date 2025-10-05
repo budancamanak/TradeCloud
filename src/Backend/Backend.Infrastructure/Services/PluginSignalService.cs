@@ -19,7 +19,7 @@ public class PluginSignalService(
     protected override async Task ExecuteItem(IntegrationEvent workItem)
     {
         if (workItem is not PluginSignalEvent model) return;
-        logger.LogInformation(ChartLogEvents.ExecutionSignal, "Consuming {0}", model.Signal.SignalType);
+        logger.LogInformation(ChartLogEvents.ExecutionSignal, "Consuming {Signal}", model.Signal.SignalType);
         var plugin = await pluginExecutionRepository.GetByIdAsync(model.PluginId);
         if (plugin == null) return;
         var mr = await pluginOutputRepository.AddAsync(new PluginOutput

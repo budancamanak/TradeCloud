@@ -32,6 +32,7 @@ public static class DependencyInjection
             {
                 config.AddConsumer<PluginStatusEventConsumer>();
                 config.AddConsumer<PluginSignalEventConsumer>();
+                config.AddConsumer<PluginComputationEventConsumer>();
                 config.AddConsumer<PluginProgressEventConsumer>(cfg => { cfg.ConcurrentMessageLimit = 4; });
                 // config.AddConsumer<AnalysisExecutionProgressEventConsumer>(cfg => { cfg.ConcurrentMessageLimit = 4; });
             },
@@ -63,6 +64,12 @@ public static class DependencyInjection
                     ep.ConfigureConsumeTopology = false;
                     ep.Bind("plugin.executions.exchange.signal");
                     ep.ConfigureConsumer<PluginSignalEventConsumer>(context);
+                });
+                config.ReceiveEndpoint("plugin.executions.computation", ep =>
+                {
+                    ep.ConfigureConsumeTopology = false;
+                    ep.Bind("plugin.executions.computation");
+                    ep.ConfigureConsumer<PluginComputationEventConsumer>(context);
                 });
             }
         );

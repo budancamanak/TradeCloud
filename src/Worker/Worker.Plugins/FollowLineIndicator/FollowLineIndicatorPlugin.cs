@@ -66,6 +66,7 @@ public class FollowLineIndicatorPlugin(
         var atrList = tradeMath.GetAtr(Params.ATRPeriod).ToList();
         var trendLine = new double[2];
         var iTrend = new int[2];
+        int rowId = 0;
         for (var i = 0; i < PriceInfo.Count; i++)
         {
             trendLine[1] = trendLine[0];
@@ -85,6 +86,10 @@ public class FollowLineIndicatorPlugin(
                 continue;
             }
 
+            MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "bbUpper", bbUpper.Value,
+                PriceInfo[i].Timestamp);
+            MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "bbLower", bbLower.Value,
+                PriceInfo[i].Timestamp);
             var bbSignal = 0;
             if (price.Close.ToDouble() > bbUpper.Value) bbSignal = 1;
             else if (price.Close.ToDouble() < bbLower) bbSignal = -1;
@@ -131,6 +136,11 @@ public class FollowLineIndicatorPlugin(
             var buy = iTrend[1] == -1 && iTrend[0] == 1 ? 1 : 0;
             var sell = iTrend[1] == 1 && iTrend[0] == -1 ? 1 : 0;
 
+            MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "iTrend", iTrend[0],
+                PriceInfo[i].Timestamp);
+            MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "trendLine", trendLine[0],
+                PriceInfo[i].Timestamp);
+
             if (buy == 1)
             {
                 Logger.LogCritical(LogEventId,
@@ -140,6 +150,8 @@ public class FollowLineIndicatorPlugin(
                     PluginSignal.CloseShort(TickerDto.Id, PriceInfo[i].Timestamp));
                 MessageBroker.OnPluginSignal(this, ExecutionId,
                     PluginSignal.OpenLong(TickerDto.Id, PriceInfo[i].Timestamp));
+                MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "Output", (double)SignalType.OpenLong,
+                    PriceInfo[i].Timestamp);
             }
             else if (sell == 1)
             {
@@ -150,10 +162,13 @@ public class FollowLineIndicatorPlugin(
                     PluginSignal.CloseLong(TickerDto.Id, PriceInfo[i].Timestamp));
                 MessageBroker.OnPluginSignal(this, ExecutionId,
                     PluginSignal.OpenShort(TickerDto.Id, PriceInfo[i].Timestamp));
+                MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "Output", (double)SignalType.OpenShort,
+                    PriceInfo[i].Timestamp);
             }
 
             if (trendLine[1] == 0)
                 trendLine[1] = trendLine[0];
+            rowId++;
         }
     }
 }

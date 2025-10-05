@@ -11,10 +11,13 @@ namespace Worker.Plugins.MovingAverage;
 
 public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
 {
+    private GoldenDeathCrossCollector _collector;
+
     public GoldenDeathCrossPlugin(ILogger<IPlugin> logger, IPluginMessageBroker messageBroker,
         IPluginStateManager stateManager,
         ICacheService cache) : base(logger, messageBroker, stateManager, cache)
     {
+        _collector = new GoldenDeathCrossCollector(this, messageBroker);
     }
 
     protected override GoldenDeathCrossPluginParams ParseParams(string? json)
@@ -77,6 +80,7 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
         // var slow = quotes.GetSma(Params.SlowMovingAverage).ToList();
         // var fast = quotes.GetSma(Params.FastMovingAverage).ToList();
         var isLastLong = 0;
+        var rowId = 0;
         for (var i = 0; i < PriceInfo.Count; i++)
         {
             StateManager.ThrowIfCancelRequested(ExecutionId);
@@ -92,6 +96,11 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
                     slowSma, fastSma, PriceInfo[i].Close, PriceInfo[i].Timestamp);
                 continue;
             }
+
+            MessageBroker.OnPluginComputation(this,ExecutionId, rowId,"slow", slowSma.Value, PriceInfo[i].Timestamp);
+            MessageBroker.OnPluginComputation(this,ExecutionId, rowId,"fast", fastSma.Value, PriceInfo[i].Timestamp);
+            // _collector.Collect(ExecutionId, rowId++, slowSma.Value, fastSma.Value, PriceInfo[i].Timestamp);
+            rowId++;
 
             bool currentLong = false;
             if (fastSma.Value > slowSma.Value)
@@ -121,8 +130,9 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
             if (isLastLong == 1 && !currentLong)
             {
                 // turned bearish
-                Logger.LogCritical(LogEventId, ">> We TURNED to bear. fast:{Fast}, slow: {Slow} @ {Date}", fastSma.Value,
-                    slowSma.Value,slowResult?.Date);
+                Logger.LogCritical(LogEventId, ">> We TURNED to bear. fast:{Fast}, slow: {Slow} @ {Date}",
+                    fastSma.Value,
+                    slowSma.Value, slowResult?.Date);
                 MessageBroker.OnPluginSignal(this, ExecutionId,
                     PluginSignal.CloseLong(TickerDto.Id, PriceInfo[i].Timestamp));
                 MessageBroker.OnPluginSignal(this, ExecutionId,
@@ -131,7 +141,8 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
             else if (isLastLong == -1 && currentLong)
             {
                 // turned bullish
-                Logger.LogCritical(LogEventId, ">> We TURNED to bull. fast:{Fast}, slow: {Slow} @ {Date}", fastSma.Value,
+                Logger.LogCritical(LogEventId, ">> We TURNED to bull. fast:{Fast}, slow: {Slow} @ {Date}",
+                    fastSma.Value,
                     slowSma.Value, slowResult?.Date);
                 MessageBroker.OnPluginSignal(this, ExecutionId,
                     PluginSignal.CloseShort(TickerDto.Id, PriceInfo[i].Timestamp));

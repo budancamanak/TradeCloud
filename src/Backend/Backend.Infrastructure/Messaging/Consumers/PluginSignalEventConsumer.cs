@@ -14,7 +14,7 @@ public class PluginSignalEventConsumer(
 {
     public async Task Consume(ConsumeContext<PluginSignalEvent> context)
     {
-        logger.LogInformation("PluginSignalEvent");
+        logger.LogInformation("PluginSignalEvent:{Signal}", context.Message.Signal.SignalType);
         await taskQueue.QueueBackgroundWorkItemAsync(context.Message);
     }
 }

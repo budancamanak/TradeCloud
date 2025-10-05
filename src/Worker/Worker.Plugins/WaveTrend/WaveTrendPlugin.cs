@@ -1,4 +1,5 @@
 ﻿using Common.Application.Repositories;
+using Common.Core.Enums;
 using Common.Core.Models;
 using Common.Plugin.Abstraction;
 using Common.Plugin.Math;
@@ -75,6 +76,7 @@ public class WaveTrendPlugin(
 
         var prevLong = false;
         var prevShort = false;
+        int rowId = 0;
         for (int i = 0; i < PriceInfo.Count; i++)
         {
             StateManager.ThrowIfCancelRequested(ExecutionId);
@@ -88,6 +90,13 @@ public class WaveTrendPlugin(
                     wt1, wt2, PriceInfo[i].Close, PriceInfo[i].Timestamp);
                 continue;
             }
+
+            MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "wt1.Ema", wt1.Ema.Value,
+                PriceInfo[i].Timestamp);
+            MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "wt2.Ema", wt2.Ema.Value,
+                PriceInfo[i].Timestamp);
+            MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "Params.OverBoughtLevel",
+                Params.OverBoughtLevel, PriceInfo[i].Timestamp);
 
             bool goingDown = false, goingUp = false;
             if (wt1.Ema.Value > wt2.Ema.Value && wt2.Ema.Value - wt1.Ema.Value > 0 &&
@@ -111,6 +120,8 @@ public class WaveTrendPlugin(
                     PluginSignal.CloseShort(TickerDto.Id, PriceInfo[i].Timestamp));
                 MessageBroker.OnPluginSignal(this, ExecutionId,
                     PluginSignal.OpenLong(TickerDto.Id, PriceInfo[i].Timestamp));
+                MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "Output", (double)SignalType.OpenLong,
+                    PriceInfo[i].Timestamp);
                 prevLong = true;
                 prevShort = false;
             }
@@ -124,9 +135,13 @@ public class WaveTrendPlugin(
                     PluginSignal.CloseLong(TickerDto.Id, PriceInfo[i].Timestamp));
                 MessageBroker.OnPluginSignal(this, ExecutionId,
                     PluginSignal.OpenShort(TickerDto.Id, PriceInfo[i].Timestamp));
+                MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "Output", (double)SignalType.OpenShort,
+                    PriceInfo[i].Timestamp);
                 prevShort = true;
                 prevLong = false;
             }
+
+            rowId++;
         }
     }
 }

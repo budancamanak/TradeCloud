@@ -56,4 +56,12 @@ public class RabbitMQPluginMessageBroker(IEventBus eventBus, ILogger<RabbitMQPlu
             plugin.GetPluginInfo());
         await eventBus.PublishAsync(new PluginSignalEvent(executionId, signal));
     }
+
+    public async Task OnPluginComputation(IPlugin plugin, int executionId, int rowId, string key, double output,
+        DateTime date)
+    {
+        // logger.LogWarning(WorkerLogEvents.PluginMessageBroker, "OnPluginSignal:{Signal} for {PluginInfo}", signal,
+        //     plugin.GetPluginInfo());
+        await eventBus.PublishAsync(new PluginComputationEvent(executionId, rowId, key, output, date));
+    }
 }

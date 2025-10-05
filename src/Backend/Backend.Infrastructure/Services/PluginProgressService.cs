@@ -16,7 +16,7 @@ public class PluginProgressService(
     protected override async Task ExecuteItem(IntegrationEvent workItem)
     {
         if (workItem is not PluginProgressEvent model) return;
-        logger.LogDebug(ChartLogEvents.ExecutionProgress, "Consuming {0}", $"{model.PluginId}-%{model.Progress}");
+        logger.LogDebug(ChartLogEvents.ExecutionProgress, "Consuming {Plugin}", $"{model.PluginId}-%{model.Progress}");
         await pluginExecutionRepository.SetPluginProgress(model.PluginId,model.Progress);
     }
 }
