@@ -14,6 +14,20 @@ namespace Backend.Infrastructure.Repositories;
 public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<PluginExecution> validator)
     : IPluginExecutionRepository
 {
+    
+    // Returns true if DB row was modified (i.e. incoming timestamp was newer)
+    public async Task<bool> SetPluginProgressIfNewer(int id, double progress, DateTime incomingUtc)
+    {
+        var rows = await dbContext.Database.ExecuteSqlInterpolatedAsync($@"
+        UPDATE ""PluginExecutions""
+        SET ""Progress"" = {progress}, ""LastProgressUpdatedAt"" = {incomingUtc}
+        WHERE ""Id"" = {id} AND (""LastProgressUpdatedAt"" IS NULL OR ""LastProgressUpdatedAt"" < {incomingUtc}) AND {progress} > ""Progress""
+    ");
+
+        return rows > 0;
+    }
+
+
     public async Task<PluginExecution> GetByIdAsync(int id)
     {
         Guard.Against.NegativeOrZero(id);
@@ -178,6 +192,9 @@ public class PluginExecutionRepository(BackendDbContext dbContext, IValidator<Pl
             case PluginStatus.Failure:
             case PluginStatus.Success:
                 existing.FinishDate = DateTime.UtcNow;
+                // Force progress to 100% on any completion
+                existing.Progress = 1.0;
+                existing.LastProgressUpdatedAt = DateTime.UtcNow;
                 break;
             case PluginStatus.Running:
                 existing.RunStartDate = DateTime.UtcNow;

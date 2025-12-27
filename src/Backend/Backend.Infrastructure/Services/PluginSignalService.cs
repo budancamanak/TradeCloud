@@ -1,37 +1,98 @@
-﻿using System.Collections.Concurrent;
-using Backend.Application.Abstraction.Repositories;
+﻿using Backend.Application.Abstraction.Repositories;
 using Backend.Domain.Entities;
-using Common.Application.Queue;
-using Common.Core.Models;
-using Common.Logging.Events.Backend;
 using Common.Messaging.Events.PluginExecution;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace Backend.Infrastructure.Services;
 
-public class PluginSignalService(
-    IPluginOutputRepository pluginOutputRepository,
-    IPluginExecutionRepository pluginExecutionRepository,
-    IBackgroundTaskQueue taskQueue,
-    ILogger<PluginSignalService> logger) : QueuedHostedService(taskQueue, logger)
+public class PluginSignalService : BackgroundService
 {
-    protected override async Task ExecuteItem(IntegrationEvent workItem)
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly IConnectionMultiplexer _mux;
+    private readonly ILogger<PluginSignalService> _logger;
+    private const string KeyPattern = "plugin:signal:*";
+
+    public PluginSignalService(IServiceScopeFactory scopeFactory, IConnectionMultiplexer mux, ILogger<PluginSignalService> logger)
     {
-        if (workItem is not PluginSignalEvent model) return;
-        logger.LogInformation(ChartLogEvents.ExecutionSignal, "Consuming {Signal}", model.Signal.SignalType);
-        var plugin = await pluginExecutionRepository.GetByIdAsync(model.PluginId);
-        if (plugin == null) return;
-        var mr = await pluginOutputRepository.AddAsync(new PluginOutput
+        _scopeFactory = scopeFactory;
+        _mux = mux;
+        _logger = logger;
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        var server = _mux.GetServer(_mux.GetEndPoints().First());
+        var db = _mux.GetDatabase();
+
+        while (!stoppingToken.IsCancellationRequested)
         {
-            PluginId = model.PluginId,
-            PluginSignal = model.Signal.SignalType,
-            CreatedDate = model.CreatedDate,
-            SignalDate = model.Signal.SignalDate
-        });
-        logger.LogInformation(ChartLogEvents.ExecutionSignal,
-            "Consumed PluginSignalEvent> Saving signal result for {PluginId}: {Signal} - Response: {Result}",
-            model.PluginId,
-            model.Signal, mr);
+            try
+            {
+                foreach (var key in server.Keys(pattern: KeyPattern).Take(1000))
+                {
+                    var val = await db.StringGetAsync(key);
+                    if (val.IsNullOrEmpty) continue;
+
+                    PluginSignalEvent? signal;
+                    try
+                    {
+                        signal = JsonConvert.DeserializeObject<PluginSignalEvent>(val!);
+                    }
+                    catch (JsonException ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to deserialize signal from key {Key}", key);
+                        await db.KeyDeleteAsync(key);
+                        continue;
+                    }
+
+                    if (signal?.Signal == null)
+                    {
+                        _logger.LogWarning("Invalid signal data in key {Key}", key);
+                        await db.KeyDeleteAsync(key);
+                        continue;
+                    }
+
+                    using var scope = _scopeFactory.CreateScope();
+                    var repo = scope.ServiceProvider.GetRequiredService<IPluginOutputRepository>();
+                    
+                    try
+                    {
+                        var mr = await repo.AddAsync(new PluginOutput
+                        {
+                            CreatedDate = DateTime.UtcNow,
+                            PluginId = signal.PluginId,
+                            PluginSignal = signal.Signal.SignalType,
+                            SignalDate = signal.Signal.SignalDate
+                        });
+
+                        if (mr.IsSuccess)
+                        {
+                            _logger.LogInformation("Signal saved for plugin {PluginId}: {SignalType}", 
+                                signal.PluginId, signal.Signal.SignalType);
+                            await db.KeyDeleteAsync(key);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Failed to save signal: {Error}", mr.Message);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Exception saving signal for plugin {PluginId}", signal.PluginId);
+                        // Keep key for retry, TTL will clean up eventually
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in PluginSignalService");
+            }
+
+            await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+        }
     }
 }

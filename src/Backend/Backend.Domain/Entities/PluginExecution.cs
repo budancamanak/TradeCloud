@@ -13,6 +13,8 @@ public class PluginExecution
     public DateTime? RunStartDate { get; set; }
     public DateTime? FinishDate { get; set; }
     public int AnalysisExecutionId { get; set; }
+    // Add this property to your PluginExecution class
+    public DateTime? LastProgressUpdatedAt { get; set; }
     public virtual ICollection<PluginOutput> PluginOutputs { get; set; }
     public virtual AnalysisExecution AnalysisExecution { get; set; }
 

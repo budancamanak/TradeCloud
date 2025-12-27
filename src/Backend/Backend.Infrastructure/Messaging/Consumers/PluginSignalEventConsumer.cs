@@ -1,7 +1,4 @@
-﻿using Backend.Application.Abstraction.Repositories;
-using Backend.Domain.Entities;
-using Backend.Infrastructure.Services;
-using Common.Application.Queue;
+﻿using Backend.Infrastructure.Services;
 using Common.Messaging.Events.PluginExecution;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -9,12 +6,16 @@ using Microsoft.Extensions.Logging;
 namespace Backend.Infrastructure.Messaging.Consumers;
 
 public class PluginSignalEventConsumer(
-    IBackgroundTaskQueue taskQueue,
+    RedisPluginSignalPublisher _redisPublisher,
     ILogger<PluginSignalEventConsumer> logger) : IConsumer<PluginSignalEvent>
 {
     public async Task Consume(ConsumeContext<PluginSignalEvent> context)
     {
-        logger.LogInformation("PluginSignalEvent:{Signal}", context.Message.Signal.SignalType);
-        await taskQueue.QueueBackgroundWorkItemAsync(context.Message);
+        var msg = context.Message;
+
+        // Write to Redis (fast, non-blocking)
+        await _redisPublisher.PublishAsync(msg.PluginId, msg);
+
+        // logger.LogInformation("Signal {signal}% for plugin {Id} written to Redis", msg.Signal, msg.PluginId);
     }
 }

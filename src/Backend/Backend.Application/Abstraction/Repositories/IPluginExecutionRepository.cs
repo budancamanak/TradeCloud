@@ -7,6 +7,7 @@ namespace Backend.Application.Abstraction.Repositories;
 
 public interface IPluginExecutionRepository : IAsyncRepository<PluginExecution>
 {
+    Task<bool> SetPluginProgressIfNewer(int id, double progress, DateTime incomingUtc);
     Task<PluginExecution> GetNextWaitingPluginExecution();
     Task<List<PluginExecution>> GetWaitingPluginExecutions();
     Task<List<PluginExecution>> GetActivePluginExecutions(int analysisId);

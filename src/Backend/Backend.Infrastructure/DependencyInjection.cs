@@ -32,7 +32,7 @@ public static class DependencyInjection
             {
                 config.AddConsumer<PluginStatusEventConsumer>();
                 config.AddConsumer<PluginSignalEventConsumer>();
-                config.AddConsumer<PluginComputationEventConsumer>();
+                // config.AddConsumer<PluginComputationEventConsumer>();
                 config.AddConsumer<PluginProgressEventConsumer>(cfg => { cfg.ConcurrentMessageLimit = 4; });
                 // config.AddConsumer<AnalysisExecutionProgressEventConsumer>(cfg => { cfg.ConcurrentMessageLimit = 4; });
             },
@@ -65,12 +65,12 @@ public static class DependencyInjection
                     ep.Bind("plugin.executions.exchange.signal");
                     ep.ConfigureConsumer<PluginSignalEventConsumer>(context);
                 });
-                config.ReceiveEndpoint("plugin.executions.computation", ep =>
-                {
-                    ep.ConfigureConsumeTopology = false;
-                    ep.Bind("plugin.executions.computation");
-                    ep.ConfigureConsumer<PluginComputationEventConsumer>(context);
-                });
+                // config.ReceiveEndpoint("plugin.executions.computation", ep =>
+                // {
+                //     ep.ConfigureConsumeTopology = false;
+                //     ep.Bind("plugin.executions.computation");
+                //     ep.ConfigureConsumer<PluginComputationEventConsumer>(context);
+                // });
             }
         );
         services.AddScoped<ITrackListRepository, TrackListRepository>();
@@ -88,17 +88,20 @@ public static class DependencyInjection
 
         services.AddHostedService<PluginSignalService>();
         services.AddHostedService<PluginProgressService>();
-        services.AddSingleton<IBackgroundTaskQueue>(ctx =>
-        {
-            if (!int.TryParse(configurationManager["QueueCapacity"], out var queueCapacity))
-                queueCapacity = 100;
-            return new BackgroundTaskQueue(queueCapacity);
-        });
+        // services.AddSingleton<IBackgroundTaskQueue>(ctx =>
+        // {
+        //     if (!int.TryParse(configurationManager["QueueCapacity"], out var queueCapacity))
+        //         queueCapacity = 100;
+        //     return new BackgroundTaskQueue(queueCapacity);
+        // });
 
         //
         var multiplexer = ConnectionMultiplexer.Connect(configurationManager.GetConnectionString("Redis"));
         services.AddSingleton<IConnectionMultiplexer>(multiplexer);
         services.AddTransient<ICacheService, RedisCacheService>();
+        // Register RedisProgressPublisher (singleton - thread-safe)
+        services.AddSingleton<RedisProgressPublisher>();
+        services.AddSingleton<RedisPluginSignalPublisher>();
         // serviceCollection.AddTransient<IPriceService, PriceService>();
         // serviceCollection.AddTransient<ITickerService, TickerService>();
         // serviceCollection.AddTransient<IPriceFetchCalculatorService, PriceFetchCalculatorService>();
