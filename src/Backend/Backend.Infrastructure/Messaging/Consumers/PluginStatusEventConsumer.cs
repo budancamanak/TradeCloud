@@ -1,5 +1,7 @@
 ﻿using Backend.Application.Abstraction.Repositories;
+using Backend.Infrastructure.Services;
 using Common.Core.Enums;
+using Common.Core.Extensions;
 using Common.Messaging.Events.PluginExecution;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -9,6 +11,7 @@ namespace Backend.Infrastructure.Messaging.Consumers;
 public class PluginStatusEventConsumer(
     IPluginExecutionRepository repository,
     IAnalysisExecutionRepository analysisRepository,
+    IProgressNotifier _notifier,
     ILogger<PluginStatusEventConsumer> logger)
     : IConsumer<PluginStatusEvent>
 {
@@ -23,13 +26,24 @@ public class PluginStatusEventConsumer(
             // logger.LogInformation("PluginStatusEvent > Setting plugin[{PluginId}] progress to {Status}",
             //     context.Message.PluginId, 1.0d);
             // mr = await repository.SetPluginProgress(context.Message.PluginId, 1.0d);
-            await analysisRepository.SetAnalysisExecutionProgress(context.Message.AnalysisId, 1, 0);
+            mr = await analysisRepository.SetAnalysisExecutionProgress(context.Message.AnalysisId, 1, 0);
+            if (mr.IsSuccess)
+            {
+                await _notifier.NotifyProgressAsync(context.Message.AnalysisId, mr.Data.ToDouble());
+                if (mr.Data.ToDouble() >= 1.0d)
+                {
+                    await _notifier.NotifyStatusChangedAsync(context.Message.AnalysisId,
+                        PluginStatus.Success.ToString());
+                }
+            }
+
             if (context.Message.Status == PluginStatus.Failure)
             {
                 await repository.SetPluginError(context.Message.PluginId, context.Message.Error);
             }
         }
 
+        // await _notifier.NotifyStatusChangedAsync(context.Message.AnalysisId, context.Message.Status.ToString());
 
         logger.LogInformation("Consumed PluginStatusEvent > Setting plugin[{PluginId}] status to {Status} : {Result}",
             context.Message.PluginId, context.Message.Status, mr);

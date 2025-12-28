@@ -91,12 +91,12 @@ public class WaveTrendPlugin(
                 continue;
             }
 
-            MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "wt1.Ema", wt1.Ema.Value,
-                PriceInfo[i].Timestamp);
-            MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "wt2.Ema", wt2.Ema.Value,
-                PriceInfo[i].Timestamp);
-            MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "Params.OverBoughtLevel",
-                Params.OverBoughtLevel, PriceInfo[i].Timestamp);
+            // MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "wt1.Ema", wt1.Ema.Value,
+            //     PriceInfo[i].Timestamp);
+            // MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "wt2.Ema", wt2.Ema.Value,
+            //     PriceInfo[i].Timestamp);
+            // MessageBroker.OnPluginComputation(this, ExecutionId, rowId, "Params.OverBoughtLevel",
+            //     Params.OverBoughtLevel, PriceInfo[i].Timestamp);
 
             bool goingDown = false, goingUp = false;
             if (wt1.Ema.Value > wt2.Ema.Value && wt2.Ema.Value - wt1.Ema.Value > 0 &&

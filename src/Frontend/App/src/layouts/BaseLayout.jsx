@@ -1,12 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "./Navbar.jsx";
 import Sidebar from "./Sidebar.jsx";
 import AppLogo from "../assets/img/AdminLTELogo.png";
 import UserLogo from "../assets/img/user3-128x128.jpg";
 import { Outlet } from "react-router-dom";
 import Breadcumb from "./Breadcumb.jsx";
+import WebSocketService from "../services/WebSocket.Service";
 
 function BaseLayout() {
+  useEffect(() => {
+    console.log("loaded page");
+    WebSocketService.connect(process.env.APP_BASE_URL);
+  }, []);
   return (
     <>
       <div className="wrapper">

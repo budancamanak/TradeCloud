@@ -118,7 +118,7 @@ public class AnalysisExecutionRepository(
             existing.ProgressCurrent, existing.ProgressTotal);
 
         var result = await dbContext.SaveChangesAsync();
-        if (result > 0) return MethodResponse.Success(result, "AnalysisExecutions updated progress");
+        if (result > 0) return MethodResponse.Success(result, "AnalysisExecutions updated progress", (existing.Progress));
 
         return MethodResponse.Error("Failed to update AnalysisExecutions progress");
     }

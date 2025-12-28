@@ -31,6 +31,7 @@ public static class DependencyInjection
             consumerConfiguration: (config) =>
             {
                 config.AddConsumer<PluginStatusEventConsumer>();
+                config.AddConsumer<AnalysisStatusEventConsumer>();
                 config.AddConsumer<PluginSignalEventConsumer>();
                 // config.AddConsumer<PluginComputationEventConsumer>();
                 config.AddConsumer<PluginProgressEventConsumer>(cfg => { cfg.ConcurrentMessageLimit = 4; });
@@ -41,11 +42,18 @@ public static class DependencyInjection
                 config.Publish<IntegrationEvent>(f => f.Exclude = true);
                 config.Message<RunAnalysisRequestedEvent>(f => f.SetEntityName("analysis.executions.exchange.run"));
                 config.Message<StopAnalysisEvent>(f => f.SetEntityName("analysis.executions.exchange.stop"));
+                config.Message<AnalysisStatusEvent>(f => f.SetEntityName("analysis.executions.exchange.status"));
                 config.ReceiveEndpoint("plugin.executions.queue.status", ep =>
                 {
                     ep.ConfigureConsumeTopology = false;
                     ep.Bind("plugin.executions.exchange.status");
                     ep.ConfigureConsumer<PluginStatusEventConsumer>(context);
+                });
+                config.ReceiveEndpoint("analysis.executions.queue.status", ep =>
+                {
+                    ep.ConfigureConsumeTopology = false;
+                    ep.Bind("analysis.executions.exchange.status");
+                    ep.ConfigureConsumer<AnalysisStatusEventConsumer>(context);
                 });
                 config.ReceiveEndpoint("plugin.executions.queue.progress", ep =>
                 {

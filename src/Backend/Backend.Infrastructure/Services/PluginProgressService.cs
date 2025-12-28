@@ -18,7 +18,8 @@ public class PluginProgressService : BackgroundService
     private readonly ILogger<PluginProgressService> _logger;
     private const string KeyPrefix = "plugin:progress:";
 
-    public PluginProgressService(IServiceScopeFactory scopeFactory, IConnectionMultiplexer mux, ILogger<PluginProgressService> logger)
+    public PluginProgressService(IServiceScopeFactory scopeFactory, IConnectionMultiplexer mux,
+        ILogger<PluginProgressService> logger)
     {
         _scopeFactory = scopeFactory;
         _mux = mux;
@@ -41,10 +42,23 @@ public class PluginProgressService : BackgroundService
                     if (val.IsNullOrEmpty) continue;
 
                     var parts = ((string)val).Split(':');
-                    if (parts.Length != 2) { await db.KeyExpireAsync(key, TimeSpan.FromSeconds(30)); continue; }
+                    if (parts.Length != 2)
+                    {
+                        await db.KeyExpireAsync(key, TimeSpan.FromSeconds(30));
+                        continue;
+                    }
 
-                    if (!double.TryParse(parts[0], out var progress)) { await db.KeyExpireAsync(key, TimeSpan.FromSeconds(30)); continue; }
-                    if (!long.TryParse(parts[1], out var tsMillis)) { await db.KeyExpireAsync(key, TimeSpan.FromSeconds(30)); continue; }
+                    if (!double.TryParse(parts[0], out var progress))
+                    {
+                        await db.KeyExpireAsync(key, TimeSpan.FromSeconds(30));
+                        continue;
+                    }
+
+                    if (!long.TryParse(parts[1], out var tsMillis))
+                    {
+                        await db.KeyExpireAsync(key, TimeSpan.FromSeconds(30));
+                        continue;
+                    }
 
                     var pluginIdStr = key.ToString().Substring(KeyPrefix.Length);
                     if (!int.TryParse(pluginIdStr, out var pluginId)) continue;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ToastUtility } from "../../utils/toast-utility";
@@ -6,44 +6,114 @@ import Fetcher from "../../utils/network";
 import DataTable from "datatables.net-bs4";
 import AnalysisActionButton from "../../components/actionButtons/AnalysisActionButton";
 import "datatables.net-plugins/dataRender/datetime.mjs";
+import WebSocketService from "../../services/WebSocket.Service";
 
 function ExecutionHistory() {
   const navigate = useNavigate();
   const [tickers, setTickers] = useState([]);
-  const [update, setUpdate] = useState(false);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const dataTableRef = useRef(null);
   const fetcher = new Fetcher();
 
   useEffect(() => {
-    setUpdate(false);
-    fetcher.get("AnalysisExecutions/User/Info").then((result) => {
-      setTickers(result);
-      setUpdate(true);
-    });
-  }, []);
+      fetcher.get("AnalysisExecutions/User/Info").then((result) => {
+        setTickers(result);
+        setInitialLoadComplete(true);
+
+        // Subscribe to running executions
+        result.forEach((item) => {
+          if (item.status === "Running" || item.status === "Init") {
+            WebSocketService.subscribeToExecution(item.id, {
+              onProgress: (id, progress) => {
+                setTickers((prev) =>
+                  prev.map((t) => (t.id === id ? { ...t, progress } : t))
+                );
+              },
+              onStatus: (id, status) => {
+                setTickers((prev) =>
+                  prev.map((t) => (t.id === id ? { ...t, status } : t))
+                );
+              },
+              onCompleted: (id, success, error) => {
+                if (success) ToastUtility.success(`Execution ${id} completed`);
+                else ToastUtility.error(`Execution ${id} failed: ${error}`);
+                WebSocketService.unsubscribeFromExecution(id);
+              },
+            });
+          }
+        });
+      });
+
+      return () => {
+        tickers.forEach((item) => {
+          WebSocketService.unsubscribeFromExecution(item.id);
+        });
+      };
+    }, []);
 
   useEffect(() => {
-    if (tickers && tickers.length > 0)
-      new DataTable("#example1", {
-        order: [[0, "desc"]],
-        columnDefs: [
-          {
-            targets: 7,
-            render: DataTable.render.datetime("Do MMM YYYY"),
-          },
-          {
-            targets: 6,
-            render: DataTable.render.datetime("Do MMM YYYY"),
-          },
-        ],
-      });
-  }, [tickers, update]);
+    // Only initialize DataTable once after initial load, not on every tickers update
+    if (initialLoadComplete && !dataTableRef.current) {
+      // Small delay to ensure DOM is ready with the rendered rows
+      const timer = setTimeout(() => {
+        if (document.querySelector("#example1 tbody tr")) {
+          dataTableRef.current = new DataTable("#example1", {
+            order: [[0, "desc"]],
+            columnDefs: [
+              {
+                targets: 7,
+                render: DataTable.render.datetime("Do MMM YYYY"),
+              },
+              {
+                targets: 6,
+                render: DataTable.render.datetime("Do MMM YYYY"),
+              },
+            ],
+          });
+        }
+      }, 0);
 
-  const startExecution = async (execution) => {
+      return () => clearTimeout(timer);
+    }
+  }, [initialLoadComplete]);
+
+  // Cleanup DataTable on unmount
+  useEffect(() => {
+    return () => {
+      if (dataTableRef.current) {
+        dataTableRef.current.destroy();
+        dataTableRef.current = null;
+      }
+    };
+  }, []);
+
+const startExecution = async (execution) => {
     const mr = await fetcher.send("AnalysisExecutions", "PATCH", {
       executionId: execution.id,
     });
-    if (mr.isSuccess) ToastUtility.success(mr.message);
-    else ToastUtility.error(mr.message);
+    if (mr.isSuccess) {
+      ToastUtility.success(mr.message);
+      // Subscribe to this execution's progress
+      WebSocketService.subscribeToExecution(execution.id, {
+        onProgress: (id, progress) => {
+          setTickers((prev) =>
+            prev.map((t) => (t.id === id ? { ...t, progress } : t))
+          );
+        },
+        onStatus: (id, status) => {
+          setTickers((prev) =>
+            prev.map((t) => (t.id === id ? { ...t, status } : t))
+          );
+        },
+        onCompleted: (id, success, error) => {
+          if (success) ToastUtility.success(`Execution ${id} completed`);
+          else ToastUtility.error(`Execution ${id} failed: ${error}`);
+          WebSocketService.unsubscribeFromExecution(id);
+        },
+      });
+    } else {
+      ToastUtility.error(mr.message);
+    }
   };
 
   const executeAction = (type, execution) => {

@@ -33,6 +33,17 @@ public class MethodResponse
         };
     }
 
+    public static MethodResponse Success(int id, string message, object data)
+    {
+        return new MethodResponse
+        {
+            Id = id,
+            Message = message,
+            IsSuccess = true,
+            Data = data
+        };
+    }
+
     public static MethodResponse Error(Exception exception)
     {
         return Error(-1, exception.Message);

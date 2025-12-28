@@ -3,6 +3,7 @@ using Backend.Application;
 using Backend.Application.Abstraction.Services;
 using Backend.Infrastructure;
 using Backend.Infrastructure.Data;
+using Backend.Infrastructure.Hubs;
 using Backend.Infrastructure.Services;
 using Common.Logging;
 using Common.Security.Abstraction;
@@ -11,6 +12,7 @@ using Common.Security.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Serilog;
@@ -21,9 +23,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll",
         b =>
         {
-            b.AllowAnyOrigin()
+            b
+                .SetIsOriginAllowed(_ => true)  // Allow any origin dynamically
+                // .AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowAnyHeader();
+                .AllowAnyHeader()
+                .AllowCredentials(); // Required for SignalR
         });
 });
 // Add services to the container.
@@ -118,6 +123,14 @@ builder.Logging.ClearProviders();
 builder.Host.UseSerilog((context, configuration) =>
     LogHelper.ConfigureLogger("backend-api", builder.Configuration, context, configuration), true);
 
+// Add SignalR with the auth filter
+builder.Services.AddSignalR(options =>
+{
+    options.AddFilter<SignalRAuthorizationFilter>();
+});
+builder.Services.AddSingleton<SignalRAuthorizationFilter>();
+builder.Services.AddSingleton<IProgressNotifier, SignalRProgressNotifier>();
+
 var app = builder.Build();
 app.UseCors("AllowAll");
 app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -142,5 +155,7 @@ app.UseAuthorization();
 app.UseExceptionHandler();
 
 app.MapControllers();
+// After app.MapControllers();
+app.MapHub<ProgressHub>("/hubs/progress");
 app.MapHealthChecks("/health");
 app.Run();

@@ -43,6 +43,7 @@ public static class DependencyInjection
                     f.SetEntityName("analysis.executions.exchange.progress"));
                 config.Message<PluginSignalEvent>(f => f.SetEntityName("plugin.executions.exchange.signal"));
                 config.Message<PluginStatusEvent>(f => f.SetEntityName("plugin.executions.exchange.status"));
+                config.Message<AnalysisStatusEvent>(f => f.SetEntityName("analysis.executions.exchange.status"));
                 config.Message<PluginStartedEvent>(f => f.SetEntityName("plugin.executions.exchange.started"));
                 config.Message<PluginFailedEvent>(f => f.SetEntityName("plugin.executions.exchange.failed"));
                 config.Message<PluginSucceededEvent>(f => f.SetEntityName("plugin.executions.exchange.succeeded"));
@@ -94,6 +95,6 @@ public static class DependencyInjection
                 options.UseNpgsqlConnection(configurationManager.GetConnectionString("HangfireConnection"))));
         serviceCollection.AddHangfireServer((_, options) => { options.WorkerCount = Environment.ProcessorCount * 2; });
         GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute
-            { Attempts = 0, OnAttemptsExceeded = AttemptsExceededAction.Fail });
+            { Attempts = 2, OnAttemptsExceeded = AttemptsExceededAction.Fail });
     }
 }
