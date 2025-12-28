@@ -12,6 +12,59 @@ namespace Backend.Infrastructure.Services;
 
 public class PluginExecutionEngine : IPluginExecutionEngine
 {
+    private const int MaxCartesianSize = 1000;
+
+    static IEnumerable<List<Param>> CartesianLazy(List<List<Param>> sets)
+    {
+        if (sets.Count == 0)
+        {
+            yield return new List<Param>();
+            yield break;
+        }
+
+        var indices = new int[sets.Count];
+        var lengths = sets.Select(s => s.Count).ToArray();
+
+        while (true)
+        {
+            // Build current combination
+            var result = new List<Param>(sets.Count);
+            for (int i = 0; i < sets.Count; i++)
+            {
+                result.Add(sets[i][indices[i]]);
+            }
+
+            yield return result;
+
+            // Increment indices (like counting in mixed-radix)
+            int pos = sets.Count - 1;
+            while (pos >= 0)
+            {
+                indices[pos]++;
+                if (indices[pos] < lengths[pos])
+                    break;
+                indices[pos] = 0;
+                pos--;
+            }
+
+            if (pos < 0) yield break;
+        }
+    }
+
+    private static int PossibleCombinationsCount(List<List<Param>> sets)
+    {
+        var count = 1;
+        foreach (var set in sets)
+        {
+            count *= Math.Max(1, set.Count);
+            if (count > MaxCartesianSize)
+                return count;
+        }
+
+        return count;
+    }
+
+
     static List<List<Param>> Cartesian(List<List<Param>> sets)
     {
         List<List<Param>> temp = new List<List<Param>> { new List<Param>() };
@@ -72,6 +125,37 @@ public class PluginExecutionEngine : IPluginExecutionEngine
         return list;
     }
 
+    public List<PluginExecution> GeneratePluginExecutionsLazy(AnalysisExecution execution)
+    {
+        var parameters = GenerateParameters(execution);
+        var deflated = parameters.Select(p => p.Deflate()).ToList();
+        var estimatedSize = PossibleCombinationsCount(deflated);
+        if (estimatedSize > MaxCartesianSize)
+        {
+            throw new InvalidOperationException(
+                $"Parameter combination count ({(estimatedSize):N0}) exceeds maximum allowed ({MaxCartesianSize:N0}). " +
+                "Please reduce parameter ranges.");
+        }
+
+        Console.WriteLine($"[PluginExecutionEngine] Generating {estimatedSize} plugin executions lazily.");
+        var list = new List<PluginExecution>();
+        foreach (var param in CartesianLazy(deflated))
+        {
+            var dict = param.ToDictionary(p => p.Name, p => p.Value);
+            list.Add(new PluginExecution
+            {
+                ParamSet = JsonConvert.SerializeObject(dict),
+                AnalysisExecutionId = execution.Id,
+                Status = PluginStatus.Init,
+                Error = "",
+                Progress = 0
+            });
+        }
+
+        return list;
+    }
+
+
     public List<Param> GenerateParameters(AnalysisExecution execution)
     {
         var listOfParams = new List<Param>();
@@ -80,7 +164,7 @@ public class PluginExecutionEngine : IPluginExecutionEngine
         Guard.Against.NullOrZeroLengthArray(parameters);
         foreach (var param in parameters!)
         {
-            if(string.IsNullOrWhiteSpace(param.Name)) continue;
+            if (string.IsNullOrWhiteSpace(param.Name)) continue;
             switch (param.Type)
             {
                 case ParameterType.Int:

@@ -53,61 +53,32 @@ public class CreateAnalysisExecutionRequestHandler(
         logger.LogInformation(AnalysisExecutionLogEvents.CreateAnalysisExecution,
             "Creating analysis execution for [{Identifier}] in request handler. For {Symbol} @ {Timeframe}",
             analysisExecution.PluginIdentifier, request.Symbol, request.Timeframe.GetStringRepresentation());
-        var executions = pluginExecutionEngine.GeneratePluginExecutions(analysisExecution);
-        executions.ForEach(f => analysisExecution.PluginExecutions.Add(f));
-        var mr = await repository.AddAsync(analysisExecution);
-        if (mr.IsSuccess)
+        try
         {
-            // var executions = pluginExecutionEngine.GeneratePluginExecutions(analysisExecution);
-            // int savedCount = 0, failedCount = 0;
-            // foreach (var item in executions)
-            // {
-            //     try
-            //     {
-            //         mr = await pluginRepository.AddAsync(item);
-            //         if (!mr.IsSuccess)
-            //         {
-            //             logger.LogCritical(AnalysisExecutionLogEvents.CreateAnalysisExecution,
-            //                 "Failed to save plugin execution!! for : {PluginExecution}", item);
-            //             failedCount++;
-            //         }
-            //         else
-            //         {
-            //             savedCount++;
-            //         }
-            //     }
-            //     catch (AlreadySavedException e)
-            //     {
-            //         logger.LogDebug(AnalysisExecutionLogEvents.CreateAnalysisExecution,
-            //             "Plugin[{PluginExecution}] is already saved. Safe exception skip. {Exception}", item, e);
-            //         // pass.
-            //         savedCount++;
-            //     }
-            // }
-            //
-            // if (failedCount == executions.Count)
-            // {
-            //     logger.LogCritical(AnalysisExecutionLogEvents.CreateAnalysisExecution,
-            //         "Failed to create plugin executions for analysis[{AnalysisExecution}]", mr.Id);
-            //     await repository.SetAnalysisExecutionProgress(mr.Id, 1, 1);
-            //     var failEvent = new AnalysisFinishedEvent();
-            //     await messageBroker.PublishAsync(failEvent);
-            //     return MethodResponse.Error(
-            //         $"Failed to create plugin executions for analysis[{mr.Id}]. Stopped execution");
-            // }
-            //
-            // await repository.SetAnalysisExecutionProgress(mr.Id, 0, savedCount);
-            //
-            logger.LogInformation(AnalysisExecutionLogEvents.CreateAnalysisExecution,
-                "Created analysis execution for [{Identifier}] in request handler. For {Symbol} @ {Timeframe}",
-                analysisExecution.PluginIdentifier, request.Symbol, request.Timeframe.GetStringRepresentation());
+            var executions = pluginExecutionEngine.GeneratePluginExecutionsLazy(analysisExecution);
+            executions.ForEach(f => analysisExecution.PluginExecutions.Add(f));
+            var mr = await repository.AddAsync(analysisExecution);
+            if (mr.IsSuccess)
+            {
+                logger.LogInformation(AnalysisExecutionLogEvents.CreateAnalysisExecution,
+                    "Created analysis execution for [{Identifier}] in request handler. For {Symbol} @ {Timeframe}",
+                    analysisExecution.PluginIdentifier, request.Symbol, request.Timeframe.GetStringRepresentation());
+            }
+            else
+                logger.LogInformation(AnalysisExecutionLogEvents.CreateAnalysisExecution,
+                    "Failed to create analysis execution for [{Identifier}] in request handler. For {Symbol} @ {Timeframe}. Reason: {Reason}",
+                    analysisExecution.PluginIdentifier, request.Symbol, request.Timeframe.GetStringRepresentation(),
+                    mr.Message);
+
+            return mr;
         }
-        else
-            logger.LogInformation(AnalysisExecutionLogEvents.CreateAnalysisExecution,
+        catch (InvalidOperationException ex)
+        {
+            logger.LogError(AnalysisExecutionLogEvents.CreateAnalysisExecution,
                 "Failed to create analysis execution for [{Identifier}] in request handler. For {Symbol} @ {Timeframe}. Reason: {Reason}",
                 analysisExecution.PluginIdentifier, request.Symbol, request.Timeframe.GetStringRepresentation(),
-                mr.Message);
-
-        return mr;
+                ex.Message);
+            return MethodResponse.Error(ex);
+        }
     }
 }

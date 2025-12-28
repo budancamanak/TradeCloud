@@ -18,4 +18,5 @@ public interface IPluginExecutionEngine
 
     List<PluginExecution> GeneratePluginExecutions(AnalysisExecution execution);
     List<Param> GenerateParameters(AnalysisExecution execution);
+    List<PluginExecution> GeneratePluginExecutionsLazy(AnalysisExecution analysisExecution);
 }

@@ -107,7 +107,7 @@ public class GoldenDeathCrossPlugin : PluginBase<GoldenDeathCrossPluginParams>
             {
                 // go long
                 currentLong = true;
-                Logger.LogInformation(LogEventId, ">> We are in bull. fast:{}, slow: {}, timestamp: {}, close: {}",
+                Logger.LogInformation(LogEventId, ">> We are in bull. fast:{Fast}, slow: {Slow}, timestamp: {Date}, close: {Price}",
                     fastSma.Value,
                     slowSma.Value, PriceInfo[i].Timestamp, PriceInfo[i].Close);
             }
